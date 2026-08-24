@@ -236,15 +236,10 @@ button{font-family:inherit;border:none;cursor:pointer;}
   max-width:440px;margin:2rem auto 2rem;
   position:relative;
 }
-.word-card.is-spy{
-  border-color:rgba(232,50,79,0.45);
-  background:linear-gradient(165deg, rgba(232,50,79,0.14), var(--panel));
-}
 .word-label{
   font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;
   color:var(--gold);font-weight:800;display:block;margin-bottom:1rem;
 }
-.word-card.is-spy .word-label{color:var(--crimson);}
 .word-text{
   font-family:var(--font-type);
   font-size:clamp(2rem,7vw,3rem);

@@ -22,7 +22,19 @@ const PICTUREGUESS_CATEGORIES = {
     { emoji: "🎡", answer: "The London Eye (London)", wikiTitle: "London Eye" },
     { emoji: "🏰", answer: "Neuschwanstein Castle (Germany)", wikiTitle: "Neuschwanstein Castle" },
     { emoji: "🌉", answer: "Golden Gate Bridge (San Francisco)", wikiTitle: "Golden Gate Bridge" },
-    { emoji: "🕋", answer: "The Kaaba (Mecca)", wikiTitle: "Kaaba" }
+    { emoji: "🕋", answer: "The Kaaba (Mecca)", wikiTitle: "Kaaba" },
+    { emoji: "🧱🐉", answer: "Great Wall of China", wikiTitle: "Great Wall of China" },
+    { emoji: "🕌🤍", answer: "Taj Mahal (India)", wikiTitle: "Taj Mahal" },
+    { emoji: "✝️🇧🇷", answer: "Christ the Redeemer (Brazil)", wikiTitle: "Christ the Redeemer (statue)" },
+    { emoji: "🎭🇦🇺", answer: "Sydney Opera House (Australia)", wikiTitle: "Sydney Opera House" },
+    { emoji: "🕰️🇬🇧", answer: "Big Ben (London)", wikiTitle: "Big Ben" },
+    { emoji: "🏛️🇮🇹", answer: "The Colosseum (Rome)", wikiTitle: "Colosseum" },
+    { emoji: "🪨🌀", answer: "Stonehenge (England)", wikiTitle: "Stonehenge" },
+    { emoji: "💦🌊", answer: "Niagara Falls", wikiTitle: "Niagara Falls" },
+    { emoji: "🏔️🇵🇪", answer: "Machu Picchu (Peru)", wikiTitle: "Machu Picchu" },
+    { emoji: "🏜️🇯🇴", answer: "Petra (Jordan)", wikiTitle: "Petra" },
+    { emoji: "🏙️🇦🇪", answer: "Burj Khalifa (Dubai)", wikiTitle: "Burj Khalifa" },
+    { emoji: "🗼📐", answer: "Leaning Tower of Pisa (Italy)", wikiTitle: "Leaning Tower of Pisa" }
   ],
   "Food": [
     { emoji: "🍕", answer: "Pizza", wikiTitle: "Pizza" },
@@ -32,7 +44,19 @@ const PICTUREGUESS_CATEGORIES = {
     { emoji: "🍔", answer: "Burger", wikiTitle: "Hamburger" },
     { emoji: "🥟", answer: "Dumpling", wikiTitle: "Dumpling" },
     { emoji: "🍩", answer: "Donut", wikiTitle: "Doughnut" },
-    { emoji: "🧇", answer: "Waffle", wikiTitle: "Waffle" }
+    { emoji: "🧇", answer: "Waffle", wikiTitle: "Waffle" },
+    { emoji: "🍝", answer: "Pasta", wikiTitle: "Pasta" },
+    { emoji: "🥐", answer: "Croissant", wikiTitle: "Croissant" },
+    { emoji: "🥞", answer: "Pancakes", wikiTitle: "Pancake" },
+    { emoji: "🍦", answer: "Ice Cream", wikiTitle: "Ice cream" },
+    { emoji: "🥨", answer: "Pretzel", wikiTitle: "Pretzel" },
+    { emoji: "🌭", answer: "Hot Dog", wikiTitle: "Hot dog" },
+    { emoji: "🍿", answer: "Popcorn", wikiTitle: "Popcorn" },
+    { emoji: "🧀", answer: "Nachos", wikiTitle: "Nachos" },
+    { emoji: "🍲", answer: "Pho", wikiTitle: "Pho" },
+    { emoji: "🍛", answer: "Curry", wikiTitle: "Curry" },
+    { emoji: "🧆", answer: "Falafel", wikiTitle: "Falafel" },
+    { emoji: "🥖🍫", answer: "Churros", wikiTitle: "Churro" }
   ],
   "Animals": [
     { emoji: "🦁", answer: "Lion", wikiTitle: "Lion" },
@@ -42,7 +66,19 @@ const PICTUREGUESS_CATEGORIES = {
     { emoji: "🦋", answer: "Butterfly", wikiTitle: "Butterfly" },
     { emoji: "🐢", answer: "Turtle", wikiTitle: "Turtle" },
     { emoji: "🦈", answer: "Shark", wikiTitle: "Shark" },
-    { emoji: "🦉", answer: "Owl", wikiTitle: "Owl" }
+    { emoji: "🦉", answer: "Owl", wikiTitle: "Owl" },
+    { emoji: "🐯", answer: "Tiger", wikiTitle: "Tiger" },
+    { emoji: "🦓", answer: "Zebra", wikiTitle: "Zebra" },
+    { emoji: "🦘", answer: "Kangaroo", wikiTitle: "Kangaroo" },
+    { emoji: "🐼", answer: "Giant Panda", wikiTitle: "Giant panda" },
+    { emoji: "🐬", answer: "Dolphin", wikiTitle: "Dolphin" },
+    { emoji: "🦅", answer: "Bald Eagle", wikiTitle: "Bald eagle" },
+    { emoji: "🐨", answer: "Koala", wikiTitle: "Koala" },
+    { emoji: "🐊", answer: "Crocodile", wikiTitle: "Crocodile" },
+    { emoji: "🐆", answer: "Cheetah", wikiTitle: "Cheetah" },
+    { emoji: "🐙", answer: "Octopus", wikiTitle: "Octopus" },
+    { emoji: "🦩", answer: "Flamingo", wikiTitle: "Flamingo" },
+    { emoji: "🦚", answer: "Peacock", wikiTitle: "Peafowl" }
   ],
   "Movies": [
     { emoji: "🦁👑", answer: "The Lion King", wikiTitle: "The Lion King" },
@@ -52,7 +88,19 @@ const PICTUREGUESS_CATEGORIES = {
     { emoji: "🚢🧊💔", answer: "Titanic", wikiTitle: "Titanic (1997 film)" },
     { emoji: "🦖🏝️", answer: "Jurassic Park", wikiTitle: "Jurassic Park (film)" },
     { emoji: "👻🚫", answer: "Ghostbusters", wikiTitle: "Ghostbusters (1984 film)" },
-    { emoji: "🐟🔍", answer: "Finding Nemo", wikiTitle: "Finding Nemo" }
+    { emoji: "🐟🔍", answer: "Finding Nemo", wikiTitle: "Finding Nemo" },
+    { emoji: "🌌💙", answer: "Avatar", wikiTitle: "Avatar (2009 film)" },
+    { emoji: "⚔️🚀", answer: "Star Wars", wikiTitle: "Star Wars (film)" },
+    { emoji: "🦸‍♂️🛡️", answer: "The Avengers", wikiTitle: "The Avengers (2012 film)" },
+    { emoji: "⚡🧙", answer: "Harry Potter", wikiTitle: "Harry Potter and the Philosopher's Stone (film)" },
+    { emoji: "🤠🚀", answer: "Toy Story", wikiTitle: "Toy Story" },
+    { emoji: "🟢👂", answer: "Shrek", wikiTitle: "Shrek (film)" },
+    { emoji: "🦇🃏", answer: "Batman", wikiTitle: "Batman (1989 film)" },
+    { emoji: "🃏😂", answer: "Joker", wikiTitle: "Joker (2019 film)" },
+    { emoji: "💊🕶️", answer: "The Matrix", wikiTitle: "The Matrix" },
+    { emoji: "🌀💤", answer: "Inception", wikiTitle: "Inception" },
+    { emoji: "🐾👑", answer: "Black Panther", wikiTitle: "Black Panther (film)" },
+    { emoji: "💀🎸", answer: "Coco", wikiTitle: "Coco (2017 film)" }
   ],
   "Anime": [
     { emoji: "🍥🦊", answer: "Naruto", wikiTitle: "Naruto" },
@@ -62,7 +110,19 @@ const PICTUREGUESS_CATEGORIES = {
     { emoji: "📓💀", answer: "Death Note", wikiTitle: "Death Note" },
     { emoji: "🦸‍♂️🎓", answer: "My Hero Academia", wikiTitle: "My Hero Academia" },
     { emoji: "⚙️🔥", answer: "Fullmetal Alchemist", wikiTitle: "Fullmetal Alchemist" },
-    { emoji: "🧱🦖", answer: "Attack on Titan", wikiTitle: "Attack on Titan" }
+    { emoji: "🧱🦖", answer: "Attack on Titan", wikiTitle: "Attack on Titan" },
+    { emoji: "⚡🐭", answer: "Pokémon", wikiTitle: "Pokémon (anime)" },
+    { emoji: "🌙🎀", answer: "Sailor Moon", wikiTitle: "Sailor Moon" },
+    { emoji: "⚔️👻", answer: "Bleach", wikiTitle: "Bleach (TV series)" },
+    { emoji: "👊😐", answer: "One-Punch Man", wikiTitle: "One-Punch Man" },
+    { emoji: "🚀🎷", answer: "Cowboy Bebop", wikiTitle: "Cowboy Bebop" },
+    { emoji: "🤖⚡", answer: "Neon Genesis Evangelion", wikiTitle: "Neon Genesis Evangelion" },
+    { emoji: "🐉🛁", answer: "Spirited Away", wikiTitle: "Spirited Away" },
+    { emoji: "🌳🐰", answer: "My Neighbor Totoro", wikiTitle: "My Neighbor Totoro" },
+    { emoji: "👹🔮", answer: "Jujutsu Kaisen", wikiTitle: "Jujutsu Kaisen" },
+    { emoji: "🪚😈", answer: "Chainsaw Man", wikiTitle: "Chainsaw Man" },
+    { emoji: "🎣🃏", answer: "Hunter x Hunter", wikiTitle: "Hunter × Hunter" },
+    { emoji: "🎭🩸", answer: "Tokyo Ghoul", wikiTitle: "Tokyo Ghoul" }
   ],
   "Celebrities": [
     { emoji: "🤴🎤", answer: "Michael Jackson (King of Pop)", wikiTitle: "Michael Jackson" },
@@ -72,7 +132,19 @@ const PICTUREGUESS_CATEGORIES = {
     { emoji: "⚡🏃", answer: "Usain Bolt (Lightning Bolt)", wikiTitle: "Usain Bolt" },
     { emoji: "🎤💃", answer: "Madonna (Queen of Pop)", wikiTitle: "Madonna (entertainer)" },
     { emoji: "🥊🦋🐝", answer: "Muhammad Ali (float like a butterfly, sting like a bee)", wikiTitle: "Muhammad Ali" },
-    { emoji: "📱🍎", answer: "Steve Jobs (Apple co-founder)", wikiTitle: "Steve Jobs" }
+    { emoji: "📱🍎", answer: "Steve Jobs (Apple co-founder)", wikiTitle: "Steve Jobs" },
+    { emoji: "🎤🐍", answer: "Taylor Swift", wikiTitle: "Taylor Swift" },
+    { emoji: "⚽🐐", answer: "Cristiano Ronaldo", wikiTitle: "Cristiano Ronaldo" },
+    { emoji: "⚽🇦🇷", answer: "Lionel Messi", wikiTitle: "Lionel Messi" },
+    { emoji: "📺🎙️", answer: "Oprah Winfrey", wikiTitle: "Oprah Winfrey" },
+    { emoji: "🧠✏️", answer: "Albert Einstein", wikiTitle: "Albert Einstein" },
+    { emoji: "🚀🚗", answer: "Elon Musk", wikiTitle: "Elon Musk" },
+    { emoji: "🇺🇸🕴️", answer: "Barack Obama", wikiTitle: "Barack Obama" },
+    { emoji: "🎤☂️", answer: "Rihanna", wikiTitle: "Rihanna" },
+    { emoji: "🎬🖐️", answer: "Will Smith", wikiTitle: "Will Smith" },
+    { emoji: "🪨💪", answer: "Dwayne Johnson (The Rock)", wikiTitle: "Dwayne Johnson" },
+    { emoji: "🥋🐉", answer: "Bruce Lee", wikiTitle: "Bruce Lee" },
+    { emoji: "🎤👑", answer: "Freddie Mercury", wikiTitle: "Freddie Mercury" }
   ],
   "Philippine Locations": [
     { emoji: "🏝️🤍", answer: "Boracay", wikiTitle: "Boracay" },
@@ -82,7 +154,19 @@ const PICTUREGUESS_CATEGORIES = {
     { emoji: "🌾⛰️", answer: "Banaue Rice Terraces", wikiTitle: "Banaue Rice Terraces" },
     { emoji: "🏔️❄️", answer: "Baguio", wikiTitle: "Baguio" },
     { emoji: "🐠🤿", answer: "Palawan", wikiTitle: "Palawan" },
-    { emoji: "🌊🏄", answer: "Siargao", wikiTitle: "Siargao" }
+    { emoji: "🌊🏄", answer: "Siargao", wikiTitle: "Siargao" },
+    { emoji: "🏙️🇵🇭", answer: "Cebu City", wikiTitle: "Cebu" },
+    { emoji: "🐎🏘️", answer: "Vigan", wikiTitle: "Vigan" },
+    { emoji: "🏰🇵🇭", answer: "Intramuros (Manila)", wikiTitle: "Intramuros" },
+    { emoji: "🌳🗿", answer: "Rizal Park (Manila)", wikiTitle: "Rizal Park" },
+    { emoji: "🚣‍♂️🌊", answer: "Puerto Princesa Underground River", wikiTitle: "Puerto Princesa Subterranean River National Park" },
+    { emoji: "🐠🏝️", answer: "Coron, Palawan", wikiTitle: "Coron, Palawan" },
+    { emoji: "⛰️☁️", answer: "Sagada", wikiTitle: "Sagada" },
+    { emoji: "🍈🏙️", answer: "Davao City", wikiTitle: "Davao City" },
+    { emoji: "🌋🍽️", answer: "Tagaytay", wikiTitle: "Tagaytay" },
+    { emoji: "🏖️🐚", answer: "Bantayan Island", wikiTitle: "Bantayan Island" },
+    { emoji: "🌋🏝️", answer: "Camiguin", wikiTitle: "Camiguin" },
+    { emoji: "🐄🌾", answer: "Batanes", wikiTitle: "Batanes" }
   ],
   "Logos": [
     { emoji: "🍎", answer: "Apple", wikiTitle: "Apple Inc." },
@@ -92,7 +176,19 @@ const PICTUREGUESS_CATEGORIES = {
     { emoji: "▶️🔴", answer: "YouTube", wikiTitle: "YouTube" },
     { emoji: "👤📘", answer: "Facebook", wikiTitle: "Facebook" },
     { emoji: "☕🧜‍♀️", answer: "Starbucks", wikiTitle: "Starbucks" },
-    { emoji: "🚗⚡", answer: "Tesla", wikiTitle: "Tesla, Inc." }
+    { emoji: "🚗⚡", answer: "Tesla", wikiTitle: "Tesla, Inc." },
+    { emoji: "🔴🟡", answer: "Google", wikiTitle: "Google" },
+    { emoji: "📦➡️", answer: "Amazon", wikiTitle: "Amazon (company)" },
+    { emoji: "🎬🔴", answer: "Netflix", wikiTitle: "Netflix" },
+    { emoji: "👟⚪", answer: "Adidas", wikiTitle: "Adidas" },
+    { emoji: "📱🔵", answer: "Samsung", wikiTitle: "Samsung" },
+    { emoji: "📸🌈", answer: "Instagram", wikiTitle: "Instagram" },
+    { emoji: "🎧🟢", answer: "Spotify", wikiTitle: "Spotify" },
+    { emoji: "🥤🔵", answer: "Pepsi", wikiTitle: "Pepsi" },
+    { emoji: "🥤🔴", answer: "Coca-Cola", wikiTitle: "Coca-Cola" },
+    { emoji: "🪟💻", answer: "Microsoft", wikiTitle: "Microsoft" },
+    { emoji: "🐆👟", answer: "Puma", wikiTitle: "Puma (brand)" },
+    { emoji: "🚗🔵", answer: "BMW", wikiTitle: "BMW" }
   ]
 };
 

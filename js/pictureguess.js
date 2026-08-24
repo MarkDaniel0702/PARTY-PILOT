@@ -4,15 +4,27 @@
   const BLUR_STEPS = [20, 12, 6, 0];
   const AWARD_POINTS = 10;
   const MAX_TEAMS = 6;
+  const CHALLENGE_SIZE = 20;
 
   const state = {
     category: null,
     pool: [],
-    usedIndices: new Set(),
+    queue: [],       // shuffled, deduped indices into `pool` for this challenge
+    queuePos: 0,
     currentPic: null,
     revealLevel: 0,
     picsPlayed: 0
   };
+
+  // Builds a fresh randomized challenge: up to CHALLENGE_SIZE unique
+  // questions from the pool, in a new random order every time. If the pool
+  // has fewer than CHALLENGE_SIZE questions, uses all of them (no repeats)
+  // rather than padding with duplicates.
+  function buildChallengeQueue() {
+    const allIndices = Array.from({ length: state.pool.length }, (_, i) => i);
+    state.queue = shuffle(allIndices).slice(0, CHALLENGE_SIZE);
+    state.queuePos = 0;
+  }
 
   const screens = {
     setup: document.getElementById("screen-setup"),
@@ -66,15 +78,18 @@
 
   btnStart.addEventListener("click", () => {
     state.pool = PICTUREGUESS_CATEGORIES[state.category];
-    state.usedIndices = new Set();
+    buildChallengeQueue();
     state.picsPlayed = 0;
     document.getElementById("category-label").textContent = state.category;
+    renderChallengeNote();
     teamScoreboard.renderScoreboard();
     showScreen("play");
     pickPicture();
   });
 
   // ---------- Play ----------
+  const pictureProgressEl = document.getElementById("picture-progress");
+  const challengeNoteEl = document.getElementById("challenge-note");
   const pictureLoadingEl = document.getElementById("picture-loading");
   const pictureImageEl = document.getElementById("picture-image");
   const pictureFallbackEl = document.getElementById("picture-fallback");
@@ -163,12 +178,27 @@
     }
   }
 
+  function renderChallengeNote() {
+    if (state.queue.length < CHALLENGE_SIZE) {
+      const n = state.queue.length;
+      challengeNoteEl.textContent = `This theme only has ${n} unique question${n === 1 ? "" : "s"} so far — you'll play through all ${n}.`;
+      challengeNoteEl.classList.remove("hidden");
+    } else {
+      challengeNoteEl.classList.add("hidden");
+    }
+  }
+
+  function updateProgress() {
+    pictureProgressEl.textContent = `Picture ${state.queuePos + 1} of ${state.queue.length}`;
+  }
+
   function pickPicture() {
-    const { item } = pickRandomUnused(state.pool, state.usedIndices);
+    const item = state.pool[state.queue[state.queuePos]];
     state.currentPic = item;
     state.revealLevel = 0;
     loadPicture(item);
     applyBlur();
+    updateProgress();
 
     answerBlock.classList.add("hidden");
     awardRow.classList.add("hidden");
@@ -214,7 +244,14 @@
   }
   btnRevealAnswer.addEventListener("click", revealAnswer);
 
-  btnNextPicture.addEventListener("click", pickPicture);
+  btnNextPicture.addEventListener("click", () => {
+    state.queuePos++;
+    if (state.queuePos >= state.queue.length) {
+      goToSummary();
+    } else {
+      pickPicture();
+    }
+  });
 
   // ---------- Summary ----------
   function goToSummary() {
@@ -255,8 +292,9 @@
   document.getElementById("btn-end-session").addEventListener("click", goToSummary);
 
   document.getElementById("btn-play-again").addEventListener("click", () => {
-    state.usedIndices = new Set();
+    buildChallengeQueue();
     state.picsPlayed = 0;
+    renderChallengeNote();
     teamScoreboard.resetScores();
     showScreen("play");
     pickPicture();

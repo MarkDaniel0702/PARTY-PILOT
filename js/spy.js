@@ -13,6 +13,7 @@
     mainWord: "",
     spyWord: "",
     spyIndex: -1,
+    prevSpyIndex: -1,
     revealIndex: 0
   };
 
@@ -142,11 +143,23 @@
     return pairs[Math.floor(Math.random() * pairs.length)];
   }
 
+  // Randomly picks a Spy index, excluding the previous round's Spy whenever
+  // more than one player is available so the role rotates fairly.
+  function pickSpyIndex(playerCount, prevSpyIndex) {
+    if (playerCount <= 1) return 0;
+    const candidates = [];
+    for (let i = 0; i < playerCount; i++) {
+      if (i !== prevSpyIndex) candidates.push(i);
+    }
+    return candidates[Math.floor(Math.random() * candidates.length)];
+  }
+
   function dealWords() {
     const pair = pickRandomPair(state.theme);
     state.mainWord = pair.main;
     state.spyWord = pair.spy;
-    state.spyIndex = Math.floor(Math.random() * state.playerCount);
+    state.spyIndex = pickSpyIndex(state.playerCount, state.prevSpyIndex);
+    state.prevSpyIndex = state.spyIndex;
 
     const names = resolvedNames();
     state.words = names.map((name, i) => ({
@@ -175,7 +188,6 @@
   const progressDots = document.getElementById("progress-dots");
   const passName = document.getElementById("pass-name");
   const btnReveal = document.getElementById("btn-reveal");
-  const wordCard = document.getElementById("word-card");
   const wordLabel = document.getElementById("word-label");
   const wordText = document.getElementById("word-text");
   const wordFootnote = document.getElementById("word-footnote");
@@ -196,18 +208,12 @@
   }
 
   btnReveal.addEventListener("click", () => {
+    // Every player sees an identical layout, label, and footnote — only the
+    // word itself differs — so nothing on screen hints at who the Spy is.
     const player = state.words[state.revealIndex];
-    if (player.isSpy) {
-      wordCard.classList.add("is-spy");
-      wordLabel.textContent = "YOU ARE THE SPY";
-      wordText.textContent = player.word;
-      wordFootnote.textContent = "You don't know the real word. Bluff convincingly.";
-    } else {
-      wordCard.classList.remove("is-spy");
-      wordLabel.textContent = "YOUR WORD IS";
-      wordText.textContent = player.word;
-      wordFootnote.textContent = "Remember it. Don't say it out loud.";
-    }
+    wordLabel.textContent = "YOUR WORD IS";
+    wordText.textContent = player.word;
+    wordFootnote.textContent = "Remember it. Don't say it out loud.";
     showScreen("word");
   });
 
@@ -264,6 +270,7 @@
 
   btnNewGame.addEventListener("click", () => {
     state.theme = null;
+    state.prevSpyIndex = -1;
     document.querySelectorAll(".theme-btn").forEach((b) => b.classList.remove("selected"));
     validateSetup();
     showScreen("setup");
