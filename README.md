@@ -1,8 +1,9 @@
 # 🎮 B-Rotation Party Night
 
 <p>
-  <img alt="No build step" src="https://img.shields.io/badge/build-none-brightgreen">
-  <img alt="No dependencies" src="https://img.shields.io/badge/dependencies-none-blue">
+  <img alt="Games: no build step" src="https://img.shields.io/badge/12%20games-no%20build%20step-brightgreen">
+  <img alt="Games: no dependencies" src="https://img.shields.io/badge/12%20games-zero%20dependencies-blue">
+  <img alt="Homepage: React" src="https://img.shields.io/badge/homepage-React%20%2B%20Vite-61dafb">
   <img alt="No accounts" src="https://img.shields.io/badge/sign--up-not%20required-blue">
   <img alt="Host optional" src="https://img.shields.io/badge/host-optional-orange">
   <img alt="Games" src="https://img.shields.io/badge/games-12-purple">
@@ -396,18 +397,24 @@ Each remaining game has its own curated category list — see that game's sectio
 
 ## ⚙️ Installation
 
-B-Rotation Party Night has **zero dependencies and no build step** — it's plain HTML, CSS, and JavaScript.
+The **12 games** are still plain HTML, CSS, and JavaScript with **zero dependencies and no build step** — nothing to install to work on them. The **homepage** (`web-home/`) is a small React + Vite app and needs Node.js to build or run locally; see [🧱 Tech Stack](#-tech-stack) below.
 
 ```bash
-# Just get the files — nothing to install
+# Just get the files
 git clone <this-repo-url>
+
+# Only needed if you're touching the homepage — the 12 games need nothing:
+cd web-home
+npm install
 ```
 
 ## ▶️ How to Run
 
-**Option A — just open it.** Double-click `index.html` and it opens in your default browser.
+**Any individual game** — `spy.html`, `quiz.html`, etc. — still just opens directly:
 
-**Option B — run a local server** (recommended if your browser restricts `file://` pages):
+**Option A — just open it.** Double-click a game's `.html` file and it opens in your default browser.
+
+**Option B — run a local server** (recommended if your browser restricts `file://` pages, and required for the homepage below):
 
 ```bash
 # Using Python (already installed on most systems)
@@ -418,7 +425,31 @@ python -m http.server 8000
 npx serve .
 ```
 
+**The homepage** is a React app, so it needs its own dev server instead of a plain static one:
+
+```bash
+cd web-home
+npm run dev
+# then open the URL Vite prints (defaults to http://localhost:5173)
+```
+
+Game links on the homepage's dev server point at `spy.html`, `quiz.html`, etc. relative to the site root, so to click through into an actual game from the React dev server you'll want the repo root also being served (Option B above) — or just `npm run build` in `web-home/` and preview the fully assembled site as described in [🌐 Deployment](#-deployment).
+
 No accounts or backend are required to play. An internet connection is needed for two things: loading the Google Fonts on first visit, and fetching each Picture Guess photo from Wikipedia during that game — everything else works fully offline, and Picture Guess itself degrades gracefully to its emoji fallback if a photo can't be fetched.
+
+---
+
+## 🧱 Tech Stack
+
+| Area | Stack |
+|---|---|
+| The 12 games (`*.html`, `js/`, `css/`) | Plain HTML, CSS, and vanilla JavaScript — zero dependencies, zero build step, by design. Unaffected by anything below. |
+| Homepage (`web-home/`) | [React](https://react.dev) 19 + [Vite](https://vite.dev) for the dev server/build, [lucide-react](https://lucide.dev) for icons |
+| Deployment | [GitHub Actions](https://github.com/features/actions) → [GitHub Pages](https://pages.github.com) — see [🌐 Deployment](#-deployment) |
+
+Only the homepage — the game-hub landing page — is a React app. It exists to be the site's front door and the one place emoji-as-UI-icon made sense to swap for a real icon set (`lucide-react`); the 12 games each have their own hand-built UI (turn banners, timers, boards, reveal screens) that don't need — and intentionally don't have — a framework or build tooling. This keeps every game trivially forkable/editable by just opening its files in a browser, while the homepage gets the componentized, icon-consistent treatment a landing page benefits most from.
+
+Why **lucide-react** specifically: it's a single, consistent line-icon family (unlike aggregator libraries such as `react-icons`, which mix several visually inconsistent source sets), it's tree-shakeable (only the ~16 icons actually imported end up in the bundle), and it has no runtime CSS framework dependency to drag in alongside it.
 
 ---
 
@@ -426,31 +457,33 @@ No accounts or backend are required to play. An internet connection is needed fo
 
 **Live site:** https://markdaniel0702.github.io/PARTY-PILOT/
 
-The site is deployed on **GitHub Pages**, serving straight from this repository's `main` branch — free, HTTPS by default, no account needed to play, and no backend to provision, since the whole project is static HTML/CSS/JS with zero dependencies and zero build step.
+The site is deployed on **GitHub Pages** — still free, still HTTPS by default, still no account needed to play, and still no backend to provision. The only thing that changed with the React homepage is *how* the site gets published: instead of Pages serving the repository as-is, a GitHub Actions workflow (`.github/workflows/deploy.yml`) now builds the homepage and assembles the final site on every push.
 
 ### Build settings
 
-There's nothing to build. GitHub Pages is configured to publish the repository as-is:
-
 | Setting | Value |
 |---|---|
-| Source | Deploy from a branch |
-| Branch | `main` |
-| Folder | `/` (root) |
-| Build command | None |
+| Source | **GitHub Actions** (not "Deploy from a branch") |
+| Workflow | `.github/workflows/deploy.yml` |
+| Trigger | Push to `main` (or manually via **Actions → Deploy to GitHub Pages → Run workflow**) |
+| Build command | `npm ci && npm run build` inside `web-home/` (Vite) |
 | Environment variables | None |
+
+What the workflow actually does:
+1. Installs `web-home/`'s dependencies and runs its Vite build.
+2. Assembles a `dist/` folder: the 12 games' `.html` files plus `css/` and `js/` are copied in **completely untouched**, then the built homepage (`web-home/dist/`'s `index.html` + hashed JS/CSS) is copied on top.
+3. Uploads `dist/` as the Pages artifact and deploys it — same free `actions/deploy-pages` action GitHub itself recommends for React/Vite sites.
 
 ### Connecting the repository (one-time setup)
 
 1. Push the repo to GitHub (already done for this project).
 2. In the repo, go to **Settings → Pages**.
-3. Under **Build and deployment → Source**, choose **Deploy from a branch**.
-4. Set **Branch** to `main` and the folder to `/ (root)`, then **Save**.
-5. GitHub publishes the site at `https://<username>.github.io/<repo-name>/` within about a minute, and **Enforce HTTPS** is on by default.
+3. Under **Build and deployment → Source**, choose **GitHub Actions** (this is the one manual step — it was previously set to "Deploy from a branch" and needs to be switched over).
+4. Push to `main` (or run the workflow manually) — GitHub publishes the site at `https://<username>.github.io/<repo-name>/` within about a minute, and **Enforce HTTPS** is on by default.
 
 ### Redeploying after changes
 
-No redeploy step is needed — GitHub Pages rebuilds automatically on every push to `main`:
+Still no manual redeploy step — the workflow runs automatically on every push to `main`, same as before:
 
 ```bash
 git add .
@@ -458,11 +491,11 @@ git commit -m "Your change"
 git push origin main
 ```
 
-The live site updates within roughly a minute of the push finishing.
+The live site updates within roughly a minute or two of the push finishing (a little longer than before, since the workflow now has an `npm ci` + build step rather than a zero-config passthrough). Progress is visible under the repo's **Actions** tab.
 
 ### Free-tier alternatives
 
-If this project ever needs something GitHub Pages doesn't offer (custom edge functions, a real backend, etc.), it's still a static site, so it can move to any of these free platforms with zero code changes — set the build command to none and the output/publish directory to the repository root:
+If this project ever needs something GitHub Pages doesn't offer (custom edge functions, a real backend, etc.), it's still fundamentally a static site once built, so it can move to any of these free platforms — set the build command to `npm ci && npm run build --prefix web-home` plus the same copy-and-overlay steps the Actions workflow does, and the output/publish directory to `dist/`:
 
 | Platform | Notes |
 |---|---|
@@ -478,14 +511,21 @@ GitHub Pages was chosen over these because it needs no new third-party account a
 
 ```
 Gamenight/
-├── index.html                Homepage — grouped "Choose Your Game" screen
-├── spy.html / quiz.html      The two original flagship games
+├── web-home/                  React + Vite homepage — the only build step in the project
+│   ├── src/
+│   │   ├── App.jsx            Header, game groups, and card grid
+│   │   ├── gameData.js        The 12 games' titles/links/descriptions/icons (edit this to add a game card)
+│   │   ├── main.jsx           React entry point
+│   │   └── style.css          Homepage design (moved here from css/style.css — homepage-only, always was)
+│   ├── index.html             Vite's HTML entry (becomes the site's real index.html once built)
+│   ├── package.json
+│   └── vite.config.js
+├── spy.html / quiz.html       The two original flagship games
 ├── whoami.html, password.html, categories.html, wordgrid.html,
 │   guessthesong.html, pictureguess.html, twotruths.html,
 │   wouldurather.html, mostlikely.html, charades.html
 │                              The ten party games — one page each
 ├── css/
-│   ├── style.css             Homepage design
 │   ├── spy.css / quiz.css    Spy Word / Quiz Night styles (bespoke themes)
 │   ├── party.css             Shared component styles for the 9 party games
 │   ├── timer.css             Universal timer widget styles, loaded by all 12 games
@@ -496,8 +536,11 @@ Gamenight/
 │   ├── shared.js             Reusable helpers for every game, including the universal timer (see below)
 │   ├── data-<game>.js        Each party game's themes/categories/content
 │   └── <game>.js             Each party game's screen logic
+├── .github/workflows/deploy.yml   Builds web-home/, assembles the full static site, deploys to Pages
 └── README.md                 You are here
 ```
+
+> `index.html` isn't checked into the repo root anymore — it's build output. `npm run build` inside `web-home/` (or the deploy workflow) produces it fresh each time from `web-home/index.html` + `src/`.
 
 **`js/shared.js`** is what keeps all 12 games consistent without duplicating code — every game loads it, including Spy Word and Quiz Night — and provides:
 
@@ -524,7 +567,7 @@ The site is intentionally flat and repetitive on purpose — every game is `<gam
 1. Copy the structure of the party game closest to what you're building (e.g. `charades.html`/`.js` for a turn-based reveal game, `wouldurather.html`/`.js` for a voting game).
 2. Load `css/party.css` before your own `<game>.css`, and `js/shared.js` before your own `<game>.js` — your stylesheet only needs a `:root { --accent: ...; }` palette override plus any bespoke visual touches; your script can reach for `createTimer`, `createRoster`, `renderGroupedPicker`, etc. instead of rebuilding them.
 3. Put your content in a new `js/data-<game>.js` file.
-4. Add a card for it to `index.html`'s grouped game grid (copy an existing `<a class="game-card">` block and give it a unique `--card-accent` color).
+4. Add a card for it to `web-home/src/gameData.js`'s `GAME_GROUPS` array (copy an existing game entry, pick a [lucide-react](https://lucide.dev) icon, and give it a unique `accent` color) — the homepage picks it up on the next build, no JSX to touch.
 
 > [!IMPORTANT]
 > Keep every game host-optional: let the app manage turns/timers/randomization, and only add a Game Master toggle if a timer would otherwise force pacing on the group.
@@ -595,7 +638,8 @@ The other ten games use much simpler, flat data files — no nested point struct
 
 | Want to change... | Edit... |
 |---|---|
-| Homepage / shared party-game colors & fonts | `:root { ... }` in `css/style.css` (homepage) or `css/party.css` (shared party-game components) |
+| Homepage colors & fonts | `:root { ... }` in `web-home/src/style.css` (requires an `npm run build` in `web-home/` to take effect on the live site) |
+| Shared party-game colors & fonts | `:root { ... }` in `css/party.css` |
 | One game's accent color | `:root { --accent: ...; }` at the top of that game's own `css/<game>.css` |
 | Spy Word / Quiz Night colors & fonts | `:root { ... }` at the top of `spy.css` / `quiz.css` |
 | Min/max players | `MIN_PLAYERS` / `MAX_PLAYERS` near the top of that game's `js/<game>.js` |
@@ -649,6 +693,12 @@ Open the <strong>Timer</strong> block on any setup screen — tap a preset chip,
 <summary><strong>The game jumped to a "It's a Tie!" screen I wasn't expecting</strong></summary>
 
 That's the universal tie-breaker — it only appears when two or more entrants finish with the same top score, and only the tied entrants play it out. Tap <strong>🤝 Accept a Shared Win</strong> anytime to skip it and keep the tie standing.
+</details>
+
+<details>
+<summary><strong>The homepage didn't update after I pushed a change, or the live site shows a 404</strong></summary>
+
+Check the repo's <strong>Actions</strong> tab first — if the "Deploy to GitHub Pages" workflow failed, the old build stays live. The most common cause is <strong>Settings → Pages → Source</strong> still being set to "Deploy from a branch" instead of <strong>GitHub Actions</strong> (a one-time setting change described in <a href="#-deployment">🌐 Deployment</a>). This only affects the homepage — the 12 games are static files and don't need a successful workflow run to keep working once they're on Pages.
 </details>
 
 ---
