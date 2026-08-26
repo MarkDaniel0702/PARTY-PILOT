@@ -7,8 +7,8 @@
   <img alt="Host optional" src="https://img.shields.io/badge/host-optional-orange">
   <img alt="Games" src="https://img.shields.io/badge/games-12-purple">
   <img alt="Spy Word themes" src="https://img.shields.io/badge/spy%20word%20themes-57-e8324f">
-  <img alt="Quiz Night themes" src="https://img.shields.io/badge/quiz%20night%20themes-17-ffcb3c">
-  <img alt="Quiz Night questions" src="https://img.shields.io/badge/quiz%20night%20questions-975-ffcb3c">
+  <img alt="Quiz Night themes" src="https://img.shields.io/badge/quiz%20night%20themes-27-ffcb3c">
+  <img alt="Quiz Night questions" src="https://img.shields.io/badge/quiz%20night%20questions-1725-ffcb3c">
   <img alt="Customizable timers" src="https://img.shields.io/badge/timers-customizable-2fd67f">
 </p>
 
@@ -71,7 +71,7 @@ A social deduction word game. Almost every player secretly receives the same **m
 
 ## ❓ Quiz Night
 
-A Jeopardy-style trivia board with **17 themes** and a 100–500 point system. Pick a theme, and a board appears with categories as columns and point values as rows.
+A Jeopardy-style trivia board with **27 themes** and a 100–500 point system. Pick a theme, and a board appears with categories as columns and point values as rows.
 
 - Pick a theme, add up to 6 teams, and choose **🤖 Automated** or **🎙️ Game Master** mode.
 - A turn banner shows whose turn it is to pick — the app tracks it, nobody has to referee.
@@ -377,14 +377,14 @@ Spy Word themes are deliberately **specific**, not broad — "Naruto Characters"
 | **Philippines** | Famous Places, Provinces, Cities, Filipino Celebrities, Filipino Food, Historical Figures |
 | **General Knowledge** | World Capitals, Planets of the Solar System, World Currencies, Ancient Civilizations, Tech Companies, International Dishes, Famous Scientists, E-Commerce Platforms |
 
-### ❓ Quiz Night — 17 themes across 4 groups
+### ❓ Quiz Night — 27 themes across 4 groups
 
 | Group | Themes |
 |---|---|
-| **Pop Culture** | Cartoons, Marvel, Anime, Movies & TV, Video Games |
+| **Pop Culture** | Cartoons, Marvel, Anime, Movies & TV, Video Games, Studio Ghibli, Sitcoms, It's Always Sunny in Philadelphia, Marvel Cinematic Universe, Harry Potter, Disney, Star Wars, Lord of the Rings |
 | **Music** | Music |
-| **Academic & Local** | College Programs, Philippine Trivia, E-Commerce |
-| **General Knowledge** | World Geography, Science, World Trivia, History, Technology, Food, Famous People, Sports |
+| **Academic & Local** | College Programs, Philippine Trivia, E-Commerce, Filipino Culture |
+| **General Knowledge** | World Geography, Science, World Trivia, History, Technology, Food, Famous People, Sports, Internet and Social Media |
 
 Boards with more than 5 categories (like College Programs' 8) scroll sideways automatically, with an on-screen hint.
 

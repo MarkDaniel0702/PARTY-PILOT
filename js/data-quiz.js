@@ -2035,17 +2035,1567 @@ const QUIZ_THEMES = {
         }
       }
     ]
-  }
+  },
+"Studio Ghibli": {
+  icon: "🌳",
+  categories: [
+    {
+      name: "Ghibli Movies",
+      questions: {
+        100: [
+          { q: "Which 1988 Studio Ghibli film follows two sisters, Satsuki and Mei, who befriend a magical forest spirit while their mother recovers in the hospital?", a: "My Neighbor Totoro" },
+          { q: "Which Studio Ghibli film follows a ten-year-old girl named Chihiro who must work in a spirit-world bathhouse to save her parents after they are turned into pigs?", a: "Spirited Away" },
+          { q: "Which Studio Ghibli film follows a young witch named Kiki who moves to a new town and starts a delivery service using her flying broomstick?", a: "Kiki's Delivery Service" }
+        ],
+        200: [
+          { q: "Which 1997 Studio Ghibli film follows a young woman named San, raised by wolves, amid a war between forest spirits and a growing industrial settlement?", a: "Princess Mononoke" },
+          { q: "Which Studio Ghibli film follows Sophie, a young hat maker cursed to live in an old woman's body, who takes refuge in a wizard's magical walking castle?", a: "Howl's Moving Castle" },
+          { q: "Which Studio Ghibli film follows a goldfish princess who wants to become human after befriending a five-year-old boy named Sosuke?", a: "Ponyo" }
+        ],
+        300: [
+          { q: "Which 1988 Studio Ghibli film, originally released as a double feature with My Neighbor Totoro, follows two siblings struggling to survive in Japan during the final months of World War II?", a: "Grave of the Fireflies" },
+          { q: "Which Studio Ghibli film follows Pazu and Sheeta as they search for a legendary floating island called Laputa?", a: "Castle in the Sky" },
+          { q: "Which 2013 Studio Ghibli film is a fictionalized biography of aircraft designer Jiro Horikoshi, following his career through the years leading up to World War II?", a: "The Wind Rises" }
+        ],
+        400: [
+          { q: "Which Studio Ghibli film, the only feature directed by Yoshifumi Kondo before his early death, follows an aspiring writer named Shizuku who is inspired by a cat figurine named the Baron?", a: "Whisper of the Heart" },
+          { q: "Which 2013 Studio Ghibli film, based on the ancient Japanese folktale 'The Tale of the Bamboo Cutter,' was director Isao Takahata's final film and used a distinctive hand-drawn watercolor art style?", a: "The Tale of the Princess Kaguya" },
+          { q: "Which 1994 Studio Ghibli film follows a community of shapeshifting tanuki (raccoon dogs) as they use their magical transformation powers to resist suburban development?", a: "Pom Poko" }
+        ],
+        500: [
+          { q: "Which 1993 film was Studio Ghibli's first production made for television, directed by Tomomi Mochizuki and centered on a teenage love triangle?", a: "Ocean Waves" },
+          { q: "Which 2020 Studio Ghibli film, directed by Goro Miyazaki, was the studio's first feature animated entirely in 3D computer graphics?", a: "Earwig and the Witch" },
+          { q: "Which 1999 Studio Ghibli film, based on Hisaichi Ishii's yonkoma comic strip 'Nono-chan,' was the studio's first film animated entirely with digital ink-and-paint, presented in a stylized comic-strip art style?", a: "My Neighbors the Yamadas" }
+        ]
+      }
+    },
+    {
+      name: "Characters",
+      questions: {
+        100: [
+          { q: "What is the name of the young witch who moves to a new seaside town to complete her year of independent training, delivering packages by broomstick?", a: "Kiki" },
+          { q: "What is the name of the ten-year-old girl who must work in a spirit-world bathhouse to save her parents in Spirited Away?", a: "Chihiro Ogino" },
+          { q: "What are the names of the two sisters who move to the countryside and befriend the forest spirit Totoro?", a: "Satsuki and Mei Kusakabe" }
+        ],
+        200: [
+          { q: "What is the name of the wandering wizard whose real name is revealed to be Howl Jenkins Pendragon, who lives inside a magical walking castle?", a: "Howl" },
+          { q: "What is the name of the young woman raised by wolves who fights to protect the forest from humans in Princess Mononoke?", a: "San" },
+          { q: "What is the name of the young prince who is cursed with a deadly infection after killing a demon boar at the start of Princess Mononoke?", a: "Ashitaka" }
+        ],
+        300: [
+          { q: "What are the names of the two young protagonists who search for the legendary floating island of Laputa in Castle in the Sky?", a: "Pazu and Sheeta" },
+          { q: "In Porco Rosso, what is the human name of the title character, a World War I flying ace cursed to have the face of a pig?", a: "Marco Pagot" },
+          { q: "What is the name of the princess and protagonist who tries to make peace between her people and a spreading toxic jungle in Nausicaä of the Valley of the Wind?", a: "Nausicaä" }
+        ],
+        400: [
+          { q: "What is the name of the aspiring young writer in Whisper of the Heart who is inspired to write a fantasy novel after meeting an antique cat figurine?", a: "Shizuku Tsukishima" },
+          { q: "What is the name of the fictionalized aircraft designer, based on a real historical figure, who is the protagonist of The Wind Rises?", a: "Jiro Horikoshi" },
+          { q: "What is the surname of Sophie, the young hat maker who is transformed into an old woman by a witch's curse in Howl's Moving Castle?", a: "Hatter (Sophie Hatter)" }
+        ],
+        500: [
+          { q: "What is the name of the tiny 'Borrower' girl, a member of the Clock family, who lives secretly beneath the floorboards in The Secret World of Arrietty?", a: "Arrietty" },
+          { q: "What name does the orphanage matron give to the title character of Earwig and the Witch, replacing the nickname 'Earwig,' before she is adopted by a witch?", a: "Erica Wigg" },
+          { q: "What is the name of the grieving boy who follows a talking gray heron into a mysterious tower in The Boy and the Heron?", a: "Mahito Maki" }
+        ]
+      }
+    },
+    {
+      name: "Creatures",
+      questions: {
+        100: [
+          { q: "In My Neighbor Totoro, what is the English name for the small, round, soot-covered creatures that inhabit the dusty corners of old houses?", a: "Soot sprites (Susuwatari)" },
+          { q: "In My Neighbor Totoro, what is the name of the enormous, multi-eyed bus-shaped creature that transports the Totoro through the night?", a: "The Catbus" },
+          { q: "In Spirited Away, what is the name of the mostly silent, masked spirit who becomes obsessed with Chihiro and grows increasingly monstrous?", a: "No-Face (Kaonashi)" }
+        ],
+        200: [
+          { q: "In Princess Mononoke, what is the name of the giant wolf god who raised San as her own daughter?", a: "Moro" },
+          { q: "In Howl's Moving Castle, what is the name of the sarcastic fire demon who powers Howl's castle in exchange for a magical contract?", a: "Calcifer" },
+          { q: "In Spirited Away, Haku is revealed to be the spirit of which body of water, after it was filled in and built over?", a: "The Kohaku River" }
+        ],
+        300: [
+          { q: "In Princess Mononoke, the Forest Spirit (Shishigami) transforms into a towering, translucent giant at night after losing its head — what is this nighttime form commonly called?", a: "The Nightwalker" },
+          { q: "In Ponyo, what is the name of Ponyo's father, a former human sorcerer who now lives beneath the sea?", a: "Fujimoto" },
+          { q: "In Princess Mononoke, what is the name of the ancient, blind boar god who leads his clan into a doomed final charge against the humans of Irontown?", a: "Okkoto" }
+        ],
+        400: [
+          { q: "In Nausicaä of the Valley of the Wind, what is the name for the giant, armored insect-like creatures that inhabit the toxic Sea of Corruption?", a: "Ohmu" },
+          { q: "In Spirited Away, what animal does the witch Yubaba turn Chihiro's parents into after they greedily eat food meant for spirits?", a: "Pigs" },
+          { q: "What is the full name of the debonair cat gentleman who runs the Cat Bureau and assists Haru in The Cat Returns?", a: "Baron Humbert von Gikkingen" }
+        ],
+        500: [
+          { q: "What is the name of the demon boar, formerly a peaceful forest god, that curses Prince Ashitaka's arm at the very start of Princess Mononoke?", a: "Nago" },
+          { q: "The large, gruff gray cat named Muta in The Cat Returns first appeared in an earlier Ghibli film, Whisper of the Heart, under what different name?", a: "Moon" },
+          { q: "In Ponyo, what is the name of the sea goddess who serves as Ponyo's mother and grants Sosuke's wish?", a: "Granmamare" }
+        ]
+      }
+    },
+    {
+      name: "Locations",
+      questions: {
+        100: [
+          { q: "In Spirited Away, Chihiro ends up working to save her parents at what kind of large communal bathing establishment for spirits?", a: "A bathhouse" },
+          { q: "My Neighbor Totoro takes place in the rural countryside of which country?", a: "Japan" },
+          { q: "In My Neighbor Totoro, the Kusakabe family moves to the countryside so they can be closer to Mei and Satsuki's mother, who is recovering in what type of facility?", a: "A hospital" }
+        ],
+        200: [
+          { q: "What is the name of the seaside, European-style town where Kiki settles to complete her year of witch training?", a: "Koriko" },
+          { q: "What is the name of the legendary floating island, home to an ancient lost civilization, sought after in Castle in the Sky?", a: "Laputa" },
+          { q: "What is the name of the small desert kingdom ruled by Princess Nausicaä, threatened by an expanding toxic jungle?", a: "The Valley of the Wind" }
+        ],
+        300: [
+          { q: "What is the name of the walled, industrial settlement in Princess Mononoke where Lady Eboshi's people forge iron and weapons?", a: "Irontown" },
+          { q: "What is the name of the magical realm, ruled by a feline royal family, that Haru is whisked away to in The Cat Returns?", a: "The Cat Kingdom" },
+          { q: "What is the name of the school clubhouse that students fight to save from demolition ahead of the 1964 Tokyo Olympics in From Up on Poppy Hill?", a: "The Latin Quarter (Quartier Latin)" }
+        ],
+        400: [
+          { q: "What is the proper Japanese name of Yubaba's bathhouse in Spirited Away, which literally translates to 'oil house'?", a: "Aburaya" },
+          { q: "What real coastal town in Hiroshima Prefecture, now nicknamed 'Ponyo Town,' inspired the setting of Ponyo after Miyazaki stayed there for two months?", a: "Tomonoura" },
+          { q: "Ocean Waves is set primarily in the protagonist's hometown, a real city in Shikoku — what is this city?", a: "Kochi" }
+        ],
+        500: [
+          { q: "Which real medieval Swedish town, on the island of Gotland, did Miyazaki visit and later use as visual inspiration for Kiki's Delivery Service's city of Koriko, alongside Stockholm?", a: "Visby" },
+          { q: "According to The Art of Spirited Away, which real hot spring resort in Matsuyama was confirmed as the visual basis for Yubaba's bathhouse, the Aburaya?", a: "Dogo Onsen" },
+          { q: "What is the name of the fictional kingdom, based on Diana Wynne Jones' original novel, in which Howl's Moving Castle takes place?", a: "Ingary" }
+        ]
+      }
+    },
+    {
+      name: "Music and Soundtracks",
+      questions: {
+        100: [
+          { q: "Which composer, famous for his four-decade collaboration with Hayao Miyazaki, scored the music for My Neighbor Totoro, Spirited Away, and most other Ghibli films?", a: "Joe Hisaishi" },
+          { q: "What is the English title of Spirited Away's emotional ending theme song, performed by Youmi Kimura?", a: "Always With Me" },
+          { q: "What is the Japanese title of Kiki's Delivery Service's upbeat opening theme song, originally performed in 1975 by singer Yumi Matsutoya (then known as Yumi Arai)?", a: "Rouge no Dengon" }
+        ],
+        200: [
+          { q: "Which classically trained countertenor performs the haunting Japanese vocal theme song for Princess Mononoke?", a: "Yoshikazu Mera" },
+          { q: "Which real-world folk song, originally written and performed by John Denver, is covered in Japanese as the recurring musical theme of Whisper of the Heart?", a: "Take Me Home, Country Roads" },
+          { q: "Which Japanese singer-songwriter wrote and performed 'Spinning Globe,' the theme song for The Boy and the Heron?", a: "Kenshi Yonezu" }
+        ],
+        300: [
+          { q: "What is the title of Howl's Moving Castle's famous waltz-time instrumental theme, one of Joe Hisaishi's best-known compositions?", a: "Merry-Go-Round of Life" },
+          { q: "What is the title of Castle in the Sky's soaring theme song, whose title translates to 'Carrying You'?", a: "Kimi wo Nosete" },
+          { q: "What is the title of Ponyo's bouncy Japanese theme song, performed by young singer Nozomi Ohashi alongside Fujioka Fujimaki?", a: "Gake no Ue no Ponyo (On the Cliff by the Sea)" }
+        ],
+        400: [
+          { q: "Which composer, not Joe Hisaishi, wrote the scores for both Whisper of the Heart and its spin-off The Cat Returns?", a: "Yuji Nomi" },
+          { q: "Which composer, a frequent collaborator of director Isao Takahata, wrote the haunting score for Grave of the Fireflies?", a: "Michio Mamiya" },
+          { q: "Which Okinawan-influenced band composed and performed the folk-inflected score for Pom Poko, blending traditional Japanese instruments with rock?", a: "Shang Shang Typhoon" }
+        ],
+        500: [
+          { q: "Before becoming Hayao Miyazaki's primary composer starting with Nausicaä of the Valley of the Wind in 1984, Joe Hisaishi was known for composing music in which experimental genre, influenced by Steve Reich and Philip Glass?", a: "Minimalism (minimalist music)" },
+          { q: "Youmi Kimura's song 'Always With Me' was originally written for a different, ultimately shelved Ghibli project — what was that project called?", a: "Rin the Chimney Painter" },
+          { q: "What is the title of Joe Hisaishi's 1981 debut album, recorded with his experimental percussion-and-synthesizer ensemble years before he began scoring Studio Ghibli films?", a: "MKWAJU" }
+        ]
+      }
+    }
+  ]
+},
+"Harry Potter": {
+  icon: "⚡",
+  categories: [
+    {
+      name: "Characters",
+      questions: {
+        100: [
+          { q: "What are the first and last names of Harry Potter's two closest friends throughout his years at Hogwarts?", a: "Ron Weasley and Hermione Granger" },
+          { q: "What is the name of the half-giant gamekeeper who first tells eleven-year-old Harry that he is a wizard?", a: "Rubeus Hagrid" },
+          { q: "What is the name of the Dark wizard who killed Harry's parents and is the central villain of the series?", a: "Lord Voldemort" }
+        ],
+        200: [
+          { q: "What is the name of the Potions Master, later Headmaster, famously played by Alan Rickman in the films?", a: "Severus Snape" },
+          { q: "What is the name of Harry's godfather, an escaped convict from Azkaban who can transform into a large black dog?", a: "Sirius Black" },
+          { q: "What is the name of the strict Transfiguration professor and Head of Gryffindor House who can transform into a tabby cat?", a: "Minerva McGonagall" }
+        ],
+        300: [
+          { q: "What are the surnames of Draco Malfoy's two large, dim-witted bodyguards at Hogwarts?", a: "Crabbe and Goyle" },
+          { q: "What is Lord Voldemort's real full birth name, which forms the anagram 'I am Lord Voldemort'?", a: "Tom Marvolo Riddle" },
+          { q: "What is the name of the dreamy, eccentric Ravenclaw student known for her unusual beliefs and her father's magazine, The Quibbler?", a: "Luna Lovegood" }
+        ],
+        400: [
+          { q: "What is the name of Neville Longbottom's pet toad, which he is constantly losing throughout the early books?", a: "Trevor" },
+          { q: "What is the name of the Divination professor who delivers the real prophecy about Harry and Voldemort, despite usually giving false predictions?", a: "Sybill Trelawney" },
+          { q: "What is the name of the house-elf enslaved by the Malfoy family, whom Harry eventually frees using a sock?", a: "Dobby" }
+        ],
+        500: [
+          { q: "What is the name of Sirius Black's younger brother, a former Death Eater who secretly betrayed Voldemort by trying to destroy one of his Horcruxes?", a: "Regulus Black (Regulus Arcturus Black)" },
+          { q: "What is the name of Albus Dumbledore's estranged younger brother, who runs the Hog's Head Inn in Hogsmeade?", a: "Aberforth Dumbledore" },
+          { q: "What is the name of the eccentric knight in a Hogwarts portrait who becomes the new guardian of Gryffindor Tower after the Fat Lady is attacked?", a: "Sir Cadogan" }
+        ]
+      }
+    },
+    {
+      name: "Hogwarts",
+      questions: {
+        100: [
+          { q: "What are the four houses that students are sorted into at Hogwarts School of Witchcraft and Wizardry?", a: "Gryffindor, Hufflepuff, Ravenclaw, and Slytherin" },
+          { q: "What magical object is placed on a new student's head each year to sort them into their house?", a: "The Sorting Hat" },
+          { q: "What is the name of the broomstick sport played at Hogwarts, in which players try to catch a small flying golden ball?", a: "Quidditch" }
+        ],
+        200: [
+          { q: "Who is the headmaster of Hogwarts for most of the series, played in the films first by Richard Harris and later by Michael Gambon?", a: "Albus Dumbledore" },
+          { q: "Which Hogwarts house, known for valuing courage and daring, is Harry Potter sorted into?", a: "Gryffindor" },
+          { q: "What is the name of the scarlet steam train that carries students from London's Platform Nine and Three-Quarters to Hogwarts each year?", a: "The Hogwarts Express" }
+        ],
+        300: [
+          { q: "What are the names of the four founders of Hogwarts, after whom each house is named?", a: "Godric Gryffindor, Helga Hufflepuff, Rowena Ravenclaw, and Salazar Slytherin" },
+          { q: "What is the name of the hidden room at Hogwarts that only appears when someone truly needs it, famously used by Dumbledore's Army?", a: "The Room of Requirement" },
+          { q: "What is the name of the caretaker of Hogwarts, whose beloved cat is named Mrs. Norris?", a: "Argus Filch" }
+        ],
+        400: [
+          { q: "What is the name of the secret chamber built by Salazar Slytherin, said to house a monster that only his true heir can control?", a: "The Chamber of Secrets" },
+          { q: "What Latin phrase, meaning 'never tickle a sleeping dragon,' appears on the Hogwarts coat of arms as its official motto?", a: "Draco dormiens nunquam titillandus" },
+          { q: "What is the name of the ghost who haunts a second-floor girls' bathroom and is later revealed to be connected to the Chamber of Secrets?", a: "Moaning Myrtle" }
+        ],
+        500: [
+          { q: "What is the name of the Ravenclaw house ghost, later revealed to be Rowena Ravenclaw's own daughter?", a: "The Grey Lady (Helena Ravenclaw)" },
+          { q: "What is the name of the Hufflepuff house ghost, a jolly spirit in monk's robes?", a: "The Fat Friar" },
+          { q: "What is the full name of the Gryffindor house ghost commonly known as Nearly Headless Nick?", a: "Sir Nicholas de Mimsy-Porpington" }
+        ]
+      }
+    },
+    {
+      name: "Spells",
+      questions: {
+        100: [
+          { q: "What spell disarms an opponent, causing their wand to fly out of their hand?", a: "Expelliarmus" },
+          { q: "What spell conjures a magical guardian to fend off Dementors?", a: "Expecto Patronum" },
+          { q: "What levitation spell does Hermione famously correct Ron's pronunciation of during their first Charms class?", a: "Wingardium Leviosa" }
+        ],
+        200: [
+          { q: "What spell is commonly used to unlock doors?", a: "Alohomora" },
+          { q: "What spell produces a small light from the tip of a wand?", a: "Lumos" },
+          { q: "What spell summons an object toward the caster from a distance?", a: "Accio" }
+        ],
+        300: [
+          { q: "What is the incantation for the curse that instantly kills its target, one of the three Unforgivable Curses?", a: "Avada Kedavra" },
+          { q: "What spell fully immobilizes a target's body, often called the 'full body-bind curse'?", a: "Petrificus Totalus" },
+          { q: "What charm is used to erase or alter a person's memories?", a: "Obliviate" }
+        ],
+        400: [
+          { q: "What is the name of the dark curse invented by Severus Snape as a student, which causes deep slashing wounds and is found scrawled in his old Potions textbook?", a: "Sectumsempra" },
+          { q: "What is the name of the Unforgivable Curse that gives the caster total control over another person's actions?", a: "The Imperius Curse" },
+          { q: "What incantation conjures the skull-and-serpent Dark Mark into the sky above a scene the Death Eaters wish to mark?", a: "Morsmordre" }
+        ],
+        500: [
+          { q: "What is the name of the complex charm that hides a secret, such as a location or a person's existence, entrusting it entirely to a single Secret-Keeper?", a: "The Fidelius Charm" },
+          { q: "What is the name of the rare magical phenomenon that causes the losing wand in a duel between 'brother wands' to eject echoes of its own past spells in reverse order?", a: "Priori Incantatem" },
+          { q: "What spell allows a witch or wizard to enter and read another person's mind or memories?", a: "Legilimens" }
+        ]
+      }
+    },
+    {
+      name: "Magical Creatures",
+      questions: {
+        100: [
+          { q: "What magical creature, part horse and part eagle, must be approached with a respectful bow before it can be safely ridden?", a: "A Hippogriff" },
+          { q: "What loyal magical bird belonging to Dumbledore can carry heavy loads, heal with its tears, and is reborn from its own ashes?", a: "A Phoenix (Fawkes)" },
+          { q: "What type of magical creature does Hagrid illegally hatch and briefly raise from an egg, naming it Norbert?", a: "A dragon (Norwegian Ridgeback)" }
+        ],
+        200: [
+          { q: "What is the name of the enormous, ancient spider that Hagrid raised as a pet, later the leader of a colony of Acromantula in the Forbidden Forest?", a: "Aragog" },
+          { q: "What ghostly, skeletal, horse-like creatures pull the Hogwarts carriages and are visible only to those who have witnessed death?", a: "Thestrals" },
+          { q: "What small, mischievous blue creatures does Professor Lockhart disastrously release into his classroom in Chamber of Secrets?", a: "Cornish Pixies" }
+        ],
+        300: [
+          { q: "What is the name of Hagrid's enormous half-brother, a giant sought out by Hagrid and Madame Maxime in Order of the Phoenix?", a: "Grawp" },
+          { q: "What is the name of the large, black, dog-shaped omen of death from wizarding folklore, which Sirius Black's Animagus form is often mistaken for?", a: "The Grim" },
+          { q: "What is the name of the house-elf who once served the Crouch family and later works in the Hogwarts kitchens?", a: "Winky" }
+        ],
+        400: [
+          { q: "What is the name for the intelligent, half-human, half-horse beings who dwell in the Forbidden Forest, one of whom, Firenze, later teaches at Hogwarts?", a: "Centaurs" },
+          { q: "What is the name of Lord Voldemort's giant venomous snake, later revealed to be one of his Horcruxes?", a: "Nagini" },
+          { q: "What is the name of the enormous three-headed dog that Hagrid keeps to guard the trapdoor hiding the Philosopher's Stone?", a: "Fluffy" }
+        ],
+        500: [
+          { q: "What are the small, humanoid water demons that Harry must fight off during the Second Task of the Triwizard Tournament?", a: "Grindylows" },
+          { q: "What is the name for the dangerous, unpredictable magical creatures that Hagrid breeds by crossing several species together in Goblet of Fire?", a: "Blast-Ended Skrewts" },
+          { q: "What magical breed of cat is Hermione's pet Crookshanks partly descended from, giving him unusual intelligence?", a: "A Kneazle" }
+        ]
+      }
+    },
+    {
+      name: "Movies and Books",
+      questions: {
+        100: [
+          { q: "Who is the British author who wrote the original Harry Potter novel series?", a: "J.K. Rowling" },
+          { q: "How many main novels make up the core Harry Potter book series?", a: "Seven" },
+          { q: "What is the UK title of the first Harry Potter book and film, in which Harry learns he is a wizard?", a: "Harry Potter and the Philosopher's Stone" }
+        ],
+        200: [
+          { q: "Which actor plays Harry Potter in all eight films?", a: "Daniel Radcliffe" },
+          { q: "What is the title of the seventh and final Harry Potter book, which was split into two films?", a: "Harry Potter and the Deathly Hallows" },
+          { q: "Which actress plays Hermione Granger throughout the entire film series?", a: "Emma Watson" }
+        ],
+        300: [
+          { q: "Which actor played Severus Snape in every Harry Potter film until his character's death in Deathly Hallows?", a: "Alan Rickman" },
+          { q: "Which director helmed the first two Harry Potter films, Philosopher's Stone and Chamber of Secrets?", a: "Chris Columbus" },
+          { q: "Which two actors played Albus Dumbledore across the film series, with the role recast after the first actor's death?", a: "Richard Harris and Michael Gambon" }
+        ],
+        400: [
+          { q: "Which acclaimed director, known for dark and atmospheric filmmaking, directed Harry Potter and the Prisoner of Azkaban, the series' third film?", a: "Alfonso Cuarón" },
+          { q: "Which Harry Potter book is the longest in the series by word count?", a: "Harry Potter and the Order of the Phoenix" },
+          { q: "Which director helmed every Harry Potter film from Order of the Phoenix through both parts of Deathly Hallows?", a: "David Yates" }
+        ],
+        500: [
+          { q: "In what year was the first Harry Potter book originally published in the United Kingdom?", a: "1997" },
+          { q: "Which director, who worked on no other film in the franchise, directed Harry Potter and the Goblet of Fire, the fourth film?", a: "Mike Newell" },
+          { q: "Which Harry Potter book is the shortest in the series by word count?", a: "Harry Potter and the Philosopher's Stone" }
+        ]
+      }
+    }
+  ]
+},
+"Sitcoms": {
+  icon: "🛋️",
+  categories: [
+    {
+      name: "Friends",
+      questions: {
+        100: [
+          { q: "What is the name of the coffee shop where the six friends regularly hang out?", a: "Central Perk" },
+          { q: "Which two Friends characters got married in Las Vegas after a drunken night out, then quickly got the marriage annulled?", a: "Ross and Rachel" },
+          { q: "What is the name of Ross's pet monkey during the show's early seasons?", a: "Marcel" }
+        ],
+        200: [
+          { q: "What is Ross Geller's profession?", a: "Paleontologist" },
+          { q: "What is the nonsense job title the friends jokingly guess for Chandler when none of them can remember what he actually does for a living?", a: "Transponster" },
+          { q: "What is the name of Phoebe Buffay's twin sister, also played by Lisa Kudrow?", a: "Ursula" }
+        ],
+        300: [
+          { q: "What is the title of Joey's most famous acting role, a character on a soap opera?", a: "Dr. Drake Ramoray" },
+          { q: "What is the name of Ross's second wife, whom he marries in London after saying the wrong name at the altar?", a: "Emily" },
+          { q: "Whose rent-controlled apartment did Monica originally live in and illegally sublet, before eventually inheriting the lease?", a: "Her grandmother's (Nana's)" }
+        ],
+        400: [
+          { q: "Chandler's estranged father performs as a drag queen in Las Vegas under what stage name?", a: "Helena Handbasket" },
+          { q: "Who officiates Carol and Susan's wedding, a real-life activist and sister of a conservative U.S. congressman?", a: "Candace Gingrich" },
+          { q: "What are the names of the triplets Phoebe gives birth to as a surrogate for her brother Frank Jr. and his wife Alice?", a: "Frank Jr. Jr., Leslie, and Chandler" }
+        ],
+        500: [
+          { q: "What is the full name of Ross's first wife, who leaves him for a woman named Susan?", a: "Carol Willick" },
+          { q: "What is the name of the upscale Manhattan restaurant where Monica becomes head chef during the show's final two seasons?", a: "Javu" },
+          { q: "In later seasons, what are the apartment numbers of Monica and Rachel's apartment and Joey and Chandler's apartment across the hall?", a: "20 and 19" }
+        ]
+      }
+    },
+    {
+      name: "The Office",
+      questions: {
+        100: [
+          { q: "What paper company do the employees of the show work for?", a: "Dunder Mifflin" },
+          { q: "Who is the bumbling regional manager of the Scranton branch for most of the series?", a: "Michael Scott" },
+          { q: "What is the name of Jim Halpert's coworker, and eventual wife, who works as the office receptionist?", a: "Pam Beesly" }
+        ],
+        200: [
+          { q: "What is the name of Dwight Schrute's family farm and bed-and-breakfast, where he raises beets?", a: "Schrute Farms" },
+          { q: "What dessert does Jim frequently trap Dwight's stapler inside of, as a running prank?", a: "Jell-O (gelatin)" },
+          { q: "What title does Dwight insist on being called, correcting anyone who shortens it to 'Assistant Regional Manager'?", a: "Assistant TO the Regional Manager" }
+        ],
+        300: [
+          { q: "What is the name of the company Dunder Mifflin merges with partway through the series, becoming 'Dunder Mifflin Sabre'?", a: "Sabre" },
+          { q: "After quitting Dunder Mifflin, what is the name of the rival paper company Michael starts with Pam and Ryan?", a: "Michael Scott Paper Company" },
+          { q: "What is the name of Andy Bernard's college a cappella group, which he frequently brings up?", a: "Here Comes Treble" }
+        ],
+        400: [
+          { q: "Which character, played by James Spader, is hired to interview for branch manager but instead becomes CEO of the parent company?", a: "Robert California" },
+          { q: "Who briefly serves as regional manager immediately after Michael Scott leaves, before a basketball injury takes him out of the role?", a: "Deangelo Vickers" },
+          { q: "After business school, what corporate title is Ryan Howard promoted to, taking over Jan Levinson's old position?", a: "Vice President of Northeast Sales" }
+        ],
+        500: [
+          { q: "What is the name of the Pennsylvania Dutch folklore figure Dwight dresses up as every Christmas?", a: "Belsnickel" },
+          { q: "What is the name of Dwight's cousin, who lives and works with him at the beet farm?", a: "Mose Schrute" },
+          { q: "What is the name of the failed company website Ryan launches as VP, which later becomes central to the fraud that gets him fired?", a: "Dunder Mifflin Infinity" }
+        ]
+      }
+    },
+    {
+      name: "How I Met Your Mother",
+      questions: {
+        100: [
+          { q: "What is the name of the bar where the gang regularly hangs out?", a: "MacLaren's Pub" },
+          { q: "What profession does Ted Mosby practice throughout the show, eventually becoming a professor of?", a: "Architect" },
+          { q: "What color is the umbrella that becomes a recurring symbol tied to Ted meeting the Mother?", a: "Yellow" }
+        ],
+        200: [
+          { q: "What is the name of Barney Stinson's book cataloging his many scams for picking up women?", a: "The Playbook" },
+          { q: "What country is Robin Scherbatsky originally from, before moving to New York?", a: "Canada" },
+          { q: "What is the full name of the Mother, eventually revealed on the show?", a: "Tracy McConnell" }
+        ],
+        300: [
+          { q: "What catchphrase does Barney shout whenever something amazing or unexpected happens?", a: "'Legen— wait for it —dary!' (Legendary)" },
+          { q: "What university did Ted, Marshall, and Lily all attend together?", a: "Wesleyan University" },
+          { q: "What is the stage name of Robin's secret past as a 1990s Canadian teen pop star, revealed via a 'slap bet'?", a: "Robin Sparkles" }
+        ],
+        400: [
+          { q: "What is the unusual official middle name Marshall and Lily give their son, at Barney's insistence?", a: "Waitforit (Marvin Waitforit Eriksen)" },
+          { q: "What company does Barney work for throughout most of the series, whose actual business remains a running mystery?", a: "Goliath National Bank (GNB)" },
+          { q: "The show's entire final season unfolds in real time around what single event?", a: "Barney and Robin's wedding weekend" }
+        ],
+        500: [
+          { q: "How long does Barney and Robin's marriage ultimately last, as revealed in the series finale?", a: "Three years" },
+          { q: "What happens to Tracy, the Mother, that explains why Ted is telling this whole story to his kids in the show's 'future' framing device?", a: "She dies, of an unspecified illness, years before the story is told" },
+          { q: "What is Barney Stinson's full, formal first name, for which 'Barney' is a nickname?", a: "Barnabus" }
+        ]
+      }
+    },
+    {
+      name: "Modern Family",
+      questions: {
+        100: [
+          { q: "What is the name of the family patriarch, married to a much younger Colombian woman named Gloria?", a: "Jay Pritchett" },
+          { q: "What is the name of Mitchell and Cameron's adopted daughter from Vietnam?", a: "Lily" },
+          { q: "What is Phil Dunphy's profession?", a: "Real estate agent" }
+        ],
+        200: [
+          { q: "What is the name of Gloria's son from her first marriage, whom Jay helps raise?", a: "Manny Delgado" },
+          { q: "What are the names of Claire and Phil Dunphy's three children?", a: "Haley, Alex, and Luke" },
+          { q: "What does Phil call his personal life philosophy and rulebook for being a cool, modern dad?", a: "Phil's-osophy" }
+        ],
+        300: [
+          { q: "What is the name of Jay and Gloria's son, born partway through the series?", a: "Joe" },
+          { q: "What is Mitchell Pritchett's profession?", a: "Lawyer" },
+          { q: "What is the name of Mitchell and Cameron's second child, adopted near the end of the series?", a: "Rexford 'Rex' Jason Tucker-Pritchett" }
+        ],
+        400: [
+          { q: "What is the name of the closet and home-organization business Jay Pritchett built from the ground up?", a: "Pritchett's Closets and Blinds" },
+          { q: "What is the full given name of Jay and Gloria's son, Joe?", a: "Fulgencio Joseph Pritchett" },
+          { q: "Which of Jay's children eventually takes over as head of his closet company?", a: "Claire" }
+        ],
+        500: [
+          { q: "What Colombian city does Gloria repeatedly say she is from?", a: "Barranquilla" },
+          { q: "What breed of dog is Stella, Jay and Gloria's beloved family pet?", a: "French Bulldog" },
+          { q: "What fictional Missouri town does Cameron Tucker say he grew up in, on a farm?", a: "Grasshopper, Missouri" }
+        ]
+      }
+    },
+    {
+      name: "Brooklyn Nine-Nine",
+      questions: {
+        100: [
+          { q: "What is the name of Jake Peralta's stern, deadpan police captain?", a: "Raymond Holt (Captain Holt)" },
+          { q: "What 1988 action movie is Jake Peralta endlessly obsessed with?", a: "Die Hard" },
+          { q: "What is the number of the fictional NYPD precinct the show is named after and set in?", a: "The 99th Precinct" }
+        ],
+        200: [
+          { q: "What rank does Terry Jeffords hold at the Nine-Nine?", a: "Sergeant" },
+          { q: "What is the name of the dance troupe Gina Linetti is part of, which later kicks her out for missing rehearsals?", a: "Floorgasm" },
+          { q: "What vehicle does Rosa Diaz famously ride to work?", a: "A motorcycle" }
+        ],
+        300: [
+          { q: "What nickname do Jake and Amy give their son, referencing Jake's favorite movie hero, John McClane?", a: "Mac" },
+          { q: "Which recurring character, an old friend of Jake's from the police academy, spent 12 years undercover infiltrating the mob and becomes seriously unhinged?", a: "Adrian Pimento" },
+          { q: "What nickname does the squad give the obnoxious rival detective Keith Pembroke, who steals credit for their cases?", a: "The Vulture" }
+        ],
+        400: [
+          { q: "What is the name of Captain Holt's husband, a professor and head of the Classics Department at Columbia University?", a: "Kevin Cozner" },
+          { q: "What is the name of Charles Boyle's son, whom he and his wife Genevieve adopt from Latvia?", a: "Nikolaj" },
+          { q: "What historic distinction did Raymond Holt hold within the NYPD before commanding the Nine-Nine?", a: "He was the NYPD's first openly gay Black police captain" }
+        ],
+        500: [
+          { q: "In the series finale, what rank does Amy Santiago ultimately rise to, the highest position for a uniformed NYPD officer?", a: "Chief (of Department)" },
+          { q: "What role is Captain Holt promoted to at the same time as Amy, overseeing a citywide police reform program?", a: "Deputy Commissioner of Police Reform" },
+          { q: "What is the name of Charles Boyle's food-writer fiancée, whose engagement to him ends when he won't move to Canada with her?", a: "Vivian Ludley" }
+        ]
+      }
+    }
+  ]
+},
+"It's Always Sunny in Philadelphia": {
+  icon: "🌞",
+  categories: [
+    {
+      name: "Characters",
+      questions: {
+        100: [
+          { q: "What is the name of the run-down bar in Philadelphia owned and operated by the show's five main characters?", a: "Paddy's Pub" },
+          { q: "What are the first names of the image-obsessed twin siblings in 'the Gang,' played by Glenn Howerton and Kaitlin Olson?", a: "Dennis and Dee (Reynolds)" },
+          { q: "Which member of the Gang is not very bright, easily manipulated, and revealed over the series to be functionally illiterate?", a: "Charlie (Kelly)" }
+        ],
+        200: [
+          { q: "What nickname is commonly used for Deandra Reynolds, Dennis's twin sister?", a: "Sweet Dee" },
+          { q: "What is the name of Dennis and Dee's boisterous, degenerate father, played by Danny DeVito?", a: "Frank Reynolds" },
+          { q: "Which member of the Gang insists he's a master of martial arts and bodybuilding, despite little evidence of either?", a: "Mac" }
+        ],
+        300: [
+          { q: "What is the name of Mac's father, a convicted criminal whose release from prison sets off major plot events across the series?", a: "Luther (McDonald)" },
+          { q: "What nickname is given to Matthew Mara, a former high school classmate of the Gang who becomes a struggling street priest over the course of the show?", a: "Rickety Cricket" },
+          { q: "Who is revealed to be Dennis and Dee's biological father, a man their mother Barbara had an affair with, rather than Frank?", a: "Bruce Mathis" }
+        ],
+        400: [
+          { q: "What is the real name of the character known throughout the entire series only as 'the Waitress'?", a: "It's never revealed" },
+          { q: "Which real-life spouse of a main cast member plays 'the Waitress'?", a: "Mary Elizabeth Ellis (Charlie Day's wife)" },
+          { q: "What is Mac's full first name, for which 'Mac' is a nickname?", a: "Ronald (McDonald)" }
+        ],
+        500: [
+          { q: "What is the name of Dennis and Dee's mother, whose decades-old affair is revealed to have produced the twins?", a: "Barbara (Reynolds)" },
+          { q: "Dennis and Dee's biological father, Bruce Mathis, is ironically revealed to be what, despite their mother leaving him because she thought Frank was wealthier?", a: "A wealthy philanthropist" },
+          { q: "In a later-season episode set partly in Ireland, who is revealed to be Charlie's actual biological father?", a: "Shelley Kelly" }
+        ]
+      }
+    },
+    {
+      name: "Episodes",
+      questions: {
+        100: [
+          { q: "What is the title of the fan-favorite episode centered on the elaborate musical Charlie writes and performs to propose to the Waitress?", a: "The Nightman Cometh" },
+          { q: "What is the title of the two-part Season 4 episode in which Mac and Charlie fake their own deaths to escape Mac's dangerous father?", a: "Mac and Charlie Die" },
+          { q: "What is the title of the episode in which the Gang plays their own brutal, homemade drinking game against each other?", a: "Chardee MacDennis: The Game of Games" }
+        ],
+        200: [
+          { q: "What is the title of the episode in which Frank introduces 'Rum Ham' while the Gang vacations at the shore?", a: "The Gang Goes to the Jersey Shore" },
+          { q: "What is the title of the episode in which Dee discovers a man online claiming to be her and Dennis's real father?", a: "Dennis and Dee Get a New Dad" },
+          { q: "What is the title of the episode centered on Dennis's step-by-step method for manipulating women into relationships?", a: "The D.E.N.N.I.S. System" }
+        ],
+        300: [
+          { q: "What is the title of the episode in which the Gang's lawyer reveals a novelty cat product being sold out of the bar?", a: "Paddy's Pub: Home of the Original Kitten Mittens" },
+          { q: "What is the title of the episode in which Charlie finally meets his real biological father?", a: "The Gang's Still in Ireland" },
+          { q: "What is the title of the emotional Season 13 finale in which Mac comes out to his father through an elaborate interpretive dance?", a: "Mac Finds His Pride" }
+        ],
+        400: [
+          { q: "What is the title of the low-budget original pilot — later folded into a Season 1 episode of the same name — that got the show picked up by FX?", a: "Charlie Has Cancer" },
+          { q: "What is the title of the episode in which the Gang tries to take credit for reversing climate change?", a: "The Gang Solves Global Warming" },
+          { q: "What is the title of the episode in which the Gang checks into a literal suite numbered 'H666'?", a: "The Gang Goes to Hell" }
+        ],
+        500: [
+          { q: "What is the title of the episode that permanently changed the show's title-card format so the episode title appears before the show's own title?", a: "The Gang Goes Jihad" },
+          { q: "What is the title of the early episode explaining how Frank accidentally hurts someone while planning a news segment?", a: "Frank Sets Sweet Dee on Fire" },
+          { q: "What is the title of the Season 11 premiere that serves as a sequel to the Gang's homemade drinking game episode?", a: "Chardee MacDennis 2: Electric Boogaloo" }
+        ]
+      }
+    },
+    {
+      name: "Quotes",
+      questions: {
+        100: [
+          { q: "Which member of the Gang delivers this boast about his own future greatness: 'I haven't even begun to peak. And when I do peak, you'll know. Because I'm gonna peak so hard that everybody in Philadelphia's gonna feel it'?", a: "Dennis" },
+          { q: "Which character angrily responds to being told to get a job with: 'Why don't I strap on my job helmet and squeeze down into a job cannon and fire off into job land, where jobs grow on jobbies?!'?", a: "Charlie" },
+          { q: "Which character introduces his wrestling persona with the line: 'I'm the Trash Man! I come out, I throw garbage all over the ring, and then I start eating garbage!'?", a: "Frank" }
+        ],
+        200: [
+          { q: "Which character proudly announces a boozy new beach snack with the line, 'This is ham, soaked in rum. It's loaded with booze'?", a: "Frank" },
+          { q: "Which character opens a passionate rant with, 'Well, first of all, through God, all things are possible, so jot that down'?", a: "Mac" },
+          { q: "Which character finally snaps at the Gang's years of teasing with the line, 'I KNOW, A BIRD, I GET IT, I LOOK LIKE A BIRD!!'?", a: "Dee" }
+        ],
+        300: [
+          { q: "Which character insists during an argument about his physique, 'I work out my core... I can do way more push-ups than you and that's like 16 different muscle groups'?", a: "Mac" },
+          { q: "Which character declares his car 'a transporter of gods' before shouting 'THE GOLDEN GOD!!'?", a: "Dennis" },
+          { q: "In describing the Gang's dynamic as 'looks, brains, and wild card,' which member does Mac name as the wild card?", a: "Charlie" }
+        ],
+        400: [
+          { q: "Which character screams, 'I am untethered, and my rage knows no bounds!' during an unhinged meltdown over his car?", a: "Dennis" },
+          { q: "In a bit about tax fraud, Dee insists she isn't scamming the government — only for what detail, printed right on her car, to undercut her?", a: "Her license plate, which reads 'SCAMMIN''" },
+          { q: "During 'The Nightman Cometh' rehearsals, Frank keeps singing a lyric about paying a toll that sounds inappropriate, insisting to Charlie he's actually singing what word?", a: "Soul" }
+        ],
+        500: [
+          { q: "Which character delivers this ad pitch: 'Hello, Charlie Kelly here, local business owner and cat enthusiast... Finally, there is an elegant, comfortable mitten for cats'?", a: "Charlie" },
+          { q: "In 'The Gang Gets Extreme,' Dennis objects to the Gang's new anthem, insisting they aren't singing about being ordinary birds but rather about being what 'infinitely cooler' concept?", a: "Bird-men" },
+          { q: "What is the title of the song Charlie sings while descending from the ceiling on a giant sun prop to propose to the Waitress in 'The Nightman Cometh'?", a: "Charlie's Ballad (also known as 'Marry Me')" }
+        ]
+      }
+    },
+    {
+      name: "Running Gags",
+      questions: {
+        100: [
+          { q: "What fictional soda brand appears repeatedly throughout the series, often as a background prop?", a: "Wolf Cola" },
+          { q: "What disgusting-sounding meal does Charlie repeatedly claim to order at restaurants, consisting of milk-soaked steak and jelly beans?", a: "Milk steak" },
+          { q: "What full-body costume does Mac wear as a self-appointed, unlicensed neighborhood superhero?", a: "The Green Man" }
+        ],
+        200: [
+          { q: "What family repeatedly returns throughout the series as the Gang's odd, milk-obsessed rivals?", a: "The McPoyle family" },
+          { q: "What is the origin of Cricket's 'Rickety' nickname, first earned back in high school before he ever became a priest?", a: "He wore leg braces" },
+          { q: "What is the name of the viral scene in which Charlie, working a mailroom job, becomes frantically convinced a mysterious coworker is being ignored by the company?", a: "The 'Pepe Silvia' scene" }
+        ],
+        300: [
+          { q: "What are the three rounds, or 'categories,' that make up the Gang's drinking game Chardee MacDennis?", a: "Mind, Body, and Spirit" },
+          { q: "What single piece of furniture do Frank and Charlie share as their bed every night, despite Frank's actual wealth?", a: "A pull-out couch" },
+          { q: "What entertainment career does Dee repeatedly and unsuccessfully pursue, despite crippling stage fright that makes her dry-heave on stage?", a: "Stand-up comedy" }
+        ],
+        400: [
+          { q: "Wolf Cola begins the series as what kind of scheme for Frank, before growing into a full beverage empire?", a: "A fraudulent shell company / tax scam" },
+          { q: "What does Frank frequently fake in order to win sympathy or a lawsuit payout?", a: "An injury or illness" },
+          { q: "What term does the Gang use for any disgusting, demeaning chore around the bar — extermination, cleaning, hauling trash — that inevitably falls to one particular member?", a: "'Charlie work'" }
+        ],
+        500: [
+          { q: "What comedic device does the show frequently use, in which a character narrates a flashback that visibly contradicts what viewers already know actually happened?", a: "An unreliable narrator flashback" },
+          { q: "What alter ego does Frank adopt — a black turtleneck, a white wig, and a parody of Andy Warhol — to hype up Charlie's paintings to a buyer?", a: "Ongo Gablogian" },
+          { q: "What business do the McPoyle brothers run later in the series, after selling their video rental store?", a: "A bowling alley" }
+        ]
+      }
+    },
+    {
+      name: "Trivia",
+      questions: {
+        100: [
+          { q: "What real-life city is the show set in and named after?", a: "Philadelphia" },
+          { q: "What television network has aired the show for its entire run, later joined by its sister channel?", a: "FX (and FXX)" },
+          { q: "Which three actors created the show and also write for it, starring as Dennis, Charlie, and Mac?", a: "Rob McElhenney, Glenn Howerton, and Charlie Day" }
+        ],
+        200: [
+          { q: "Which legendary actor joined the cast as Frank Reynolds starting in Season 2, credited with helping save the show from cancellation?", a: "Danny DeVito" },
+          { q: "What real-life relationship exists between Charlie Day and Mary Elizabeth Ellis, the actress who plays the Waitress?", a: "They are married" },
+          { q: "In what year did It's Always Sunny in Philadelphia first premiere?", a: "2005" }
+        ],
+        300: [
+          { q: "About how much did the original, unaired pilot cost to produce, shot on a camcorder with the creators' friends?", a: "About $200" },
+          { q: "What was the show's original working title, before its concept shifted from Los Angeles actors to a Philadelphia bar?", a: "It's Always Sunny on TV" },
+          { q: "What 1985 pop song by a-ha inspired that original working title?", a: "'The Sun Always Shines on T.V.'" }
+        ],
+        400: [
+          { q: "What is the title of the show's instantly recognizable jazzy theme song?", a: "'Temptation Sensation'" },
+          { q: "Who composed the show's theme song, 'Temptation Sensation'?", a: "Heinz Kiessling" },
+          { q: "According to the creators, what blunt one-word title was also under consideration before settling on 'It's Always Sunny in Philadelphia'?", a: "'Jerks'" }
+        ],
+        500: [
+          { q: "What is the official title of the show's very first broadcast episode, in which Charlie tries to prove to the Waitress that he isn't prejudiced?", a: "The Gang Gets Racist" },
+          { q: "Which FX executive insisted the creators use 'Temptation Sensation' over their own preferred theme song choice?", a: "John Landgraf" },
+          { q: "In the original, unaired pilot, what were the three lead characters' jobs, before the show's concept shifted to owning a bar?", a: "Aspiring actors living in Los Angeles" }
+        ]
+      }
+    }
+  ]
+},
+"Marvel Cinematic Universe": {
+  icon: "🌀",
+  categories: [
+    {
+      name: "MCU Movies",
+      questions: {
+        100: [
+          { q: "Which 2008 film starring Robert Downey Jr. as Tony Stark launched the Marvel Cinematic Universe?", a: "Iron Man" },
+          { q: "Which 2018 film ended with the villain Thanos snapping his fingers to erase half of all life in the universe?", a: "Avengers: Infinity War" },
+          { q: "Which 2024 film paired Ryan Reynolds and Hugh Jackman and became the MCU's first R-rated theatrical release?", a: "Deadpool & Wolverine" }
+        ],
+        200: [
+          { q: "Which 2025 film introduced Marvel's First Family to the MCU, set on a retro-futuristic alternate Earth?", a: "The Fantastic Four: First Steps" },
+          { q: "Which 2019 film became the highest-grossing film in box-office history at the time of its release, surpassing 'Avatar'?", a: "Avengers: Endgame" },
+          { q: "Which MCU film was the first to premiere simultaneously in theaters and on Disney+ via Premier Access, in 2021?", a: "Black Widow" }
+        ],
+        300: [
+          { q: "Which directing duo, known for 'Captain America: The Winter Soldier' and 'Captain America: Civil War,' also directed both 'Avengers: Infinity War' and 'Avengers: Endgame'?", a: "The Russo Brothers (Anthony and Joe Russo)" },
+          { q: "Which 2016 film introduced the Sokovia Accords, splitting the Avengers into two rival factions led by Iron Man and Captain America?", a: "Captain America: Civil War" },
+          { q: "Which film served as the official launch of Phase Five in February 2023, directed by Peyton Reed?", a: "Ant-Man and the Wasp: Quantumania" }
+        ],
+        400: [
+          { q: "Which 2025 film's marketing was updated after its release to rebrand it as 'The New Avengers,' reflecting a twist revealed in its ending?", a: "Thunderbolts*" },
+          { q: "Which actor replaced Edward Norton in the role of Bruce Banner starting with 2012's 'The Avengers,' after Norton originated the role in 2008's 'The Incredible Hulk'?", a: "Mark Ruffalo" },
+          { q: "Which MCU release, delayed multiple times, is scheduled for December 18, 2026 and unites the Avengers, Fantastic Four, and X-Men characters against Doctor Doom?", a: "Avengers: Doomsday" }
+        ],
+        500: [
+          { q: "Which director became the first woman to helm a Marvel Studios film, co-directing 'Captain Marvel' (2019) with Ryan Fleck?", a: "Anna Boden" },
+          { q: "Which composer, who scored 'The Avengers' (2012) and multiple Captain America films, also composed 'Avengers: Endgame'?", a: "Alan Silvestri" },
+          { q: "Which MCU film was the first to be released after Disney's acquisition of 21st Century Fox's film assets officially closed in March 2019?", a: "Avengers: Endgame" }
+        ]
+      }
+    },
+    {
+      name: "Heroes",
+      questions: {
+        100: [
+          { q: "Which actor plays Steve Rogers/Captain America throughout the Infinity Saga?", a: "Chris Evans" },
+          { q: "Which actress plays Natasha Romanoff/Black Widow across the MCU?", a: "Scarlett Johansson" },
+          { q: "Which actor plays Thor across the MCU, from 2011's 'Thor' through 'Thor: Love and Thunder'?", a: "Chris Hemsworth" }
+        ],
+        200: [
+          { q: "Which actor took over the role of Spider-Man/Peter Parker for the MCU, debuting in 'Captain America: Civil War'?", a: "Tom Holland" },
+          { q: "Which actress plays Carol Danvers/Captain Marvel?", a: "Brie Larson" },
+          { q: "Which actor plays Sam Wilson, who takes up the shield as the new Captain America after 'Avengers: Endgame'?", a: "Anthony Mackie" }
+        ],
+        300: [
+          { q: "Which actor plays Shang-Chi, master of Kung Fu and leader of the Ten Rings organization, in his 2021 solo film?", a: "Simu Liu" },
+          { q: "Which actress plays Kate Bishop, Clint Barton's protégé, who later joins the New Avengers team introduced in 'Thunderbolts*'?", a: "Hailee Steinfeld" },
+          { q: "Which actress plays Yelena Belova, Natasha Romanoff's adoptive sister, who leads the New Avengers in 'Thunderbolts*'?", a: "Florence Pugh" }
+        ],
+        400: [
+          { q: "Which actor was cast as Mr. Fantastic/Reed Richards in 'The Fantastic Four: First Steps' (2025)?", a: "Pedro Pascal" },
+          { q: "Which actress plays Sue Storm/Invisible Woman opposite Pedro Pascal in 'The Fantastic Four: First Steps'?", a: "Vanessa Kirby" },
+          { q: "Which actor plays Bob/Sentry, whose alter ego 'The Void' serves as the primary antagonist of 'Thunderbolts*'?", a: "Lewis Pullman" }
+        ],
+        500: [
+          { q: "Which actress played the child version of Cassie Lang in 'Ant-Man' (2015) and 'Ant-Man and the Wasp' (2018), before Kathryn Newton took over the role as a teenager in 'Quantumania'?", a: "Abby Ryder Fortson" },
+          { q: "Which actor plays Ben Grimm/The Thing in 'The Fantastic Four: First Steps'?", a: "Ebon Moss-Bachrach" },
+          { q: "Which actor performed Rocket Raccoon's on-set movements as a physical stand-in throughout the Guardians of the Galaxy trilogy, even though Bradley Cooper voiced the character in post-production?", a: "Sean Gunn" }
+        ]
+      }
+    },
+    {
+      name: "Villains",
+      questions: {
+        100: [
+          { q: "Which purple-skinned Mad Titan serves as the primary antagonist of the Infinity Saga, seeking to collect all six Infinity Stones?", a: "Thanos" },
+          { q: "Which actor plays Thanos across multiple MCU films via motion capture?", a: "Josh Brolin" },
+          { q: "Which Asgardian god of mischief, Thor's adoptive brother, appears as an antagonist in several early MCU films?", a: "Loki" }
+        ],
+        200: [
+          { q: "Which actor plays Erik Killmonger, T'Challa's cousin and rival for the throne of Wakanda, in 'Black Panther'?", a: "Michael B. Jordan" },
+          { q: "Which robotic villain, voiced by James Spader, is created by Tony Stark and Bruce Banner and turns against the Avengers?", a: "Ultron" },
+          { q: "Which actor plays Helmut Zemo, the Sokovian mastermind who manipulates the Avengers into fighting each other in 'Captain America: Civil War'?", a: "Daniel Brühl" }
+        ],
+        300: [
+          { q: "Which cosmic, planet-devouring villain appears as the primary antagonist of 'The Fantastic Four: First Steps,' played by Ralph Ineson?", a: "Galactus" },
+          { q: "Which actress plays Cassandra Nova, the villain revealed to have manipulated events in 'Deadpool & Wolverine'?", a: "Emma Corrin" },
+          { q: "Which actor plays the High Evolutionary, the primary antagonist of 'Guardians of the Galaxy Vol. 3' who is responsible for creating Rocket?", a: "Chukwudi Iwuji" }
+        ],
+        400: [
+          { q: "Which actor was cast as Kang the Conqueror and He Who Remains before being dropped from the MCU in 2024 following a domestic violence conviction?", a: "Jonathan Majors" },
+          { q: "Which actor plays Doctor Doom in 'Avengers: Doomsday,' after previously playing Tony Stark/Iron Man earlier in the MCU?", a: "Robert Downey Jr." },
+          { q: "Which actress plays Valentina Allegra de Fontaine, the scheming government operative who assembles the Thunderbolts and later takes credit for branding them the New Avengers?", a: "Julia Louis-Dreyfus" }
+        ],
+        500: [
+          { q: "Which actor voices M.O.D.O.K., the antagonist of 'Ant-Man and the Wasp: Quantumania' who was formerly Darren Cross?", a: "Corey Stoll" },
+          { q: "Which actress plays Shalla-Bal, the Silver Surfer and herald of Galactus, in 'The Fantastic Four: First Steps'?", a: "Julia Garner" },
+          { q: "Which actress plays Ghost, real name Ava Starr, the antagonist of 'Ant-Man and the Wasp' (2018)?", a: "Hannah John-Kamen" }
+        ]
+      }
+    },
+    {
+      name: "Infinity Saga",
+      questions: {
+        100: [
+          { q: "Which 2019 film served as the direct sequel and climactic conclusion to 'Avengers: Infinity War,' closing out the Infinity Saga?", a: "Avengers: Endgame" },
+          { q: "Which glowing, colorful gems—six in total—are the central objects sought throughout the Infinity Saga?", a: "The Infinity Stones" },
+          { q: "Which 2012 film first assembled Iron Man, Captain America, Thor, Hulk, Black Widow, and Hawkeye as a team?", a: "The Avengers" }
+        ],
+        200: [
+          { q: "How many total films make up the Infinity Saga, spanning 'Iron Man' (2008) through 'Avengers: Endgame' (2019)?", a: "23" },
+          { q: "Which three phases of the MCU together make up the Infinity Saga?", a: "Phase One, Phase Two, and Phase Three" },
+          { q: "Which 2011 film, set primarily during World War II, introduced Steve Rogers as Captain America?", a: "Captain America: The First Avenger" }
+        ],
+        300: [
+          { q: "Which 2014 film introduced the Guardians of the Galaxy team and was Marvel Studios' first major film set primarily off Earth?", a: "Guardians of the Galaxy" },
+          { q: "In 'Avengers: Endgame,' what term does the film use for the time-travel plan the surviving Avengers undertake to retrieve the Infinity Stones from the past?", a: "The Time Heist" },
+          { q: "Which Infinity Stone is hidden inside the Tesseract throughout the early Captain America and Avengers films?", a: "The Space Stone" }
+        ],
+        400: [
+          { q: "Which 2015 film introduced Vision, a synthetic being created from J.A.R.V.I.S.'s consciousness, Ultron's body, and the Mind Stone?", a: "Avengers: Age of Ultron" },
+          { q: "Which Infinity Stone is embedded in Vision's forehead and forcibly removed by Thanos in 'Avengers: Infinity War,' killing him?", a: "The Mind Stone" },
+          { q: "Which actress plays Gamora, Thanos's adoptive daughter, who is sacrificed on Vormir so he can obtain the Soul Stone in 'Avengers: Infinity War'?", a: "Zoe Saldaña" }
+        ],
+        500: [
+          { q: "According to Doctor Strange in 'Avengers: Infinity War,' out of how many possible futures did he witness only a single one in which the Avengers ultimately defeat Thanos?", a: "14,000,605" },
+          { q: "What term does Nick Fury use, in the MCU's very first post-credits scene at the end of 'Iron Man' (2008), to describe the program he invites Tony Stark to join?", a: "The Avenger Initiative" },
+          { q: "Which actor originated the role of Red Skull in 'Captain America: The First Avenger' (2011), before the character was recast for his appearances on Vormir in 'Avengers: Infinity War' and 'Avengers: Endgame'?", a: "Hugo Weaving" }
+        ]
+      }
+    },
+    {
+      name: "Multiverse Saga",
+      questions: {
+        100: [
+          { q: "Which 2022 film sends Doctor Strange across the multiverse to protect America Chavez, kicking off the multiversal chaos of Phase Four?", a: "Doctor Strange in the Multiverse of Madness" },
+          { q: "Which 2021 film brought Tobey Maguire's and Andrew Garfield's Spider-Man actors back on screen alongside Tom Holland for the first time?", a: "Spider-Man: No Way Home" },
+          { q: "Which 2025 film reintroduced the Fantastic Four to the MCU, setting Phase Six in motion?", a: "The Fantastic Four: First Steps" }
+        ],
+        200: [
+          { q: "Which three official phases make up the Multiverse Saga, as announced by Kevin Feige in 2022?", a: "Phase Four, Phase Five, and Phase Six" },
+          { q: "Which 2023 film was originally intended to establish Kang the Conqueror as the Multiverse Saga's central villain, before recasting concerns changed Marvel's plans?", a: "Ant-Man and the Wasp: Quantumania" },
+          { q: "Which two-part Avengers films are set to conclude the Multiverse Saga, released in 2026 and 2027 respectively?", a: "Avengers: Doomsday and Avengers: Secret Wars" }
+        ],
+        300: [
+          { q: "Which 2022 film sees Wanda Maximoff, corrupted by the Darkhold's dark magic, become the story's primary antagonist as she hunts across the multiverse for a version of her children?", a: "Doctor Strange in the Multiverse of Madness" },
+          { q: "Which 2024 film, starring Deadpool and Wolverine, is credited with formally bridging the 20th Century Fox X-Men film universe into the MCU's multiverse?", a: "Deadpool & Wolverine" },
+          { q: "Which government-recruited antihero team rebrands itself as 'The New Avengers' by the end of 'Thunderbolts*' (2025)?", a: "The Thunderbolts" }
+        ],
+        400: [
+          { q: "What was the original title of 'Avengers: Doomsday' before it was changed following Jonathan Majors's dismissal from the role of Kang?", a: "Avengers: The Kang Dynasty" },
+          { q: "At which entertainment convention did Kevin Feige formally unveil the 'Multiverse Saga' branding along with the Phase Five and Phase Six film lineups, in July 2022?", a: "San Diego Comic-Con" },
+          { q: "Which 2023 film marked James Gunn's final MCU directing credit before he departed to become co-CEO of DC Studios?", a: "Guardians of the Galaxy Vol. 3" }
+        ],
+        500: [
+          { q: "Which actress reprised her 2003 'Daredevil'-franchise role as Elektra Natchios in a cameo during 'Deadpool & Wolverine' (2024)?", a: "Jennifer Garner" },
+          { q: "In 'Deadpool & Wolverine,' Chris Evans's cameo tricks the audience into expecting a Captain America return, before revealing he's playing which character from the 2005 and 2007 'Fantastic Four' films?", a: "Johnny Storm/Human Torch" },
+          { q: "Which actor's cameo as Blade in 'Deadpool & Wolverine' set a Guinness World Record for the longest career playing a single live-action Marvel character, over 25 years after his first appearance in the role?", a: "Wesley Snipes" }
+        ]
+      }
+    }
+  ]
+},
+"Star Wars": {
+  icon: "🚀",
+  categories: [
+    {
+      name: "Movies",
+      questions: {
+        100: [
+          { q: "Which 1977 film, later retitled 'Star Wars: Episode IV – A New Hope,' began the Star Wars franchise?", a: "Star Wars (A New Hope)" },
+          { q: "Which 1980 sequel revealed that Darth Vader is Luke Skywalker's father?", a: "The Empire Strikes Back" },
+          { q: "Which 2015 film, directed by J.J. Abrams, revived the Skywalker saga with new leads Rey, Finn, and Poe?", a: "The Force Awakens" }
+        ],
+        200: [
+          { q: "Which 1983 film concluded the original trilogy with the destruction of the second Death Star?", a: "Return of the Jedi" },
+          { q: "Which 1999 film, the first prequel, introduced young Anakin Skywalker as a slave boy on Tatooine?", a: "The Phantom Menace" },
+          { q: "Which 2019 film concluded the Skywalker saga as its ninth mainline episode?", a: "The Rise of Skywalker" }
+        ],
+        300: [
+          { q: "Which 2002 prequel film depicts the start of the Clone Wars and the secret marriage of Anakin and Padmé?", a: "Attack of the Clones" },
+          { q: "Which 2016 anthology film, a direct prequel to 'A New Hope,' follows a group of rebels stealing the Death Star plans?", a: "Rogue One: A Star Wars Story" },
+          { q: "Which 2005 film depicts Anakin Skywalker's fall to the dark side and transformation into Darth Vader?", a: "Revenge of the Sith" }
+        ],
+        400: [
+          { q: "Which 2018 anthology film serves as an origin story for a young Han Solo, including his first meeting with Chewbacca?", a: "Solo: A Star Wars Story" },
+          { q: "Which director took over from George Lucas to direct 'The Empire Strikes Back' (1980)?", a: "Irvin Kershner" },
+          { q: "Which film was the first in the saga to display 'Episode I' on screen as newly produced material, despite the numbering scheme having already existed for earlier films?", a: "The Phantom Menace" }
+        ],
+        500: [
+          { q: "What was the fake working title used during the filming of 'Return of the Jedi' to throw off the press and public?", a: "Blue Harvest" },
+          { q: "Which film was the first Star Wars movie to display an on-screen episode number in its original theatrical release, doing so in 1980 (unlike 'A New Hope,' whose 'Episode IV' text was added in a later re-release)?", a: "The Empire Strikes Back" },
+          { q: "Which actor physically portrayed Darth Vader in the original trilogy, having his voice completely replaced in post-production by James Earl Jones?", a: "David Prowse" }
+        ]
+      }
+    },
+    {
+      name: "Characters",
+      questions: {
+        100: [
+          { q: "Which farm boy from Tatooine becomes a Jedi Knight and destroys the first Death Star?", a: "Luke Skywalker" },
+          { q: "Which princess and general leads the Rebel Alliance and is later revealed to be Luke's twin sister?", a: "Leia Organa" },
+          { q: "Which smuggler pilots the Millennium Falcon alongside his Wookiee co-pilot Chewbacca?", a: "Han Solo" }
+        ],
+        200: [
+          { q: "Which golden protocol droid is fluent in over six million forms of communication?", a: "C-3PO" },
+          { q: "Which small, green Jedi Master trains both Luke Skywalker and, decades earlier, Anakin Skywalker?", a: "Yoda" },
+          { q: "Which scavenger from the desert planet Jakku becomes a central hero of the sequel trilogy?", a: "Rey" }
+        ],
+        300: [
+          { q: "Which armored bounty hunter captures Han Solo in carbonite for Jabba the Hutt?", a: "Boba Fett" },
+          { q: "Which Jedi Master serves as Obi-Wan Kenobi's own mentor before being killed by Darth Maul in 'The Phantom Menace'?", a: "Qui-Gon Jinn" },
+          { q: "Which former stormtrooper defects from the First Order and befriends Rey and Poe Dameron?", a: "Finn" }
+        ],
+        400: [
+          { q: "Which Sith Lord secretly rules the galaxy as both Darth Sidious and, publicly, Chancellor Palpatine?", a: "Emperor Palpatine (Darth Sidious)" },
+          { q: "Which Mandalorian bounty hunter serves as the unaltered genetic template for the Republic's clone trooper army?", a: "Jango Fett" },
+          { q: "Which cyborg alien general, commander of the droid army in 'Revenge of the Sith,' collects lightsabers taken from Jedi he has killed?", a: "General Grievous" }
+        ],
+        500: [
+          { q: "Which actor played Grand Moff Tarkin in the original films and was digitally recreated for a new performance in 'Rogue One' after his death?", a: "Peter Cushing" },
+          { q: "Which actress played Padmé Amidala's decoy handmaiden Sabé in 'The Phantom Menace,' before going on to greater fame in other film roles?", a: "Keira Knightley" },
+          { q: "Which actor plays Tobias Beckett, Han Solo's mentor and fellow smuggler, in 'Solo: A Star Wars Story'?", a: "Woody Harrelson" }
+        ]
+      }
+    },
+    {
+      name: "The Force & Jedi Order",
+      questions: {
+        100: [
+          { q: "What mystical energy field, wielded by the Jedi and Sith alike, binds the Star Wars galaxy together?", a: "The Force" },
+          { q: "What is the name of the blade of pure energy that serves as a Jedi Knight's signature weapon?", a: "The lightsaber" },
+          { q: "What color is Luke Skywalker's second lightsaber, built by himself and used in 'Return of the Jedi'?", a: "Green" }
+        ],
+        200: [
+          { q: "What is the name of the ancient order of dark-side Force-wielders who are the sworn enemies of the Jedi?", a: "The Sith" },
+          { q: "What ancient rule limits the Sith to exactly two members at any time — a master and an apprentice?", a: "The Rule of Two" },
+          { q: "What is the name of the technique that allows a Jedi to influence weak-minded individuals with a wave of the hand and a few suggestive words?", a: "The Jedi mind trick" }
+        ],
+        300: [
+          { q: "Which Zabrak Sith Lord, Darth Sidious's on-screen apprentice, wields a double-bladed lightsaber in 'The Phantom Menace'?", a: "Darth Maul" },
+          { q: "What is the name of the governing body of twelve Jedi Masters who oversee the Jedi Order from the Jedi Temple on Coruscant?", a: "The Jedi Council" },
+          { q: "What is the name of the secret command that turns the clone troopers against their Jedi generals at the end of 'Revenge of the Sith'?", a: "Order 66" }
+        ],
+        400: [
+          { q: "What is the name of the dark-side power, channeled through the hands, that Emperor Palpatine famously uses to strike down Mace Windu and torture Luke Skywalker?", a: "Force lightning" },
+          { q: "Which future Sith Lord loses his right forearm to Count Dooku's lightsaber during their duel in 'Attack of the Clones'?", a: "Anakin Skywalker" },
+          { q: "What term describes a former Jedi's spiritual essence retained after death, allowing figures like Obi-Wan Kenobi and Yoda to appear as translucent, communicative apparitions?", a: "A Force ghost" }
+        ],
+        500: [
+          { q: "What is the name of the microscopic, symbiotic life-forms said to live within all living cells and allow Force-sensitives to communicate with the Force, as explained in 'The Phantom Menace'?", a: "Midichlorians" },
+          { q: "According to the prophecy referenced throughout the prequel trilogy, what is Anakin Skywalker foretold to be regarding the Force?", a: "The Chosen One (prophesied to bring balance to the Force)" },
+          { q: "In Yoda's famous warning about fear on Dagobah — 'Fear leads to anger, anger leads to hate' — what is the final link in that chain of emotions?", a: "Suffering" }
+        ]
+      }
+    },
+    {
+      name: "Starships & Planets",
+      questions: {
+        100: [
+          { q: "What is the name of Han Solo's iconic ship, said to have made 'the Kessel Run in less than twelve parsecs'?", a: "The Millennium Falcon" },
+          { q: "What is the name of Luke Skywalker's desert home planet, known for its twin suns?", a: "Tatooine" },
+          { q: "What massive, moon-sized Imperial battle station is capable of destroying entire planets?", a: "The Death Star" }
+        ],
+        200: [
+          { q: "Which ice planet is home to the Rebel base at the start of 'The Empire Strikes Back'?", a: "Hoth" },
+          { q: "What is the name of Yoda's swampy exile planet, where Luke trains as a Jedi in 'The Empire Strikes Back'?", a: "Dagobah" },
+          { q: "What is the name of the small, single-pilot starfighter flown by Rebel and Resistance pilots against the Death Star and other Imperial targets?", a: "The X-wing" }
+        ],
+        300: [
+          { q: "What is the name of the forest moon inhabited by the Ewoks, site of the climactic ground battle in 'Return of the Jedi'?", a: "Endor" },
+          { q: "What is the name of Darth Vader's personal Star Destroyer flagship?", a: "The Executor" },
+          { q: "What is the name of Rey's home desert planet, introduced in 'The Force Awakens,' where she survives by scavenging parts from crashed Star Destroyers?", a: "Jakku" }
+        ],
+        400: [
+          { q: "What is the name of the planet where the Republic's clone trooper army is secretly created in 'Attack of the Clones'?", a: "Kamino" },
+          { q: "What is the name of the prison-mining planet where Han, Chewbacca, and Lando pull off a dangerous spice heist in 'Solo: A Star Wars Story,' also referenced in the original film's 'Kessel Run' line?", a: "Kessel" },
+          { q: "Which capital planet of the Galactic Republic, and later the Empire, is depicted as an entirely city-covered world?", a: "Coruscant" }
+        ],
+        500: [
+          { q: "What is the name of the hidden Sith planet, shrouded by a permanent electrical storm, revealed as Emperor Palpatine's secret base and fleet in 'The Rise of Skywalker'?", a: "Exegol" },
+          { q: "What is the name of the volcanic planet where Obi-Wan Kenobi and Anakin Skywalker have their climactic lightsaber duel at the end of 'Revenge of the Sith'?", a: "Mustafar" },
+          { q: "What is the name of Padmé Amidala's water-covered home planet, whose capital city is Theed?", a: "Naboo" }
+        ]
+      }
+    },
+    {
+      name: "Trivia & Behind-the-Scenes",
+      questions: {
+        100: [
+          { q: "Which filmmaker created the Star Wars franchise, writing and directing the original 1977 film?", a: "George Lucas" },
+          { q: "Which legendary composer wrote the iconic musical score for the Star Wars saga, including its famous main theme?", a: "John Williams" },
+          { q: "In which desert country were the Tatooine scenes for multiple Star Wars films famously shot on location?", a: "Tunisia" }
+        ],
+        200: [
+          { q: "What is the exact wording of Darth Vader's famous line revealing he is Luke's father, which is often misquoted as 'Luke, I am your father'?", a: "No, I am your father." },
+          { q: "Which actor, standing over seven feet tall, physically performed as Chewbacca throughout the original and prequel trilogies?", a: "Peter Mayhew" },
+          { q: "Which studio distributed the original Star Wars trilogy in theaters, before Lucasfilm was acquired by Disney in 2012?", a: "20th Century Fox" }
+        ],
+        300: [
+          { q: "Which actor ad-libbed the famous response 'I know' instead of the scripted 'I love you too' during Han Solo's carbon-freezing scene in 'The Empire Strikes Back'?", a: "Harrison Ford" },
+          { q: "How many competitive Academy Awards did the original 1977 'Star Wars' film win at the 50th Academy Awards ceremony?", a: "Six" },
+          { q: "Which recycled stock scream, first recorded in 1951, was inserted by sound designer Ben Burtt into a scene of a falling stormtrooper and has since become a running in-joke throughout Hollywood?", a: "The Wilhelm scream" }
+        ],
+        400: [
+          { q: "Which visual effects company did George Lucas found specifically to create the effects for the original 'Star Wars,' which went on to become an industry leader?", a: "Industrial Light & Magic (ILM)" },
+          { q: "Which sound post-production company, also founded by George Lucas and based at Skywalker Ranch, handles the franchise's audio design?", a: "Skywalker Sound" },
+          { q: "Which single line of Han Solo's dialogue toward Greedo in the Mos Eisley cantina was digitally altered in later re-releases, sparking the long-running 'Who shot first?' fan controversy?", a: "\"Han shot first\"" }
+        ],
+        500: [
+          { q: "Which 1975 film held the record for highest-grossing movie of all time until the original 'Star Wars' overtook it in 1977?", a: "Jaws" },
+          { q: "Which actor is the only person to receive a competitive Academy Award nomination for acting in a Star Wars film, nominated for Best Supporting Actor for playing Obi-Wan Kenobi in 'A New Hope'?", a: "Alec Guinness" },
+          { q: "What trade did Harrison Ford work as, including for clients like Francis Ford Coppola, in the years before his acting career took off around the time of his 'Star Wars' casting?", a: "Carpenter" }
+        ]
+      }
+    }
+  ]
+},
+"Disney": {
+  icon: "🏰",
+  categories: [
+    {
+      name: "Disney Movies",
+      questions: {
+        100: [
+          { q: "Which 1937 Disney film was the first full-length cel-animated feature film in movie history?", a: "Snow White and the Seven Dwarfs" },
+          { q: "In 'Frozen,' what is the name of the kingdom ruled by sisters Elsa and Anna?", a: "Arendelle" },
+          { q: "Which 1994 Disney film follows a lion cub named Simba who must reclaim his throne from his uncle?", a: "The Lion King" }
+        ],
+        200: [
+          { q: "Which Disney film is set among the Polynesian islands and follows a chief's daughter who sets sail to save her people?", a: "Moana" },
+          { q: "Which 1992 Disney film is set in the fictional city of Agrabah and features a genie who lives in a magic lamp?", a: "Aladdin" },
+          { q: "Which Disney film became the first animated feature ever nominated for the Academy Award for Best Picture?", a: "Beauty and the Beast" }
+        ],
+        300: [
+          { q: "Which 1989 Disney film, based on a Hans Christian Andersen tale, stars a mermaid princess named Ariel?", a: "The Little Mermaid" },
+          { q: "Which 2010 Disney film retells the story of a long-haired princess locked in a tower?", a: "Tangled" },
+          { q: "Which 1940 Disney film pairs classical music with animated segments, including 'The Sorcerer's Apprentice' starring Mickey Mouse?", a: "Fantasia" }
+        ],
+        400: [
+          { q: "Which 1942 Disney film centers on a young deer who loses his mother to a hunter?", a: "Bambi" },
+          { q: "Which 1959 Disney film was, at the time, the studio's most expensive animated film and was shot in widescreen Super Technirama 70?", a: "Sleeping Beauty" },
+          { q: "Which 1940 Disney film features a wooden puppet who, along with his father, is swallowed by a whale named Monstro?", a: "Pinocchio" }
+        ],
+        500: [
+          { q: "Which 1985 Disney animated film was the studio's first to receive a PG rating and became a notorious box-office flop?", a: "The Black Cauldron" },
+          { q: "Which 1941 Disney film, made quickly and cheaply after 'Fantasia' underperformed, is one of the studio's shortest animated features at just over an hour?", a: "Dumbo" },
+          { q: "Which 1990 Disney film was the studio's first traditionally animated theatrical sequel and the first feature completed entirely with the digital CAPS ink-and-paint system?", a: "The Rescuers Down Under" }
+        ]
+      }
+    },
+    {
+      name: "Disney Characters",
+      questions: {
+        100: [
+          { q: "What is the name of Aladdin's mischievous pet monkey?", a: "Abu" },
+          { q: "What is the name of the living snowman built by Elsa's magic in 'Frozen'?", a: "Olaf" },
+          { q: "What is the name of the fairy who accompanies Peter Pan?", a: "Tinker Bell" }
+        ],
+        200: [
+          { q: "What is the name of Belle's father, an inventor, in 'Beauty and the Beast'?", a: "Maurice" },
+          { q: "In 'The Little Mermaid,' what is the name of Ariel's crab friend and reluctant chaperone?", a: "Sebastian" },
+          { q: "What is the name of Mulan's wisecracking dragon guardian, voiced by Eddie Murphy?", a: "Mushu" }
+        ],
+        300: [
+          { q: "What is the name of Bambi's excitable rabbit friend?", a: "Thumper" },
+          { q: "In 'Pinocchio,' what is the name of the cricket who serves as Pinocchio's conscience?", a: "Jiminy Cricket" },
+          { q: "What is the name of Rapunzel's loyal pet chameleon in 'Tangled'?", a: "Pascal" }
+        ],
+        400: [
+          { q: "In 'Sleeping Beauty,' what are the names of the three good fairies who raise Princess Aurora?", a: "Flora, Fauna, and Merryweather" },
+          { q: "What is the name of the boy genius who is paired with the robot Baymax in 'Big Hero 6'?", a: "Hiro Hamada" },
+          { q: "In 'The Hunchback of Notre Dame,' what are the names of Quasimodo's three gargoyle friends?", a: "Victor, Hugo, and Laverne" }
+        ],
+        500: [
+          { q: "What is the name of the talking willow tree spirit who guides Pocahontas?", a: "Grandmother Willow" },
+          { q: "In 'The Great Mouse Detective,' what is the name of Professor Ratigan's peg-legged bat henchman?", a: "Fidget" },
+          { q: "What is the name of the elderly albatross who helps Bernard and Bianca fly to Devil's Bayou in 'The Rescuers'?", a: "Orville" }
+        ]
+      }
+    },
+    {
+      name: "Villains",
+      questions: {
+        100: [
+          { q: "Who is the villainous sea witch who tricks Ariel into a deal in 'The Little Mermaid'?", a: "Ursula" },
+          { q: "Who is Simba's scheming uncle and the main villain of 'The Lion King'?", a: "Scar" },
+          { q: "What is the title of the evil queen and witch who poisons Snow White with a cursed apple?", a: "The Evil Queen" }
+        ],
+        200: [
+          { q: "Who is the power-hungry royal vizier in 'Aladdin' who seeks the genie's lamp?", a: "Jafar" },
+          { q: "Who is the wicked fashion designer obsessed with making a coat from puppy fur in '101 Dalmatians'?", a: "Cruella de Vil" },
+          { q: "Who is the horned, evil fairy who curses Princess Aurora in 'Sleeping Beauty'?", a: "Maleficent" }
+        ],
+        300: [
+          { q: "Who is the vain, muscle-bound hunter who tries to kill the Beast in 'Beauty and the Beast'?", a: "Gaston" },
+          { q: "In 'Hercules,' who is the fast-talking god of the underworld and the film's main villain?", a: "Hades" },
+          { q: "In 'Tangled,' what does Mother Gothel keep Rapunzel captive in order to use?", a: "Her magical, youth-restoring hair" }
+        ],
+        400: [
+          { q: "Who is the tyrannical stepmother who torments Cinderella?", a: "Lady Tremaine" },
+          { q: "In 'Pocahontas,' who is the gold-obsessed governor leading the Virginia Company's expedition?", a: "Governor Ratcliffe" },
+          { q: "What is the name of the corrupt judge who relentlessly pursues Quasimodo and Esmeralda in 'The Hunchback of Notre Dame'?", a: "Judge Claude Frollo" }
+        ],
+        500: [
+          { q: "Who is the criminal mastermind rat, voiced by Vincent Price, who serves as the villain of 'The Great Mouse Detective'?", a: "Professor Ratigan" },
+          { q: "Who is the mad, shape-shifting witch who challenges Merlin to a wizard's duel in 'The Sword in the Stone'?", a: "Madam Mim" },
+          { q: "Who is the greedy, thumb-sucking lion who usurps the throne of England in 'Robin Hood' (1973)?", a: "Prince John" }
+        ]
+      }
+    },
+    {
+      name: "Songs",
+      questions: {
+        100: [
+          { q: "Which 'Frozen' song, sung by Elsa as she abandons her kingdom, won the Academy Award for Best Original Song?", a: "\"Let It Go\"" },
+          { q: "Which song plays during Simba's presentation as a newborn cub at the opening of 'The Lion King'?", a: "\"Circle of Life\"" },
+          { q: "Which song does Ariel sing while sitting on a rock, longing to be part of the human world?", a: "\"Part of Your World\"" }
+        ],
+        200: [
+          { q: "Which duet do Aladdin and Jasmine sing while flying together on a magic carpet?", a: "\"A Whole New World\"" },
+          { q: "Which song, performed by Sebastian the crab, celebrates undersea life in 'The Little Mermaid'?", a: "\"Under the Sea\"" },
+          { q: "Which Elton John and Tim Rice song from 'The Lion King' won the Academy Award for Best Original Song?", a: "\"Can You Feel the Love Tonight\"" }
+        ],
+        300: [
+          { q: "Which song plays as Belle and the Beast share their dance in the ballroom scene of 'Beauty and the Beast'?", a: "\"Beauty and the Beast\"" },
+          { q: "Which 'Pocahontas' song, about respecting the natural world, won the Academy Award for Best Original Song?", a: "\"Colors of the Wind\"" },
+          { q: "Which carefree, problem-free philosophy song do Timon and Pumbaa teach young Simba in 'The Lion King'?", a: "\"Hakuna Matata\"" }
+        ],
+        400: [
+          { q: "Which song, sung by Jiminy Cricket in 'Pinocchio,' later became the Walt Disney Company's own signature theme song?", a: "\"When You Wish Upon a Star\"" },
+          { q: "Which composer scored 'The Little Mermaid,' 'Beauty and the Beast,' and 'Aladdin,' frequently collaborating with lyricist Howard Ashman?", a: "Alan Menken" },
+          { q: "Which tongue-twisting song from 'Mary Poppins' takes its title from one of the longest words ever used in a Disney song?", a: "\"Supercalifragilisticexpialidocious\"" }
+        ],
+        500: [
+          { q: "Which song from 'Song of the South' (1946) became Disney's second-ever Academy Award-winning song?", a: "\"Zip-a-Dee-Doo-Dah\"" },
+          { q: "Which song, written and performed by Phil Collins for 'Tarzan,' won the Academy Award for Best Original Song in 2000?", a: "\"You'll Be in My Heart\"" },
+          { q: "Which orchestral piece by French composer Paul Dukas accompanies the famous 'Sorcerer's Apprentice' segment in 'Fantasia'?", a: "\"The Sorcerer's Apprentice\" (L'Apprenti sorcier)" }
+        ]
+      }
+    },
+    {
+      name: "Pixar",
+      questions: {
+        100: [
+          { q: "Which 1995 film was Pixar's first feature film and the first feature film made entirely with computer animation?", a: "Toy Story" },
+          { q: "In 'Finding Nemo,' what type of fish is Nemo?", a: "A clownfish" },
+          { q: "What is the name of the hopping desk lamp that serves as Pixar's mascot in its opening logo?", a: "Luxo Jr." }
+        ],
+        200: [
+          { q: "In 'Up,' what is the name of the elderly widower who ties thousands of balloons to his house?", a: "Carl Fredricksen" },
+          { q: "In 'Monsters, Inc.,' what is the name of the human toddler who accidentally enters the monster world?", a: "Boo" },
+          { q: "In 'Ratatouille,' what is the name of the rat who dreams of becoming a Parisian chef?", a: "Remy" }
+        ],
+        300: [
+          { q: "In 'The Incredibles,' what is the superhero family's surname?", a: "Parr" },
+          { q: "In 'Inside Out,' name the five core emotions living inside Riley's mind.", a: "Joy, Sadness, Anger, Fear, and Disgust" },
+          { q: "In 'Coco,' which Mexican holiday is central to the film's plot?", a: "Dia de los Muertos (Day of the Dead)" }
+        ],
+        400: [
+          { q: "Which 2020 Pixar film follows two teenage elf brothers on a quest to spend one magical day with their late father?", a: "Onward" },
+          { q: "What is the nickname of the Pizza Planet delivery truck that appears as a hidden reference in nearly every Pixar film, first introduced in 'Toy Story'?", a: "The Pizza Planet Truck" },
+          { q: "Which recurring hidden number, a nod to a California Institute of the Arts classroom, appears in almost every Pixar film?", a: "A113" }
+        ],
+        500: [
+          { q: "Which actor voiced a character in 22 consecutive Pixar films, from 'Toy Story' in 1995 through 'Onward' in 2020, earning him the nickname of the studio's good-luck charm?", a: "John Ratzenberger" },
+          { q: "What is the name of the 1984 short film directed by John Lasseter at Lucasfilm's Computer Graphics Group, the team that would go on to become Pixar?", a: "\"The Adventures of Andre & Wally B.\"" },
+          { q: "Which 1988 Pixar short film, about a wind-up toy fleeing a drooling baby, won Pixar's first Academy Award, for Best Animated Short Film?", a: "\"Tin Toy\"" }
+        ]
+      }
+    }
+  ]
+},
+"Lord of the Rings": {
+  icon: "💍",
+  categories: [
+    {
+      name: "Characters",
+      questions: {
+        100: [
+          { q: "Which hobbit is chosen as the Ring-bearer to carry the One Ring to Mordor?", a: "Frodo Baggins" },
+          { q: "Which wizard leads the Fellowship and famously battles a Balrog on the Bridge of Khazad-dum?", a: "Gandalf" },
+          { q: "Who is the Ranger from the North who is revealed to be the rightful King of Gondor?", a: "Aragorn" }
+        ],
+        200: [
+          { q: "What is the name of Frodo's loyal gardener and closest companion on the journey to Mordor?", a: "Samwise \"Sam\" Gamgee" },
+          { q: "Who is the Elf archer from the Woodland Realm who joins the Fellowship?", a: "Legolas" },
+          { q: "What is the name of the creature, once a hobbit-like being called Smeagol, who is obsessed with the Ring?", a: "Gollum" }
+        ],
+        300: [
+          { q: "Who is the Dwarf warrior, son of Gloin, who joins the Fellowship and forms a friendship with Legolas?", a: "Gimli" },
+          { q: "Which Man of Gondor, son of Denethor, is corrupted by the Ring's influence and tries to take it from Frodo?", a: "Boromir" },
+          { q: "Who is the shieldmaiden of Rohan who disguises herself as a man to fight at the Battle of the Pelennor Fields?", a: "Eowyn" }
+        ],
+        400: [
+          { q: "Which wizard betrays the White Council and allies with Sauron, ruling from the tower of Orthanc?", a: "Saruman" },
+          { q: "Who is Elrond's daughter, an immortal Elf who gives up her immortality to marry Aragorn?", a: "Arwen" },
+          { q: "What is the name of Theoden's treacherous advisor, secretly working for Saruman?", a: "Grima Wormtongue" }
+        ],
+        500: [
+          { q: "Who is the ancient, giant tree-shepherd (an Ent) who leads the march on Isengard?", a: "Treebeard (Fangorn)" },
+          { q: "What is the name of Aragorn's ancestor, the King of Gondor who cut the One Ring from Sauron's hand but failed to destroy it?", a: "Isildur" },
+          { q: "What is the name of the giant spider that ambushes Frodo in the pass of Cirith Ungol?", a: "Shelob" }
+        ]
+      }
+    },
+    {
+      name: "Middle-earth Locations",
+      questions: {
+        100: [
+          { q: "What is the name of the peaceful, rural homeland of the hobbits?", a: "The Shire" },
+          { q: "What is the name of the fiery mountain in Mordor where the One Ring must be destroyed?", a: "Mount Doom (Orodruin)" },
+          { q: "What is the name of the hobbit-hole home of Bilbo and later Frodo Baggins?", a: "Bag End" }
+        ],
+        200: [
+          { q: "What is the name of the hidden Elven refuge ruled by Elrond, where the Fellowship is formed?", a: "Rivendell (Imladris)" },
+          { q: "What is the name of the ancient Dwarven kingdom and mines where the Fellowship encounters a Balrog?", a: "Moria (Khazad-dum)" },
+          { q: "What is the name of the golden-roofed hall of the King of Rohan in Edoras?", a: "Meduseld" }
+        ],
+        300: [
+          { q: "What is the name of Sauron's fortress realm, encircled by mountains?", a: "Mordor" },
+          { q: "What is the name of the great fortress of Rohan, also called the Hornburg, where a major battle is fought in 'The Two Towers'?", a: "Helm's Deep" },
+          { q: "What is the name of the Elven forest realm ruled by Galadriel and Celeborn?", a: "Lothlorien" }
+        ],
+        400: [
+          { q: "What is the name of Saruman's fortress, home to the tower of Orthanc?", a: "Isengard" },
+          { q: "What is the name of the white-walled capital of Gondor, where Denethor rules as Steward?", a: "Minas Tirith" },
+          { q: "What is the name of the forest home of the Ents, where Merry and Pippin meet Treebeard?", a: "Fangorn Forest" }
+        ],
+        500: [
+          { q: "What is the name of the ruined watchtower where Frodo is stabbed by the Witch-king with a Morgul blade?", a: "Weathertop (Amon Sul)" },
+          { q: "What is the name of the eerie swamp the Fellowship crosses en route to Mordor, where Frodo sees dead faces glowing beneath the water?", a: "The Dead Marshes" },
+          { q: "What is the name of the secret mountain path Aragorn takes to summon the Army of the Dead?", a: "The Paths of the Dead" }
+        ]
+      }
+    },
+    {
+      name: "The Films",
+      questions: {
+        100: [
+          { q: "Who directed 'The Lord of the Rings' film trilogy?", a: "Peter Jackson" },
+          { q: "In which country were all three 'Lord of the Rings' films primarily filmed?", a: "New Zealand" },
+          { q: "What is the title of the third and final film in the trilogy, released in 2003?", a: "The Return of the King" }
+        ],
+        200: [
+          { q: "Which actor plays Aragorn in the film trilogy?", a: "Viggo Mortensen" },
+          { q: "Which actor plays Gandalf across the trilogy?", a: "Ian McKellen" },
+          { q: "Who composed the film trilogy's orchestral score?", a: "Howard Shore" }
+        ],
+        300: [
+          { q: "Which actor performed the character of Gollum through motion-capture technology?", a: "Andy Serkis" },
+          { q: "Which New Zealand-based visual effects company created the trilogy's digital effects and miniatures?", a: "Weta Digital / Weta Workshop" },
+          { q: "How many Academy Awards did 'The Return of the King' win, sweeping every category it was nominated in?", a: "11" }
+        ],
+        400: [
+          { q: "Which actor plays Gimli in the trilogy and also provides the voice of the Ent Treebeard?", a: "John Rhys-Davies" },
+          { q: "What nickname did Weta Workshop coin for the trilogy's large-scale physical models, such as Minas Tirith and Orthanc?", a: "Bigatures (large-scale miniatures)" },
+          { q: "Which actress plays the Elf queen Galadriel and delivers the trilogy's opening narration?", a: "Cate Blanchett" }
+        ],
+        500: [
+          { q: "Approximately how much was the combined production budget for all three 'Lord of the Rings' films, which were shot simultaneously back-to-back?", a: "About $281 million (roughly $93-94 million per film)" },
+          { q: "What is the name of the crowd-simulation software developed by Weta Digital for the trilogy's massive battle scenes, later used industry-wide?", a: "Massive" },
+          { q: "Which studio produced and financed 'The Lord of the Rings' trilogy?", a: "New Line Cinema" }
+        ]
+      }
+    },
+    {
+      name: "Quotes",
+      questions: {
+        100: [
+          { q: "Which character shouts \"You shall not pass!\" while facing down the Balrog on the Bridge of Khazad-dum?", a: "Gandalf" },
+          { q: "Which character obsessively refers to the One Ring as \"My precious\"?", a: "Gollum" },
+          { q: "Which character warns the Council, \"One does not simply walk into Mordor\"?", a: "Boromir" }
+        ],
+        200: [
+          { q: "\"I am no man!\" is declared by which character just before she slays the Witch-king of Angmar?", a: "Eowyn" },
+          { q: "The poem containing the line \"Not all those who wander are lost\" describes which Ranger, later revealed to be the King of Gondor?", a: "Aragorn" },
+          { q: "\"I can't carry it for you, but I can carry you!\" is said by which hobbit to Frodo on the slopes of Mount Doom?", a: "Sam (Samwise Gamgee)" }
+        ],
+        300: [
+          { q: "\"Fool of a Took!\" is shouted by which wizard after Pippin causes a commotion in the Mines of Moria?", a: "Gandalf" },
+          { q: "\"The world is changed. I feel it in the water. I feel it in the earth. I smell it in the air.\" Who delivers this opening narration of 'The Fellowship of the Ring'?", a: "Galadriel" },
+          { q: "\"I would have followed you, my brother. My captain. My king.\" Which dying character speaks this line to Aragorn?", a: "Boromir" }
+        ],
+        400: [
+          { q: "\"Even the smallest person can change the course of the future.\" Which character says this to Frodo beside her Mirror in Lothlorien?", a: "Galadriel" },
+          { q: "\"Death! Death! Death!\" Which King of Rohan chants this before leading the charge at the Battle of the Pelennor Fields?", a: "Theoden" },
+          { q: "\"I bid you stand, Men of the West!\" Which character delivers this rallying speech before the Black Gate of Mordor?", a: "Aragorn" }
+        ],
+        500: [
+          { q: "\"So it begins.\" Which King quietly says this as the Battle of Helm's Deep erupts?", a: "Theoden" },
+          { q: "\"There's some good in this world, Mr. Frodo, and it's worth fighting for.\" Which character says this to encourage Frodo before they enter Mordor?", a: "Sam (Samwise Gamgee)" },
+          { q: "Responding to Frodo's regret that Bilbo didn't kill Gollum when he had the chance, which character says, \"Many that live deserve death. And some that die deserve life. Can you give it to them?\"", a: "Gandalf" }
+        ]
+      }
+    },
+    {
+      name: "Trivia & Lore",
+      questions: {
+        100: [
+          { q: "Who wrote the novel 'The Lord of the Rings,' originally published in the 1950s?", a: "J.R.R. Tolkien" },
+          { q: "What object, forged by the Dark Lord Sauron, is the central focus of the entire story?", a: "The One Ring" },
+          { q: "What is the name of the group formed to destroy the Ring, giving the first film its title?", a: "The Fellowship of the Ring" }
+        ],
+        200: [
+          { q: "How many members make up the Fellowship of the Ring?", a: "Nine" },
+          { q: "What nickname is given to Bilbo Baggins' 111th birthday party, the event that opens the story?", a: "His \"eleventy-first\" birthday party" },
+          { q: "Which prequel trilogy, also directed by Peter Jackson, adapts Tolkien's earlier novel about Bilbo Baggins?", a: "The Hobbit trilogy" }
+        ],
+        300: [
+          { q: "In the lore of the Rings of Power, how many Rings were given to the race of Men, who were later corrupted into the Ringwraiths?", a: "Nine" },
+          { q: "In what language, devised by Sauron himself, is the One Ring's fiery inscription written?", a: "The Black Speech (of Mordor)" },
+          { q: "What is the name of Bilbo's enchanted short sword, later given to Frodo, which glows blue whenever Orcs are near?", a: "Sting" }
+        ],
+        400: [
+          { q: "What is the name of Aragorn's sword, reforged from the shards of Narsil?", a: "Anduril (Flame of the West)" },
+          { q: "Who awoke the Balrog known as \"Durin's Bane\" by delving too greedily and too deep for mithril?", a: "The Dwarves of Moria" },
+          { q: "What term describes the army of oath-breaking men whom Aragorn summons from the mountain to fight at his side?", a: "The Army of the Dead (Oathbreakers)" }
+        ],
+        500: [
+          { q: "What high frame rate, controversial among audiences for its hyper-realistic look, was used to film 'The Hobbit' trilogy?", a: "48 frames per second" },
+          { q: "Which actor portrays the dragon Smaug in 'The Hobbit' trilogy through voice and motion-capture performance?", a: "Benedict Cumberbatch" },
+          { q: "What is the name of the record book, found by Gandalf in Balin's tomb in Moria, that chronicles the doomed final stand of Balin's dwarven colony?", a: "The Book of Mazarbul" }
+        ]
+      }
+    }
+  ]
+},
+"Filipino Culture": {
+  icon: "🎊",
+  categories: [
+    {
+      name: "Filipino Food",
+      questions: {
+        100: [
+          { q: "What Filipino dish, considered by many to be the country's unofficial national dish, is made by braising meat in vinegar, soy sauce, and garlic?", a: "Adobo" },
+          { q: "What term refers to a whole roasted pig, a centerpiece dish at Filipino fiestas and celebrations?", a: "Lechon" },
+          { q: "What popular Filipino dessert is made of shaved ice, evaporated milk, and a mix of sweetened beans, fruits, and jellies?", a: "Halo-halo" }
+        ],
+        200: [
+          { q: "What is the name of the fertilized duck egg eaten as a popular Filipino street food, typically boiled and eaten with salt or vinegar?", a: "Balut" },
+          { q: "What sour Filipino soup is commonly flavored with tamarind and can be made with pork, shrimp, or fish?", a: "Sinigang" },
+          { q: "What stir-fried noodle dish, one of the most common Filipino comfort foods, is often served at birthdays as a symbol of long life?", a: "Pancit (Pansit)" }
+        ],
+        300: [
+          { q: "What Filipino stew gets its rich orange-brown color and nutty flavor from ground peanuts, and is traditionally made with oxtail?", a: "Kare-kare" },
+          { q: "What fermented condiment made from tiny shrimp or fish is a staple flavoring and dipping sauce in Filipino cuisine?", a: "Bagoong" },
+          { q: "What is the name of the Filipino fried spring roll, typically filled with ground pork and vegetables?", a: "Lumpia" }
+        ],
+        400: [
+          { q: "What Filipino dish, whose name literally translates to 'blooded,' is a savory stew made from pork offal simmered in pig's blood and vinegar?", a: "Dinuguan" },
+          { q: "Sisig, the sizzling dish of chopped pig's face, ears, and liver, was popularized in the 1970s by a vendor in Angeles City, Pampanga, known by what nickname?", a: "Aling Lucing (Lucia Cunanan)" },
+          { q: "What sweet Filipino snack consists of a banana rolled in a spring roll wrapper, coated in caramelized brown sugar, and deep-fried?", a: "Turon" }
+        ],
+        500: [
+          { q: "La Paz Batchoy, the noodle soup topped with pork organs, crushed chicharon, and egg, takes its name from a district of what Philippine city?", a: "Iloilo City" },
+          { q: "What is the traditional Filipino term for eating with bare hands directly off banana leaves, a style often associated with military-style 'boodle fights'?", a: "Kamayan" },
+          { q: "Before it referred to grilled pork face, the word 'sisig' first appeared in a 1732 Kapampangan dictionary describing what kind of dish?", a: "A sour salad or relish of unripe fruit, like green mango, fermented in vinegar" }
+        ]
+      }
+    },
+    {
+      name: "Traditions",
+      questions: {
+        100: [
+          { q: "What is the term for a Filipino town or barrio's annual celebration in honor of its patron saint, usually featuring food, parades, and festivities?", a: "Fiesta" },
+          { q: "What holiday is famously celebrated in the Philippines starting as early as September, giving the country a reputation for having the world's longest festive season?", a: "Christmas" },
+          { q: "What is the name of the series of dawn masses held on the nine days leading up to Christmas Day in the Philippines?", a: "Simbang Gabi" }
+        ],
+        200: [
+          { q: "What Filipino tradition, often cited as a symbol of community spirit, traditionally involves neighbors banding together to help a family move their entire house to a new location?", a: "Bayanihan" },
+          { q: "What Filipino gesture of respect involves taking an elder's hand and pressing it lightly to one's forehead?", a: "Mano po (pagmamano)" },
+          { q: "What term refers to the gifts or souvenirs that Filipinos traditionally bring home for family and friends after traveling?", a: "Pasalubong" }
+        ],
+        300: [
+          { q: "What is the Filipino term for All Saints'/All Souls' Day observances, typically involving visiting and cleaning the graves of deceased family members?", a: "Undas" },
+          { q: "What traditional Filipino courtship practice involves a suitor singing romantic songs, often at night, outside the window of the woman he is courting?", a: "Harana" },
+          { q: "What is the name of the traditional Filipino Christmas lantern, usually star-shaped and symbolizing the Star of Bethlehem, especially associated with San Fernando, Pampanga?", a: "Parol" }
+        ],
+        400: [
+          { q: "What week-long Aklan festival, held every January in honor of the Santo Nino and often called the 'Mother of All Philippine Festivals,' features tribes dancing in soot-blackened body paint?", a: "Ati-Atihan Festival" },
+          { q: "What Baguio City festival, held every February and named for the local term for 'blooming season,' celebrates the city's flowers?", a: "Panagbenga Festival" },
+          { q: "What is the term for the continuous, often days-long chanting of the 'Pasyon,' the epic poem recounting the life and death of Jesus Christ, during Holy Week?", a: "Pabasa" }
+        ],
+        500: [
+          { q: "What Cebu festival, held every third Sunday of January and one of the largest in the Philippines, honors the Santo Nino de Cebu with a dance mimicking the movement of a river current?", a: "Sinulog Festival" },
+          { q: "In traditional Filipino Catholic weddings, what are the coins called that the groom gives the bride as a symbol of prosperity, a custom inherited from Spanish colonization?", a: "Arrhae (arras)" },
+          { q: "What is the name of the traditional Filipino New Year's Eve feast, eaten together with family at midnight to welcome the new year?", a: "Media Noche" }
+        ]
+      }
+    },
+    {
+      name: "Slang and Expressions",
+      questions: {
+        100: [
+          { q: "What common Filipino expression, often tacked onto the end of a statement to signal it was a joke, means roughly 'just kidding'?", a: "Charot" },
+          { q: "What Filipino phrase, reflecting a laid-back, fatalistic attitude, translates roughly to 'come what may' or 'leave it to fate'?", a: "Bahala na" },
+          { q: "What Filipino/Taglish slang term refers to one's boyfriend or girlfriend?", a: "Jowa" }
+        ],
+        200: [
+          { q: "What Filipino exclamation, a contraction of 'Jesus, Maria, Jose,' is used to express shock, frustration, or exasperation?", a: "Susmaryosep" },
+          { q: "What Tagalog word describes the overwhelming urge to squeeze or pinch something, or someone, because it is unbearably cute?", a: "Gigil" },
+          { q: "What Tagalog word, often called untranslatable into English, describes the fluttery, giddy feeling of romantic excitement?", a: "Kilig" }
+        ],
+        300: [
+          { q: "What Filipino slang term means casual chit-chat or gossip among friends, as in 'let's catch up on some ___'?", a: "Chika" },
+          { q: "What is the Filipino term for a small neighborhood convenience store, found on nearly every residential block?", a: "Sari-sari store" },
+          { q: "In Filipino jeepney culture, what word do passengers shout to signal the driver to stop and let them off?", a: "Para" }
+        ],
+        400: [
+          { q: "The Filipino slang term 'lodi,' meaning an admirable person or idol figure, is formed by applying what wordplay technique to the word 'idol'?", a: "Spelling it backwards (letter reversal)" },
+          { q: "The slang term 'petmalu,' meaning something impressively cool or extreme, is a reversed form of what Tagalog word meaning 'cruel' or 'fierce'?", a: "Malupit" },
+          { q: "What term describes the internet writing style, associated with the 'jejemon' subculture of the late 2000s, of texting with excessive capitalization and altered spelling?", a: "Jejemon-speak (Jejenese)" }
+        ],
+        500: [
+          { q: "The Filipino wordplay style of reversing syllables or letters to coin new slang, as in 'lodi' and 'petmalu,' is known among linguists by what Tagalog term?", a: "Tadbalik" },
+          { q: "The slang term 'werpa,' used to cheer someone on or wish them well, is a syllabic reversal of what English word?", a: "Power" },
+          { q: "What Filipino term, especially associated with sari-sari stores, describes the practice of selling goods like cigarettes, shampoo, or coffee in small, single-use retail portions rather than whole packages?", a: "Tingi" }
+        ]
+      }
+    },
+    {
+      name: "History and Heritage",
+      questions: {
+        100: [
+          { q: "Who is the Philippine national hero executed by the Spanish colonial government in 1896, celebrated for novels including 'Noli Me Tangere'?", a: "Jose Rizal" },
+          { q: "The Philippines was colonized by Spain for over 300 years, beginning with the 1521 expedition of which Portuguese explorer sailing under the Spanish flag?", a: "Ferdinand Magellan" },
+          { q: "What is the name of the 1986 non-violent uprising that ousted President Ferdinand Marcos and installed Corazon Aquino as president?", a: "The EDSA People Power Revolution" }
+        ],
+        200: [
+          { q: "What Filipino chieftain of Mactan Island defeated and killed Ferdinand Magellan in battle in 1521?", a: "Lapu-Lapu" },
+          { q: "What secret revolutionary society, founded in 1892 and led by Andres Bonifacio, sought independence from Spain?", a: "Katipunan" },
+          { q: "On what date, now celebrated as the country's Independence Day, did Emilio Aguinaldo declare Philippine independence from Spain in 1898?", a: "June 12, 1898" }
+        ],
+        300: [
+          { q: "After Spain ceded the Philippines to the United States following the Spanish-American War, what conflict was fought from 1899 to 1902 as Filipino revolutionaries resisted American rule?", a: "The Philippine-American War" },
+          { q: "The Philippines was occupied by which country's forces during World War II, from 1942 to 1945?", a: "Japan" },
+          { q: "On what date did Jose Rizal face execution by firing squad at Bagumbayan, present-day Rizal Park?", a: "December 30, 1896" }
+        ],
+        400: [
+          { q: "The Philippines gained full independence from the United States on July 4, 1946, but Independence Day was later moved by President Diosdado Macapagal in 1962 to commemorate what earlier date instead?", a: "June 12 (the 1898 declaration of independence)" },
+          { q: "What is the name of the 1896 event in which Filipino revolutionaries tore up their community tax certificates, or cedulas, as a symbolic declaration of rebellion against Spain?", a: "The Cry of Pugad Lawin (also known as the Cry of Balintawak)" },
+          { q: "What indigenous pre-colonial writing system, used by early Filipinos before Spanish colonization, is sometimes inaccurately called 'alibata' though scholars prefer its original name?", a: "Baybayin" }
+        ],
+        500: [
+          { q: "What is the term for the system of forced, unpaid labor that Spanish colonizers required of Filipino men, typically 40 days a year, on public works projects?", a: "Polo y servicio" },
+          { q: "Which Philippine president declared martial law in September 1972, ruling largely by decree until being ousted in 1986?", a: "Ferdinand Marcos Sr." },
+          { q: "What transitional government, established in 1935 with Manuel L. Quezon as its first president, governed the Philippines in preparation for full independence from the United States?", a: "The Commonwealth of the Philippines" }
+        ]
+      }
+    },
+    {
+      name: "Filipino Entertainment",
+      questions: {
+        100: [
+          { q: "What long-running Philippine noontime variety show, which premiered in 1979, is often considered the longest-running noontime show in the country?", a: "Eat Bulaga!" },
+          { q: "What Filipino singer-actress, known as the 'Megastar,' rose to fame as a teenage singing sensation in the late 1970s?", a: "Sharon Cuneta" },
+          { q: "What is the name of the Filipino komiks-turned-superheroine character, created by Mars Ravelo, who gains her powers by swallowing a magic stone?", a: "Darna" }
+        ],
+        200: [
+          { q: "What comedic actor, born Rodolfo Vera Quizon Sr., is popularly known as the 'Comedy King' of Philippine cinema?", a: "Dolphy" },
+          { q: "What noontime variety show, a rival to Eat Bulaga, premiered on ABS-CBN in 2009 and has counted Vice Ganda among its hosts?", a: "It's Showtime" },
+          { q: "Which Filipina actress became the first Miss Philippines to win the Miss Universe crown, in 1969?", a: "Gloria Diaz" }
+        ],
+        300: [
+          { q: "The 2015 'Kalyeserye' segment of Eat Bulaga launched a massive viral love team phenomenon pairing Alden Richards with Maine Mendoza's character 'Yaya Dub,' known by what portmanteau?", a: "AlDub" },
+          { q: "What action star and 2004 presidential candidate, known as 'FPJ' or 'Da King,' was one of the most popular actors in Philippine cinema history?", a: "Fernando Poe Jr." },
+          { q: "What is the stage name of comedian and TV host Jose Marie Borja Viceral, a longtime host of 'It's Showtime'?", a: "Vice Ganda" }
+        ],
+        400: [
+          { q: "In 2020, the Philippine Congress voted to deny the broadcast franchise renewal of what major television network, forcing it off free-to-air TV?", a: "ABS-CBN" },
+          { q: "What long-running Philippine drama anthology series, airing since 1991, dramatizes real-life, viewer-submitted stories?", a: "Maalaala Mo Kaya" },
+          { q: "Which Filipina actress, known as the 'Superstar,' rose to fame in the 1970s and later starred in the acclaimed film 'Himala'?", a: "Nora Aunor" }
+        ],
+        500: [
+          { q: "What actor plays the lead role of Cardo Dalisay in 'Ang Probinsyano,' one of the highest-rated and longest-running Philippine teleseryes?", a: "Coco Martin" },
+          { q: "Which Filipina became the third Filipina to win Miss Universe, taking the crown in 2015, 42 years after the previous Filipina win?", a: "Pia Wurtzbach" },
+          { q: "What long-running noontime show, hosted for years by Willie Revillame before he departed to launch rival programs, became known for its game segments in the mid-2000s?", a: "Wowowee" }
+        ]
+      }
+    }
+  ]
+},
+"Internet and Social Media": {
+  icon: "📱",
+  categories: [
+    {
+      name: "Memes",
+      questions: {
+        100: [
+          { q: "What term for a viral idea, image, or video that spreads across the internet through imitation and remixing was originally coined by biologist Richard Dawkins in his 1976 book 'The Selfish Gene'?", a: "Meme" },
+          { q: "What internet prank tricks someone into clicking a link that leads to Rick Astley's music video for 'Never Gonna Give You Up'?", a: "Rickrolling" },
+          { q: "What grumpy-faced cat, whose real name was Tardar Sauce, became a globally famous meme after photos of her went viral in 2012?", a: "Grumpy Cat" }
+        ],
+        200: [
+          { q: "What 2012 South Korean pop song by Psy became the first YouTube video ever to reach one billion views, thanks to its viral horse-riding dance?", a: "'Gangnam Style'" },
+          { q: "What meme features a Shiba Inu dog, often named Kabosu, captioned with broken-English phrases in colorful Comic Sans, and later inspired a cryptocurrency?", a: "Doge" },
+          { q: "What dance-based meme, named after a Harlem dance move, involves a video that starts with one person dancing before cutting to a wild group dance, and went viral in early 2013?", a: "The Harlem Shake" }
+        ],
+        300: [
+          { q: "What meme features a green cartoon frog character, originally created by artist Matt Furie for his comic 'Boy's Club,' before being widely appropriated online?", a: "Pepe the Frog" },
+          { q: "What 2017 stock photo meme depicts a man walking with his girlfriend while turning to ogle another woman, used to represent shifting preference or disloyalty?", a: "Distracted Boyfriend" },
+          { q: "What meme pairs a photo of a crying cat at a dinner table with a photo of two stern-looking women, used to depict someone getting scolded?", a: "Woman Yelling at a Cat" }
+        ],
+        400: [
+          { q: "What is considered one of the earliest viral internet videos, a 1996 3D-animated GIF of a boogying baby that spread via early internet forums and email years before social media existed?", a: "The Dancing Baby (Baby Cha-Cha)" },
+          { q: "What rainbow-trailed animated cat meme, set to a Japanese pop song, went viral on YouTube in April 2011?", a: "Nyan Cat" },
+          { q: "What 2007 viral YouTube music video, featuring an unexpectedly deep-voiced singer named Tay Zonday, became one of early YouTube's most-parodied videos?", a: "'Chocolate Rain'" }
+        ],
+        500: [
+          { q: "What term describes an image or meme, often deliberately degraded through repeated re-uploading, oversaturation, and excessive captions, that became its own ironic aesthetic movement in the mid-2010s?", a: "Deep-fried memes" },
+          { q: "The 'Loss' meme, one of the internet's most endlessly reformatted running jokes, originated from a 2008 comic strip in what webcomic?", a: "Ctrl+Alt+Del" },
+          { q: "What simple black-and-white line-drawn face with a mischievous grin was created by DeviantArt artist Carlos Ramirez in 2008 and became one of the defining images of the 'rage comic' era?", a: "Trollface" }
+        ]
+      }
+    },
+    {
+      name: "Social Media Platforms",
+      questions: {
+        100: [
+          { q: "What social media platform, founded by Mark Zuckerberg in 2004, was originally launched exclusively for Harvard students before expanding to the public?", a: "Facebook" },
+          { q: "What video-sharing platform, founded in 2005 and later acquired by Google, is the world's most popular website for uploading and watching videos?", a: "YouTube" },
+          { q: "What short-form video app, owned by the Chinese company ByteDance, merged with the app 'musical.ly' in 2018 and went on to become one of the most downloaded apps in the world?", a: "TikTok" }
+        ],
+        200: [
+          { q: "What photo and video-sharing app, founded by Kevin Systrom and Mike Krieger in 2010, was acquired by Facebook in 2012 for about $1 billion?", a: "Instagram" },
+          { q: "What microblogging platform, founded in 2006 by Jack Dorsey and others and known for its short posts, was rebranded to 'X' after Elon Musk's 2022 acquisition?", a: "Twitter" },
+          { q: "What messaging and photo-sharing app, launched in 2011, popularized disappearing photo messages and later introduced 'Stories'?", a: "Snapchat" }
+        ],
+        300: [
+          { q: "What social news and discussion platform, launched in 2005 and often called 'the front page of the internet,' organizes content into topic-based communities called subreddits?", a: "Reddit" },
+          { q: "What social networking site, founded by Jonathan Abrams and launched in 2003, became hugely popular in the Philippines, at one point drawing nearly 40% of its global traffic from the country?", a: "Friendster" },
+          { q: "What professional networking platform, founded in December 2002 and launched in May 2003, is widely used for job searching, recruiting, and business networking?", a: "LinkedIn" }
+        ],
+        400: [
+          { q: "What short-form video app, known for its looping six-second clips, was launched by Twitter in early 2013 and shut down in January 2017?", a: "Vine" },
+          { q: "What social networking site, co-founded by Tom Anderson and Chris DeWolfe, was the most-visited social networking site in the world before being overtaken by Facebook around 2008-2009?", a: "MySpace" },
+          { q: "What live-streaming platform, officially launched in 2011 and focused primarily on video game streaming, was acquired by Amazon in 2014?", a: "Twitch" }
+        ],
+        500: [
+          { q: "What social networking service, launched in 1997, is often cited by historians as the first true social network, featuring user profiles and friend lists years before Friendster or MySpace existed?", a: "SixDegrees.com" },
+          { q: "What social networking site, launched by Google in 2004, became enormously popular in Brazil and India despite struggling to gain traction in the United States, before being shut down in 2014?", a: "Orkut" },
+          { q: "What social news and bookmarking site, launched in 2004, dominated link-sharing online until a 2010 redesign triggered a mass user exodus to Reddit?", a: "Digg" }
+        ]
+      }
+    },
+    {
+      name: "Viral Trends",
+      questions: {
+        100: [
+          { q: "What ALS-awareness fundraising trend, which went viral in the summer of 2014, involved people filming themselves being doused with a bucket of ice water and challenging others to do the same or donate?", a: "The Ice Bucket Challenge" },
+          { q: "What dance trend, tied to Drake's 2018 song 'In My Feelings,' had people filming themselves dancing next to a moving car?", a: "The 'In My Feelings' Challenge (Kiki Challenge)" },
+          { q: "What term describes a video, photo, or trend that spreads rapidly across the internet and is shared by huge numbers of people in a short time?", a: "Going viral" }
+        ],
+        200: [
+          { q: "What 2015 online debate involved millions of people arguing over whether a photo of a dress appeared blue and black or white and gold?", a: "'The Dress' (#TheDress)" },
+          { q: "What 2014 social media trend encouraged women to post makeup-free selfies to raise awareness and funds for cancer research, raising millions of pounds in the UK within days?", a: "No Makeup Selfie" },
+          { q: "What 2015 dance craze, choreographed to the Silento song 'Watch Me,' became a viral sensation performed in classrooms and living rooms worldwide?", a: "The Whip/Nae Nae" }
+        ],
+        300: [
+          { q: "What 2016 viral trend involved groups of people freezing completely still in dramatic poses while a camera panned through the scene, often set to Rae Sremmurd's song 'Black Beatles'?", a: "The Mannequin Challenge" },
+          { q: "What 2016 meme, originating from a Snapchat video, briefly made a teenager's white Vans sneakers world-famous alongside the catchphrase that named it?", a: "'Damn, Daniel'" },
+          { q: "What 2019 event, originally created as a satirical Facebook event page, jokingly called on millions of people to storm a secretive U.S. Air Force base in Nevada?", a: "'Storm Area 51'" }
+        ],
+        400: [
+          { q: "What early 2021 stock trading phenomenon, driven largely by retail investors coordinating on the Reddit forum r/WallStreetBets, caused massive volatility and short squeezes against hedge funds shorting GameStop?", a: "The GameStop short squeeze (the GameStop/GME saga)" },
+          { q: "What weekly social media trend, built around a hashtag, involves users sharing old, nostalgic photos of themselves on Thursdays?", a: "Throwback Thursday (#TBT)" },
+          { q: "What 2012 viral campaign by the nonprofit Invisible Children aimed to raise awareness of Ugandan warlord Joseph Kony, becoming one of the fastest-spreading viral videos in internet history at the time?", a: "'Kony 2012'" }
+        ],
+        500: [
+          { q: "What 2004 viral video, predating YouTube's founding, featured a young man named Gary Brolsma lip-syncing and dancing in front of his webcam to the Romanian song 'Dragostea Din Tei'?", a: "Numa Numa (the 'Numa Numa Dance')" },
+          { q: "What 2008 prank and protest campaign by the hacker collective Anonymous specifically targeted the Church of Scientology and helped push rickrolling into mainstream news coverage that same year?", a: "Project Chanology" },
+          { q: "What 2002-2003 viral video, one of the internet's earliest viral sensations predating YouTube, showed a Canadian teenager swinging a golf-ball retriever like a lightsaber?", a: "The 'Star Wars Kid' video" }
+        ]
+      }
+    },
+    {
+      name: "Internet Slang",
+      questions: {
+        100: [
+          { q: "What common internet and text abbreviation stands for 'laughing out loud'?", a: "LOL" },
+          { q: "What internet slang term describes something embarrassing or awkward, often used to react to secondhand-embarrassment videos or posts?", a: "Cringe" },
+          { q: "What internet acronym, commonly used to end a message when someone won't be available for a while, stands for 'be right back'?", a: "BRB" }
+        ],
+        200: [
+          { q: "What internet slang term, short for 'fear of missing out,' describes the anxious feeling that others are having rewarding experiences without you?", a: "FOMO" },
+          { q: "What slang term for an obsessive, overly devoted super-fan of a celebrity originated from a 2000 Eminem song about an obsessive fan named Stan?", a: "Stan" },
+          { q: "What slang term describes feeling bitter, irritated, or resentful, especially after losing or being embarrassed?", a: "Salty" }
+        ],
+        300: [
+          { q: "What internet slang term, a blend of 'sympathize' and 'simpleton,' describes someone showing excessive, often desperate devotion toward a person they're attracted to?", a: "Simp" },
+          { q: "What acronym, popular in online gaming and chat culture, stands for 'away from keyboard'?", a: "AFK" },
+          { q: "What slang term, popularized by a 2014 Vine video of a woman describing her eyebrows, means that something is done perfectly or looks flawless?", a: "On fleek" }
+        ],
+        400: [
+          { q: "What dismissive internet slang phrase, aimed at older generations or outdated attitudes, went viral in 2019 partly through TikTok and briefly drew accusations of ageism?", a: "'OK Boomer'" },
+          { q: "What internet slang word, an exclamation with no fixed meaning used to express surprise, excitement, or approval, went viral around 2014 through Vine culture?", a: "Yeet" },
+          { q: "On Twitter/X, what slang term describes a reply to a post receiving significantly more likes than the original post, generally implying the original post was poorly received?", a: "Getting 'ratioed' (the ratio)" }
+        ],
+        500: [
+          { q: "What early internet and Usenet-era acronym, still used in chat and gaming today, stands for 'in real life,' distinguishing physical-world identity or events from online ones?", a: "IRL" },
+          { q: "What term, originating in 1990s online chat culture from the word 'elite,' refers to skilled internet or gaming users and gave rise to a numeral-substitution writing style?", a: "Leet (1337 speak)" },
+          { q: "What slang term for an intentionally provocative online post designed to provoke an angry reaction, giving rise to the phrase 'don't feed the ___,' dates back to Usenet and early internet forum culture of the 1990s?", a: "Troll (trolling)" }
+        ]
+      }
+    },
+    {
+      name: "Content Creators",
+      questions: {
+        100: [
+          { q: "Which YouTuber, known for elaborate stunt and giveaway videos, became the most-subscribed individual channel on YouTube after overtaking T-Series in 2024?", a: "MrBeast (Jimmy Donaldson)" },
+          { q: "Which Swedish YouTuber, known for gaming commentary and 'Let's Play' videos, became the first individual creator to reach 100 million subscribers, in 2019?", a: "PewDiePie (Felix Kjellberg)" },
+          { q: "What is the general term for someone who broadcasts themselves playing video games or other activities live over the internet, popularized by platforms like Twitch?", a: "A streamer" }
+        ],
+        200: [
+          { q: "Which American YouTuber, known for prank and vlog content since the mid-2010s and later a professional boxer, has an older brother named Logan who is also a famous YouTuber?", a: "Jake Paul" },
+          { q: "Which YouTuber is widely credited as one of the pioneers of the beauty and makeup tutorial genre, building a massive following starting in 2007 before launching her own cosmetics line?", a: "Michelle Phan" },
+          { q: "What term describes a content creator who primarily posts unscripted, personal day-in-the-life videos, a genre popularized on YouTube in the 2000s and 2010s?", a: "A vlogger (video blogger)" }
+        ],
+        300: [
+          { q: "Which American streamer, known for popularizing Fortnite content, broke Twitch's concurrent-viewership record in March 2018 during a stream featuring rapper Drake?", a: "Ninja (Tyler Blevins)" },
+          { q: "Which British YouTuber, who began his channel in 2009 posting FIFA video game commentary and later co-founded the YouTube group 'The Sidemen,' transitioned into professional boxing in the late 2010s?", a: "KSI (Olajide 'JJ' Olatunji)" },
+          { q: "What term, borrowed from Korean internet culture, describes a genre of online video in which a host eats a large quantity of food while interacting with viewers?", a: "Mukbang" }
+        ],
+        400: [
+          { q: "Which YouTube channel, run by the duo Rhett McLaughlin and Charles 'Link' Neal, is known for its long-running daily talk and variety show that began on YouTube in 2012?", a: "Good Mythical Morning (Rhett & Link)" },
+          { q: "Which Canadian YouTuber, known for long-form video essays on internet culture, conspiracy theories, and media criticism, hosts the channel 'Folding Ideas'?", a: "Dan Olson" },
+          { q: "MrBeast's name originated from a nickname randomly assigned to him as a teenager by which video game console's system, which he later shortened from 'MrBeast6000'?", a: "Xbox" }
+        ],
+        500: [
+          { q: "Which comedy YouTube duo, Ian Hecox and Anthony Padilla, was the first channel to reach 100,000 subscribers and held YouTube's 'most subscribed' title for over 500 consecutive days in the mid-2000s?", a: "Smosh" },
+          { q: "Which YouTube comedy duo, Ethan and Hila Klein, won a landmark 2017 court ruling establishing that their reaction commentary videos qualified as fair use under U.S. copyright law?", a: "H3H3 Productions" },
+          { q: "Which YouTuber, one of the platform's original breakout comedy stars with over 20 million subscribers, announced her retirement from YouTube in June 2020 after backlash over old videos resurfaced?", a: "Jenna Marbles (Jenna Mourey)" }
+        ]
+      }
+    }
+  ]
+}
 };
 
 // Groups themes for the theme-selection screen. Any theme not listed here
 // (e.g. a future addition) automatically falls into a "More Themes" group,
 // so new themes can be added to QUIZ_THEMES above without touching this map.
 const QUIZ_THEME_GROUPS = {
-  "Pop Culture": ["Cartoons", "Marvel", "Anime", "Movies & TV", "Video Games"],
+  "Pop Culture": ["Cartoons", "Marvel", "Anime", "Movies & TV", "Video Games", "Studio Ghibli", "Sitcoms", "It's Always Sunny in Philadelphia", "Marvel Cinematic Universe", "Harry Potter", "Disney", "Star Wars", "Lord of the Rings"],
   "Music": ["Music"],
-  "Academic & Local": ["College Programs", "Philippine Trivia", "E-Commerce"],
-  "General Knowledge": ["World Geography", "Science", "World Trivia", "History", "Technology", "Food", "Famous People", "Sports"]
+  "Academic & Local": ["College Programs", "Philippine Trivia", "E-Commerce", "Filipino Culture"],
+  "General Knowledge": ["World Geography", "Science", "World Trivia", "History", "Technology", "Food", "Famous People", "Sports", "Internet and Social Media"]
 };
 
 // Quiz Night bonus tile events. Adding a new event here is enough to put it
