@@ -1,9 +1,7 @@
 # 🎮 B-Rotation Party Night
 
 <p>
-  <img alt="Games: no build step" src="https://img.shields.io/badge/12%20games-no%20build%20step-brightgreen">
-  <img alt="Games: no dependencies" src="https://img.shields.io/badge/12%20games-zero%20dependencies-blue">
-  <img alt="Homepage: React" src="https://img.shields.io/badge/homepage-React%20%2B%20Vite-61dafb">
+  <img alt="React + Vite" src="https://img.shields.io/badge/12%20games-React%20%2B%20Vite-61dafb">
   <img alt="No accounts" src="https://img.shields.io/badge/sign--up-not%20required-blue">
   <img alt="Host optional" src="https://img.shields.io/badge/host-optional-orange">
   <img alt="Games" src="https://img.shields.io/badge/games-12-purple">
@@ -223,7 +221,7 @@ Places, Food, Animals, Movies, Anime, Celebrities, Philippine Locations, Logos.
 
 ### 🖼️ Image Sources
 
-This is a static site with no image hosting or CDN of its own, so instead of hardcoding hotlinked image URLs (which break the moment a file gets renamed or deleted), each question stores a **`wikiTitle`** — the exact Wikipedia article title for its subject — in `js/data-pictureguess.js`. At play time, `js/pictureguess.js` resolves that title to that article's current lead photo via Wikipedia's free, CORS-enabled REST API:
+This is a static site with no image hosting or CDN of its own, so instead of hardcoding hotlinked image URLs (which break the moment a file gets renamed or deleted), each question stores a **`wikiTitle`** — the exact Wikipedia article title for its subject — in `web/src/games/pictureguess/data.js`. At play time, `web/src/games/pictureguess/App.jsx` resolves that title to that article's current lead photo via Wikipedia's free, CORS-enabled REST API:
 
 ```
 https://en.wikipedia.org/api/rest_v1/page/summary/<title>
@@ -245,7 +243,7 @@ No API key, backend, or build step is required — it's a plain `fetch()` from t
 
 ### ➕ Adding New Image Questions
 
-Open `js/data-pictureguess.js` and add an entry to any category (or start a new one):
+Open `web/src/games/pictureguess/data.js` and add an entry to any category (or start a new one):
 
 ```js
 "Your Category": [
@@ -258,7 +256,7 @@ Then add an icon for it in `PICTUREGUESS_CATEGORY_ICONS`. Double-check the `wiki
 
 ### ⚙️ Configuration
 
-Same knobs as every other party game — see [🛠️ Customization](#️-customization): `MAX_TEAMS` and the timer's `recommended`/`presets`/`defaultEnabled` live near the top of `js/pictureguess.js`.
+Same knobs as every other party game — see [🛠️ Customization](#️-customization): `MAX_TEAMS` and the timer's `recommended`/`presets`/`defaultEnabled` live near the top of `web/src/games/pictureguess/App.jsx`.
 
 ### 🐛 Troubleshooting
 
@@ -397,45 +395,33 @@ Each remaining game has its own curated category list — see that game's sectio
 
 ## ⚙️ Installation
 
-The **12 games** are still plain HTML, CSS, and JavaScript with **zero dependencies and no build step** — nothing to install to work on them. The **homepage** (`web-home/`) is a small React + Vite app and needs Node.js to build or run locally; see [🧱 Tech Stack](#-tech-stack) below.
+The whole site — the homepage and all **12 games** — is a single React + Vite multi-page app in `web/`. It needs Node.js to build or run locally; see [🧱 Tech Stack](#-tech-stack) below.
 
 ```bash
-# Just get the files
 git clone <this-repo-url>
-
-# Only needed if you're touching the homepage — the 12 games need nothing:
-cd web-home
+cd web
 npm install
 ```
 
 ## ▶️ How to Run
 
-**Any individual game** — `spy.html`, `quiz.html`, etc. — still just opens directly:
-
-**Option A — just open it.** Double-click a game's `.html` file and it opens in your default browser.
-
-**Option B — run a local server** (recommended if your browser restricts `file://` pages, and required for the homepage below):
-
 ```bash
-# Using Python (already installed on most systems)
-python -m http.server 8000
-# then open http://localhost:8000
-
-# ...or using Node.js
-npx serve .
-```
-
-**The homepage** is a React app, so it needs its own dev server instead of a plain static one:
-
-```bash
-cd web-home
+cd web
 npm run dev
 # then open the URL Vite prints (defaults to http://localhost:5173)
 ```
 
-Game links on the homepage's dev server point at `spy.html`, `quiz.html`, etc. relative to the site root, so to click through into an actual game from the React dev server you'll want the repo root also being served (Option B above) — or just `npm run build` in `web-home/` and preview the fully assembled site as described in [🌐 Deployment](#-deployment).
+Vite's dev server serves every page — the homepage at `/` and each game at its own `<game>.html` (e.g. `/spy.html`, `/quiz.html`) — with hot module reload, so editing any game's `App.jsx` updates the browser instantly.
 
-No accounts or backend are required to play. An internet connection is needed for two things: loading the Google Fonts on first visit, and fetching each Picture Guess photo from Wikipedia during that game — everything else works fully offline, and Picture Guess itself degrades gracefully to its emoji fallback if a photo can't be fetched.
+To preview the exact static output the live site serves:
+
+```bash
+cd web
+npm run build      # writes web/dist/
+npm run preview    # serves web/dist/ locally
+```
+
+No accounts or backend are required to play. An internet connection is needed for three things: loading the Google Fonts on first visit, fetching each Picture Guess photo from Wikipedia during that game, and loading the YouTube IFrame API for Guess the Song's optional clip player — everything else works fully offline, and both Picture Guess and Guess the Song degrade gracefully (an emoji fallback, or just the text clues) if either can't be reached.
 
 ---
 
@@ -443,13 +429,14 @@ No accounts or backend are required to play. An internet connection is needed fo
 
 | Area | Stack |
 |---|---|
-| The 12 games (`*.html`, `js/`, `css/`) | Plain HTML, CSS, and vanilla JavaScript — zero dependencies, zero build step, by design. Unaffected by anything below. |
-| Homepage (`web-home/`) | [React](https://react.dev) 19 + [Vite](https://vite.dev) for the dev server/build, [lucide-react](https://lucide.dev) for icons |
+| Homepage + all 12 games (`web/`) | [React](https://react.dev) 19 + [Vite](https://vite.dev) (multi-page app — one HTML entry per game, auto-discovered from `web/*.html`), [lucide-react](https://lucide.dev) for icons, CSS Modules for styling |
 | Deployment | [GitHub Actions](https://github.com/features/actions) → [GitHub Pages](https://pages.github.com) — see [🌐 Deployment](#-deployment) |
 
-Only the homepage — the game-hub landing page — is a React app. It exists to be the site's front door and the one place emoji-as-UI-icon made sense to swap for a real icon set (`lucide-react`); the 12 games each have their own hand-built UI (turn banners, timers, boards, reveal screens) that don't need — and intentionally don't have — a framework or build tooling. This keeps every game trivially forkable/editable by just opening its files in a browser, while the homepage gets the componentized, icon-consistent treatment a landing page benefits most from.
+The whole site is one Vite multi-page app: `web/vite.config.js` scans the directory for every top-level `*.html` file and wires each one up as its own Rollup entry automatically, so adding a new game's `<game>.html` is enough — no config edits needed. Each page mounts its own independent React root (`web/src/games/<game>/main.jsx`), matching the site's original "open any page directly" model — there's no client-side router, and no game's bundle depends on another's.
 
-Why **lucide-react** specifically: it's a single, consistent line-icon family (unlike aggregator libraries such as `react-icons`, which mix several visually inconsistent source sets), it's tree-shakeable (only the ~16 icons actually imported end up in the bundle), and it has no runtime CSS framework dependency to drag in alongside it.
+A shared component/hook library (`web/src/shared/`) is what keeps all 12 games consistent without duplicating code — a `theme.css` token contract every game's own `palette.css` overrides with different colors, plus components for screens, timers, rosters, team scoreboards, reveal cards, voting, results, and the tie-breaker. See [📁 Project Structure](#-project-structure) below for the full layout.
+
+Why **lucide-react**: it's a single, consistent line-icon family (unlike aggregator libraries such as `react-icons`, which mix several visually inconsistent source sets), it's tree-shakeable (only the icons actually imported end up in each page's bundle), and it has no runtime CSS framework dependency to drag in alongside it.
 
 ---
 
@@ -457,7 +444,7 @@ Why **lucide-react** specifically: it's a single, consistent line-icon family (u
 
 **Live site:** https://markdaniel0702.github.io/PARTY-PILOT/
 
-The site is deployed on **GitHub Pages** — still free, still HTTPS by default, still no account needed to play, and still no backend to provision. The only thing that changed with the React homepage is *how* the site gets published: instead of Pages serving the repository as-is, a GitHub Actions workflow (`.github/workflows/deploy.yml`) now builds the homepage and assembles the final site on every push.
+The site is deployed on **GitHub Pages** — free, HTTPS by default, no account needed to play, no backend to provision. A GitHub Actions workflow (`.github/workflows/deploy.yml`) builds the whole `web/` app and publishes it on every push.
 
 ### Build settings
 
@@ -466,13 +453,12 @@ The site is deployed on **GitHub Pages** — still free, still HTTPS by default,
 | Source | **GitHub Actions** (not "Deploy from a branch") |
 | Workflow | `.github/workflows/deploy.yml` |
 | Trigger | Push to `main` (or manually via **Actions → Deploy to GitHub Pages → Run workflow**) |
-| Build command | `npm ci && npm run build` inside `web-home/` (Vite) |
+| Build command | `npm ci && npm run build` inside `web/` (Vite) |
 | Environment variables | None |
 
 What the workflow actually does:
-1. Installs `web-home/`'s dependencies and runs its Vite build.
-2. Assembles a `dist/` folder: the 12 games' `.html` files plus `css/` and `js/` are copied in **completely untouched**, then the built homepage (`web-home/dist/`'s `index.html` + hashed JS/CSS) is copied on top.
-3. Uploads `dist/` as the Pages artifact and deploys it — same free `actions/deploy-pages` action GitHub itself recommends for React/Vite sites.
+1. Installs `web/`'s dependencies and runs its Vite build, which outputs every page (homepage + 12 games) to `web/dist/`.
+2. Uploads `web/dist/` as the Pages artifact and deploys it — same free `actions/deploy-pages` action GitHub itself recommends for React/Vite sites.
 
 ### Connecting the repository (one-time setup)
 
@@ -491,11 +477,11 @@ git commit -m "Your change"
 git push origin main
 ```
 
-The live site updates within roughly a minute or two of the push finishing (a little longer than before, since the workflow now has an `npm ci` + build step rather than a zero-config passthrough). Progress is visible under the repo's **Actions** tab.
+The live site updates within roughly a minute or two of the push finishing. Progress is visible under the repo's **Actions** tab.
 
 ### Free-tier alternatives
 
-If this project ever needs something GitHub Pages doesn't offer (custom edge functions, a real backend, etc.), it's still fundamentally a static site once built, so it can move to any of these free platforms — set the build command to `npm ci && npm run build --prefix web-home` plus the same copy-and-overlay steps the Actions workflow does, and the output/publish directory to `dist/`:
+If this project ever needs something GitHub Pages doesn't offer (custom edge functions, a real backend, etc.), it's still fundamentally a static site once built, so it can move to any of these free platforms — set the build command to `npm ci && npm run build --prefix web` and the output/publish directory to `web/dist`:
 
 | Platform | Notes |
 |---|---|
@@ -511,63 +497,65 @@ GitHub Pages was chosen over these because it needs no new third-party account a
 
 ```
 Gamenight/
-├── web-home/                  React + Vite homepage — the only build step in the project
-│   ├── src/
-│   │   ├── App.jsx            Header, game groups, and card grid
-│   │   ├── gameData.js        The 12 games' titles/links/descriptions/icons (edit this to add a game card)
-│   │   ├── main.jsx           React entry point
-│   │   └── style.css          Homepage design (moved here from css/style.css — homepage-only, always was)
-│   ├── index.html             Vite's HTML entry (becomes the site's real index.html once built)
+├── web/                        The entire site — one Vite multi-page app
+│   ├── index.html              Homepage HTML entry
+│   ├── spy.html, quiz.html, whoami.html, password.html,
+│   │   categories.html, wordgrid.html, guessthesong.html,
+│   │   pictureguess.html, twotruths.html, wouldurather.html,
+│   │   mostlikely.html, charades.html
+│   │                          One HTML entry per game — each mounts its own React root
+│   ├── vite.config.js         Auto-discovers every top-level *.html and wires it as a build entry
 │   ├── package.json
-│   └── vite.config.js
-├── spy.html / quiz.html       The two original flagship games
-├── whoami.html, password.html, categories.html, wordgrid.html,
-│   guessthesong.html, pictureguess.html, twotruths.html,
-│   wouldurather.html, mostlikely.html, charades.html
-│                              The ten party games — one page each
-├── css/
-│   ├── spy.css / quiz.css    Spy Word / Quiz Night styles (bespoke themes)
-│   ├── party.css             Shared component styles for the 9 party games
-│   ├── timer.css             Universal timer widget styles, loaded by all 12 games
-│   └── <game>.css            Each party game's own palette + small bespoke touches
-├── js/
-│   ├── spy.js / quiz.js      Spy Word / Quiz Night logic
-│   ├── data-spy.js / data-quiz.js
-│   ├── shared.js             Reusable helpers for every game, including the universal timer (see below)
-│   ├── data-<game>.js        Each party game's themes/categories/content
-│   └── <game>.js             Each party game's screen logic
-├── .github/workflows/deploy.yml   Builds web-home/, assembles the full static site, deploys to Pages
-└── README.md                 You are here
+│   └── src/
+│       ├── App.jsx, gameData.js, main.jsx, style.css
+│       │                      Homepage: header, game groups, card grid, game list
+│       ├── shared/            The component/hook library every game is built from
+│       │   ├── theme.css      Base design-token contract (--ink, --panel, --paper, --accent, etc.)
+│       │   ├── tiebreakerData.js
+│       │   ├── components/    Screen, GameShell, Button, Roster, TeamSetup, TimerSetup, GameTimer,
+│       │   │                  PassCard, RevealCard, GroupedPicker, Voting, ResultsList,
+│       │   │                  TieBreakerScreen, Scoreboard, StatementCard, and their .module.css files
+│       │   ├── hooks/         useCountdown, useGameTimer, useRoster, useTeams, useTimerSetup,
+│       │   │                  useUsedIndices, usePersistedUsedIndices
+│       │   └── utils/         random.js (pickRandom/shuffle/groupKeys), resolveStanding.js
+│       └── games/
+│           └── <game>/        One folder per game — never touches another game's folder
+│               ├── App.jsx    The game's screens and logic (built from web/src/shared/)
+│               ├── main.jsx   React entry point for that page
+│               ├── data.js    That game's themes/categories/questions/content
+│               ├── palette.css   That game's color-token overrides (redeclares theme.css's tokens)
+│               └── <game>.module.css   Any styling bespoke to that one game
+├── .github/workflows/deploy.yml   Builds web/, deploys web/dist/ to Pages
+└── README.md                   You are here
 ```
 
-> `index.html` isn't checked into the repo root anymore — it's build output. `npm run build` inside `web-home/` (or the deploy workflow) produces it fresh each time from `web-home/index.html` + `src/`.
+> `web/dist/` isn't checked into the repo — it's build output. `npm run build` inside `web/` (or the deploy workflow) produces it fresh each time.
 
-**`js/shared.js`** is what keeps all 12 games consistent without duplicating code — every game loads it, including Spy Word and Quiz Night — and provides:
+**`web/src/shared/`** is what keeps all 12 games consistent without duplicating code. The highlights:
 
-| Helper | What it does |
+| Piece | What it does |
 |---|---|
-| `pickRandom(arr)` / `shuffle(arr)` | Basic randomization |
-| `pickRandomUnused(arr, usedSet)` | Picks a random item that hasn't shown up yet this session, auto-resetting once everything's been seen |
-| `createTimer({ seconds, onTick, onExpire })` | A start/stop/pause/resume countdown — the low-level engine behind every timer |
-| `createTimerSetup({ mount, unitLabel, recommended, presets, defaultEnabled })` | Renders the universal pre-game timer widget (switch, presets, custom input) used at every game's setup screen |
-| `createGameTimer({ mount, onExpire, showControls })` | Renders the universal in-game timer HUD (countdown + Pause/Resume/Reset) and drives it via `createTimer` |
-| `createUsedRegistry(namespace)` | A `localStorage`-backed version of `pickRandomUnused` — powers Quiz Night's per-slot question pools, and the tie-breaker's no-immediate-repeat challenge draw |
-| `renderGroupedPicker(container, groups, renderCard)` | The grouped card-picker UI (themes, categories, prompt sets) |
-| `createRoster({ ... })` | A named-player list with a +/- stepper |
-| `createTeamScoreboard({ ... })` | An optional add/remove/rename team scoreboard, Quiz-Night-style |
-| `createScreenManager(screens)` | The show/hide screen-toggle pattern used throughout the site |
-| `resolveSession({ entrants, mount, onEnter, onResolved })` | The universal tie-breaker — detects a tie among the top scorers, plays it out (or accepts a shared win), and calls back with the settled result. See [⚔️ Final Tie-Breaker](#️-final-tie-breaker) |
+| `theme.css` | The base `:root` design-token contract every game's own `palette.css` overrides with different colors — the same "shared stylesheet + per-game palette" split the site always used, formalized into CSS Modules |
+| `utils/random.js` | `pickRandom(arr)`, `shuffle(arr)`, `groupKeys(allKeys, groupDefs)` — pure randomization and the grouped-picker "leftover bucket" logic |
+| `hooks/useUsedIndices` / `usePersistedUsedIndices` | In-memory and `localStorage`-backed "don't repeat until exhausted" pickers — the latter powers Quiz Night's per-slot question pools and the tie-breaker's no-immediate-repeat challenge draw |
+| `hooks/useCountdown` / `useGameTimer` | The low-level start/stop/pause/resume countdown, and the in-game warn/urgent staging built on top of it |
+| `components/TimerSetup`, `components/GameTimer` | The universal pre-game timer widget (switch, presets, custom input) and in-game countdown HUD used by every timed game |
+| `components/GroupedPicker` | The grouped card-picker UI (themes, categories, prompt sets), paired with `groupKeys()` for games with sub-groups |
+| `hooks/useRoster`, `components/Roster` | A named-player list with a +/- stepper |
+| `hooks/useTeams`, `components/TeamSetup` | An optional add/remove/rename team scoreboard, Quiz-Night-style |
+| `components/Screen` | The show/hide screen-toggle pattern (with fade-in and scroll-to-top) used throughout the site |
+| `components/TieBreakerScreen`, `utils/resolveStanding` | The universal tie-breaker — detects a tie among the top scorers, plays it out (or accepts a shared win), and reports back the settled result. See [⚔️ Final Tie-Breaker](#️-final-tie-breaker) |
 
 ---
 
 ## ➕ Adding New Games
 
-The site is intentionally flat and repetitive on purpose — every game is `<game>.html` + `css/<game>.css` + `js/<game>.js` + `js/data-<game>.js`, so a new game never requires touching an existing one.
+The site is intentionally flat and repetitive on purpose — every game is its own `web/src/games/<game>/` folder (`App.jsx` + `main.jsx` + `data.js` + `palette.css`) plus one `web/<game>.html` entry, so a new game never requires touching an existing one.
 
-1. Copy the structure of the party game closest to what you're building (e.g. `charades.html`/`.js` for a turn-based reveal game, `wouldurather.html`/`.js` for a voting game).
-2. Load `css/party.css` before your own `<game>.css`, and `js/shared.js` before your own `<game>.js` — your stylesheet only needs a `:root { --accent: ...; }` palette override plus any bespoke visual touches; your script can reach for `createTimer`, `createRoster`, `renderGroupedPicker`, etc. instead of rebuilding them.
-3. Put your content in a new `js/data-<game>.js` file.
-4. Add a card for it to `web-home/src/gameData.js`'s `GAME_GROUPS` array (copy an existing game entry, pick a [lucide-react](https://lucide.dev) icon, and give it a unique `accent` color) — the homepage picks it up on the next build, no JSX to touch.
+1. Copy the folder of the game closest to what you're building (e.g. `charades/` for a turn-based reveal game, `wouldurather/` for a voting game) into a new `web/src/games/<game>/`, and copy its `web/<game>.html` to match.
+2. Update `main.jsx`'s import of `./palette.css` stays as-is; edit `palette.css` itself — it only needs the same handful of color tokens (`--ink`, `--panel`, `--paper`, `--accent`, etc.) that `theme.css` defines, redeclared with your new palette — plus any bespoke visual touches in a `<game>.module.css`. Your `App.jsx` reaches for `web/src/shared/`'s components/hooks (`GameTimer`, `Roster`, `GroupedPicker`, `useGameTimer`, etc.) instead of rebuilding them.
+3. Put your content in the new folder's `data.js`, exported as plain `export const` objects/arrays.
+4. Add a card for it to `web/src/gameData.js`'s `GAME_GROUPS` array (copy an existing game entry, pick a [lucide-react](https://lucide.dev) icon, and give it a unique `accent` color) — the homepage picks it up on the next build, no JSX to touch. `web/vite.config.js` auto-discovers your new `<game>.html` — no build config to edit.
 
 > [!IMPORTANT]
 > Keep every game host-optional: let the app manage turns/timers/randomization, and only add a Game Master toggle if a timer would otherwise force pacing on the group.
@@ -575,7 +563,7 @@ The site is intentionally flat and repetitive on purpose — every game is `<gam
 <details>
 <summary><strong>🕵️ Add a new Spy Word theme</strong></summary>
 
-Open `js/data-spy.js` and add an entry to `SPY_THEMES`:
+Open `web/src/games/spy/data.js` and add an entry to `SPY_THEMES`:
 
 ```js
 "Your Theme Name": [
@@ -594,7 +582,7 @@ Then add an icon in `SPY_THEME_ICONS` and, optionally, a spot for it in `SPY_THE
 <details>
 <summary><strong>❓ Add new Quiz Night questions</strong></summary>
 
-Open `js/data-quiz.js`. Every theme needs an `icon` and a list of `categories`, and every category needs all five point levels — each holding a **pool** (array) of questions rather than a single one:
+Open `web/src/games/quiz/data.js`. Every theme needs an `icon` and a list of `categories`, and every category needs all five point levels — each holding a **pool** (array) of questions rather than a single one:
 
 ```js
 "Your Theme": {
@@ -628,7 +616,7 @@ Add it to `QUIZ_THEME_GROUPS` the same way as Spy Word. Themes with more than 5 
 <details>
 <summary><strong>🎲 Add content to any other game</strong></summary>
 
-The other ten games use much simpler, flat data files — no nested point structure. Open the matching `js/data-<game>.js` and follow the existing pattern for that file: a category name mapped to an array of items (character names for Who Am I?, word pairs or word lists, `wikiTitle` + answer pairs for Picture Guess — see [➕ Adding New Image Questions](#-adding-new-image-questions), etc.). Every one of them is a plain JavaScript object literal, so copy an existing entry and change the words.
+The other ten games use much simpler, flat data files — no nested point structure. Open the matching `web/src/games/<game>/data.js` and follow the existing pattern for that file: a category name mapped to an array of items (character names for Who Am I?, word pairs or word lists, `wikiTitle` + answer pairs for Picture Guess — see [➕ Adding New Image Questions](#-adding-new-image-questions), etc.). Every one of them is a plain `export const` object literal, so copy an existing entry and change the words.
 
 </details>
 
@@ -638,16 +626,15 @@ The other ten games use much simpler, flat data files — no nested point struct
 
 | Want to change... | Edit... |
 |---|---|
-| Homepage colors & fonts | `:root { ... }` in `web-home/src/style.css` (requires an `npm run build` in `web-home/` to take effect on the live site) |
-| Shared party-game colors & fonts | `:root { ... }` in `css/party.css` |
-| One game's accent color | `:root { --accent: ...; }` at the top of that game's own `css/<game>.css` |
-| Spy Word / Quiz Night colors & fonts | `:root { ... }` at the top of `spy.css` / `quiz.css` |
-| Min/max players | `MIN_PLAYERS` / `MAX_PLAYERS` near the top of that game's `js/<game>.js` |
-| Max teams | `MAX_TEAMS` near the top of `js/quiz.js`, `js/guessthesong.js`, or `js/pictureguess.js` |
-| A game's recommended timer / presets / default on-off | The `createTimerSetup({...})` call near the top of that game's `js/<game>.js` — `recommended`, `presets`, and `defaultEnabled` are all plain arguments. Players themselves never need to touch this: every setup screen already lets them pick a custom duration or switch the timer off. |
-| Quiz Night point tiers | `POINT_VALUES` in `js/quiz.js` — update every category's `questions` object to match |
-| Quiz Night bonus events | `QUIZ_BONUS_EVENTS` in `js/data-quiz.js` — add a new object to the array and it's automatically in rotation; the max bonus slot count is `MAX_BONUS` in `js/quiz.js` |
-| Tie-breaker challenges | `js/data-tiebreaker.js` — `TIEBREAKER_CHALLENGES` lists the six challenge types, backed by the `TIEBREAKER_TRIVIA` / `TIEBREAKER_ESTIMATES` / `TIEBREAKER_CATEGORIES` / `TIEBREAKER_PHYSICAL` content banks |
+| Homepage colors & fonts | `:root { ... }` in `web/src/style.css` |
+| Base design tokens shared by every game | `:root { ... }` in `web/src/shared/theme.css` |
+| One game's accent color | `:root { ... }` in that game's own `web/src/games/<game>/palette.css` (redeclares `theme.css`'s color tokens with new values) |
+| Min/max players | `MIN_PLAYERS` / `MAX_PLAYERS` near the top of that game's `web/src/games/<game>/App.jsx` |
+| Max teams | `MAX_TEAMS` near the top of `web/src/games/quiz/App.jsx`, `guessthesong/App.jsx`, or `pictureguess/App.jsx` |
+| A game's recommended timer / presets / default on-off | The `useTimerSetup({...})` call near the top of that game's `App.jsx` — `recommended` and `defaultEnabled` are plain arguments; presets are passed to the `<TimerSetup>` component just below it. Players themselves never need to touch this: every setup screen already lets them pick a custom duration or switch the timer off. |
+| Quiz Night point tiers | `POINT_VALUES` in `web/src/games/quiz/App.jsx` — update every category's `questions` object to match |
+| Quiz Night bonus events | `QUIZ_BONUS_EVENTS` in `web/src/games/quiz/data.js` — add a new object to the array and it's automatically in rotation; the max bonus slot count is `MAX_BONUS` in `App.jsx` |
+| Tie-breaker challenges | `web/src/shared/tiebreakerData.js` — `TIEBREAKER_CHALLENGES` lists the six challenge types, backed by the `TIEBREAKER_TRIVIA` / `TIEBREAKER_ESTIMATES` / `TIEBREAKER_CATEGORIES` / `TIEBREAKER_PHYSICAL` content banks |
 
 ---
 
@@ -656,7 +643,7 @@ The other ten games use much simpler, flat data files — no nested point struct
 <details>
 <summary><strong>A theme/category grid looks empty, or the page is blank</strong></summary>
 
-Open your browser's dev console (F12) and check for a red error — almost always a typo in a `data-*.js` file (a missing comma or bracket stops the whole file from loading). Compare against the existing entries for the exact format.
+Open your browser's dev console (F12) and check for a red error — almost always a typo in a game's `data.js` file (a missing comma or bracket stops the whole file from loading, and `npm run build`/`npm run dev` will also fail loudly with the same error). Compare against the existing entries for the exact format.
 </details>
 
 <details>
@@ -696,9 +683,9 @@ That's the universal tie-breaker — it only appears when two or more entrants f
 </details>
 
 <details>
-<summary><strong>The homepage didn't update after I pushed a change, or the live site shows a 404</strong></summary>
+<summary><strong>The site didn't update after I pushed a change, or the live site shows a 404</strong></summary>
 
-Check the repo's <strong>Actions</strong> tab first — if the "Deploy to GitHub Pages" workflow failed, the old build stays live. The most common cause is <strong>Settings → Pages → Source</strong> still being set to "Deploy from a branch" instead of <strong>GitHub Actions</strong> (a one-time setting change described in <a href="#-deployment">🌐 Deployment</a>). This only affects the homepage — the 12 games are static files and don't need a successful workflow run to keep working once they're on Pages.
+Check the repo's <strong>Actions</strong> tab first — if the "Deploy to GitHub Pages" workflow failed, the old build stays live (the whole site, including every game, is one Vite build now, so a failed workflow means nothing updates). The most common cause is <strong>Settings → Pages → Source</strong> still being set to "Deploy from a branch" instead of <strong>GitHub Actions</strong> (a one-time setting change described in <a href="#-deployment">🌐 Deployment</a>).
 </details>
 
 ---

@@ -1,0 +1,63 @@
+.passCard {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 3rem 2rem;
+  text-align: center;
+  max-width: 440px;
+  margin: 0 auto 1.6rem;
+}
+.passIcon { font-size: 2.6rem; display: block; margin-bottom: 1rem; }
+.passTitle { font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--paper-dim); font-weight: 700; margin: 0 0 0.6rem; }
+.passName { font-family: var(--font-display); font-size: clamp(1.8rem, 6vw, 2.6rem); color: var(--accent-2); margin: 0 0 1.2rem; word-break: break-word; }
+.passHint { color: var(--paper-dim); font-size: 0.9rem; margin: 0 0 1.8rem; line-height: 1.6; }
+
+.revealCard {
+  background: linear-gradient(165deg, var(--panel-2), var(--panel));
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  border-radius: var(--radius-lg);
+  padding: 3rem 2rem;
+  text-align: center;
+  max-width: 460px;
+  margin: 2rem auto;
+  position: relative;
+}
+.revealLabel { font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-2); font-weight: 800; display: block; margin-bottom: 1rem; }
+.revealText { font-family: var(--font-display); font-size: clamp(1.6rem, 6vw, 2.4rem); margin: 0 0 1rem; color: var(--paper); word-break: break-word; }
+.revealFootnote { color: var(--paper-dim); font-size: 0.88rem; margin: 0; }
+
+.progressDots { display: flex; justify-content: center; gap: 0.5rem; margin: 0 0 1.5rem; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); transition: background 0.2s, transform 0.2s; }
+.dot.done { background: var(--accent); }
+.dot.current { background: var(--accent-2); transform: scale(1.4); }
+
+.answerBlock {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  border-radius: var(--radius-md);
+  padding: 1.2rem 1.4rem;
+  margin: 0 auto 1.5rem;
+  max-width: 520px;
+}
+.answerLabel { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-2); font-weight: 800; display: block; margin-bottom: 0.5rem; }
+.answerText { font-size: 1.2rem; font-weight: 800; margin: 0; color: var(--paper); }
+
+.awardRow { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; margin: 0 auto 1.2rem; max-width: 640px; }
+.awardBtn {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--paper);
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.awardBtn:hover { border-color: var(--accent); transform: translateY(-2px); }
+.awardSwatch { width: 10px; height: 10px; border-radius: 3px; }
+
+.turnBanner { text-align: center; font-weight: 800; font-size: 1rem; color: var(--paper); margin: 0 0 1.2rem; }
+.catBanner { text-align: center; font-family: var(--font-display); font-size: clamp(1.1rem, 3.5vw, 1.5rem); color: var(--accent-2); margin: 0 0 0.6rem; }

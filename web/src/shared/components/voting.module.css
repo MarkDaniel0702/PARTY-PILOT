@@ -1,0 +1,72 @@
+.voteRow { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-width: 640px; margin: 0 auto 1.5rem; }
+@media (max-width: 640px) { .voteRow { grid-template-columns: 1fr; } }
+
+.voteBtn {
+  background: var(--panel);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 1.8rem 1rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--paper);
+  transition: border-color 0.2s, transform 0.2s;
+}
+.voteBtn:hover:not(:disabled) { border-color: var(--accent); transform: translateY(-2px); }
+.voteBtn:disabled { opacity: 0.5; cursor: default; transform: none; }
+.voteLetter {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+  color: var(--accent-2);
+}
+/* Distinct A/B coloring — a reusable convention for any binary choice. */
+.voteBtnA { border-color: color-mix(in srgb, var(--accent) 35%, transparent); }
+.voteBtnA:hover:not(:disabled) { border-color: var(--accent); }
+.voteBtnA .voteLetter { color: var(--accent); }
+.voteBtnB { border-color: color-mix(in srgb, var(--accent-2) 35%, transparent); }
+.voteBtnB:hover:not(:disabled) { border-color: var(--accent-2); }
+.voteBtnB .voteLetter { color: var(--accent-2); }
+
+.resultOption { flex: 1; display: flex; flex-direction: column; gap: 0.6rem; }
+.resultOptionLabel { font-weight: 700; font-size: 0.95rem; }
+.resultOptionCount { font-size: 0.82rem; color: var(--paper-dim); }
+.barTrack { height: 10px; background: var(--panel-2); border-radius: 999px; overflow: hidden; }
+.barFill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width 0.5s ease; }
+
+.playerGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.7rem; max-width: 640px; margin: 0 auto; }
+.playerBtn {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 1rem;
+  color: var(--paper);
+  font-weight: 700;
+  font-size: 0.92rem;
+  text-align: center;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.playerBtn:hover:not(:disabled) { border-color: var(--accent); transform: translateY(-2px); }
+.playerBtn:disabled { opacity: 0.4; cursor: default; }
+
+.statementList { display: flex; flex-direction: column; gap: 0.7rem; max-width: 560px; margin: 0 auto 1.5rem; }
+.statementCard {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.2rem;
+  text-align: left;
+  font-size: 0.95rem;
+  color: var(--paper);
+  width: 100%;
+  transition: border-color 0.2s, transform 0.2s;
+}
+button.statementCard { cursor: pointer; }
+button.statementCard:hover { border-color: var(--accent); transform: translateY(-2px); }
+.statementNum { font-family: var(--font-display); color: var(--accent-2); flex: none; }
+.statementCard.isTruth { border-color: var(--success); }
+.statementCard.isLie { border-color: var(--danger); }

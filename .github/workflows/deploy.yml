@@ -26,31 +26,25 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: web-home/package-lock.json
+          cache-dependency-path: web/package-lock.json
 
-      - name: Install homepage dependencies
-        working-directory: web-home
+      - name: Install web app dependencies
+        working-directory: web
         run: npm ci
 
-      - name: Build React homepage
-        working-directory: web-home
+      - name: Build React multi-page app
+        working-directory: web
         run: npm run build
 
-      # The 12 games are plain, dependency-free HTML/CSS/JS by design and
-      # deploy completely untouched — only the homepage goes through a build.
-      - name: Assemble static site
-        run: |
-          mkdir -p dist
-          cp *.html dist/ 2>/dev/null || true
-          cp -r css dist/css
-          cp -r js dist/js
-          cp -r web-home/dist/. dist/
-          touch dist/.nojekyll
+      # web/ is a multi-page Vite app — one entry per game, plus the
+      # homepage. All 12 games are React now, so web/dist is the entire site.
+      - name: Mark as non-Jekyll site
+        run: touch web/dist/.nojekyll
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: web/dist
 
   deploy:
     needs: build

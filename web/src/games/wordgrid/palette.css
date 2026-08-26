@@ -1,0 +1,18 @@
+:root {
+  --ink: #0c1712;
+  --panel: #131f1a;
+  --panel-2: #182a22;
+  --paper: #eefbf3;
+  --paper-dim: #9fb8ac;
+  --accent: #39d98a;
+  --accent-2: #ffd23f;
+  --border: rgba(238, 251, 243, 0.12);
+
+  /* Word Grid-only extra tokens (not part of the shared theme.css contract):
+     the Wordle-style tile face colors. */
+  --tile-bg: var(--panel-2);
+  --tile-border: var(--border);
+  --tile-correct: #39d98a;
+  --tile-present: #ffd23f;
+  --tile-absent: #3a3f4d;
+}

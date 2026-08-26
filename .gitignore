@@ -1,6 +1,5 @@
 GUESS_THE_SONG_LIST.md
 
-# React homepage build tooling (web-home/) — see README Tech Stack section
-web-home/node_modules/
-web-home/dist/
-dist/
+# React app build tooling (web/) — see README Tech Stack section
+web/node_modules/
+web/dist/

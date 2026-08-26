@@ -1,0 +1,20 @@
+:root {
+  --ink: #0a1128;
+  --panel: #111d45;
+  --panel-2: #152350;
+  --paper: #f5f3ff;
+  --paper-dim: #93a0c9;
+  --accent: #ffcb3c;
+  --accent-2: #31e0c9;
+  --border: rgba(245, 243, 255, 0.12);
+
+  /* Quiz Night-only extra token used by bespoke gradients below (--danger
+     is already part of the shared theme.css contract). */
+  --gold-2: #ffe08a;
+}
+
+body {
+  background:
+    radial-gradient(ellipse at 50% -10%, #1b2c66 0%, var(--ink) 55%),
+    var(--ink);
+}

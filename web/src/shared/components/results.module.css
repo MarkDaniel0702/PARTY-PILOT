@@ -1,0 +1,20 @@
+.list { max-width: 520px; margin: 0 auto 2rem; display: flex; flex-direction: column; gap: 0.6rem; }
+.row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.9rem 1.2rem;
+}
+.row.winner {
+  border-color: var(--accent-2);
+  background: linear-gradient(120deg, color-mix(in srgb, var(--accent-2) 16%, transparent), var(--panel));
+  box-shadow: 0 0 0 1px var(--accent-2) inset;
+}
+.medal { font-size: 1.3rem; width: 1.6rem; text-align: center; }
+.swatch { width: 12px; height: 12px; border-radius: 4px; flex: none; }
+.name { flex: 1; font-weight: 800; }
+.score { font-family: var(--font-display); color: var(--accent-2); }
+.footnote { color: var(--paper-dim); text-align: center; font-size: 1rem; line-height: 1.6; max-width: 52ch; margin: 0.5rem auto 0; }

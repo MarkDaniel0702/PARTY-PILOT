@@ -1,0 +1,17 @@
+:root {
+  --ink: #0b0a10;
+  --panel: #161119;
+  --panel-2: #1e1620;
+  --paper: #f2ece2;
+  --paper-dim: #a99fae;
+  --accent: #e8324f;
+  --accent-2: #d9a441;
+  --border: rgba(242, 236, 226, 0.1);
+  /* Spy Word-only extra token (not part of the shared theme.css contract):
+     the typewriter face used for the secret-word reveal text. */
+  --font-type: "Special Elite", "Courier New", monospace;
+}
+
+body {
+  background: radial-gradient(circle at 50% 0%, #221a26 0%, var(--ink) 60%);
+}

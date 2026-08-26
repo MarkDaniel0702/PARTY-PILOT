@@ -1,0 +1,21 @@
+{
+  "name": "b-rotation-web",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "React + Vite multi-page app for B-Rotation Party Night — the homepage plus all 12 games, each its own entry sharing web/src/shared/.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "lucide-react": "^1.34.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.0",
+    "vite": "^8.2.2"
+  }
+}

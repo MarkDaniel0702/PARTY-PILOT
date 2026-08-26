@@ -1,0 +1,83 @@
+/* How-to-play legend */
+.howLegend { font-size: 0.85rem; color: var(--paper-dim); margin: 0.2rem 0 0.6rem; line-height: 1.8; }
+.legendChip {
+  display: inline-block;
+  font-weight: 800;
+  font-size: 0.75rem;
+  color: var(--ink);
+  padding: 0.15em 0.6em;
+  border-radius: 999px;
+  margin: 0 0.15em;
+}
+.legendCorrect { background: var(--tile-correct); }
+.legendPresent { background: var(--tile-present); }
+.legendAbsent { background: var(--tile-absent); color: var(--paper); }
+
+/* Word board */
+.board { display: flex; flex-direction: column; align-items: center; gap: clamp(4px, 1vw, 7px); margin: 0 auto 1.6rem; }
+.row { display: flex; gap: clamp(4px, 1vw, 7px); }
+.tile {
+  width: clamp(38px, 10vw, 58px);
+  height: clamp(38px, 10vw, 58px);
+  border: 2px solid var(--tile-border);
+  border-radius: 8px;
+  background: var(--tile-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 4vw, 1.6rem);
+  color: var(--paper);
+  text-transform: uppercase;
+  transition: transform 0.55s, background 0.2s, border-color 0.2s;
+  transform-style: preserve-3d;
+}
+.tile.flip { transform: rotateX(360deg); }
+.tile.correct { background: var(--tile-correct); border-color: var(--tile-correct); color: var(--ink); }
+.tile.present { background: var(--tile-present); border-color: var(--tile-present); color: var(--ink); }
+.tile.absent { background: var(--tile-absent); border-color: var(--tile-absent); color: var(--paper); }
+
+/* Guess input row */
+.inputArea { display: flex; gap: 0.7rem; max-width: 420px; margin: 0 auto 0.8rem; }
+.gameInput {
+  flex: 1;
+  min-width: 0;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  color: var(--paper);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.gameInput:focus { outline: none; border-color: var(--accent); }
+.inputArea > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  max-width: none;
+  margin: 0;
+  padding: 0 1.4rem;
+  flex: none;
+}
+
+.guessMessage {
+  text-align: center;
+  min-height: 1.6rem;
+  font-weight: 800;
+  font-size: 0.92rem;
+  color: var(--accent-2);
+  margin: 0 0 1rem;
+}
+
+.giveUpWrap { display: flex; justify-content: center; margin-top: 1.2rem; }
+.giveUpWrap > button { width: fit-content; }
+
+@media (max-width: 480px) {
+  .inputArea { flex-direction: column; max-width: 280px; }
+  .inputArea > button { width: 100%; }
+}

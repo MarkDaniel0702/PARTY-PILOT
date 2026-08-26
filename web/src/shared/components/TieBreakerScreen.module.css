@@ -1,0 +1,35 @@
+/* Ports css/tiebreaker.css exactly. */
+
+.panel {
+  text-align: center;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2.4rem 2rem;
+  max-width: 560px;
+  margin: 2rem auto;
+}
+.icon { font-size: 3rem; display: block; margin-bottom: 0.5rem; }
+.title { font-family: var(--font-display); font-size: 1.5rem; color: var(--accent-2); margin: 0 0 0.8rem; }
+.tied { color: var(--paper); font-weight: 700; margin: 0 0 0.6rem; }
+.instructions { color: var(--paper-dim); margin: 0 0 1.2rem; line-height: 1.55; }
+.body { margin-bottom: 1.2rem; }
+.actions { display: flex; flex-wrap: wrap; gap: 0.8rem; justify-content: center; }
+
+.question { font-size: 1.1rem; font-weight: 700; color: var(--paper); margin: 0 0 1rem; }
+.result { font-size: 1.05rem; font-weight: 800; color: var(--paper); margin: 0.8rem 0; }
+.buttons { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; margin-top: 0.8rem; }
+
+.guessRows { display: flex; flex-direction: column; gap: 0.6rem; margin: 0 auto 1rem; max-width: 320px; }
+.guessRow { display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; font-weight: 700; color: var(--paper); }
+.guessInput {
+  width: 90px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.4rem 0.6rem;
+  color: var(--paper);
+  font-family: var(--font-body);
+  font-weight: 700;
+}
+.guessInput:focus { outline: none; border-color: var(--accent); }

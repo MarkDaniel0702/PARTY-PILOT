@@ -1,0 +1,122 @@
+.songCard { padding: 2.4rem 2rem; }
+.clueList { display: flex; flex-direction: column; gap: 1rem; }
+.clueItem {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--paper);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  text-align: left;
+}
+.clueEmoji { font-size: 2.2rem; text-align: center; letter-spacing: 0.1em; }
+
+.revealBtnWrap { max-width: 640px; margin: 0.8rem auto 1.5rem; }
+.endWrap { max-width: 200px; margin: 1.5rem auto 0; }
+
+.pointBadge {
+  display: block;
+  text-align: center;
+  margin: 0 auto 1.2rem;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  background: linear-gradient(120deg, var(--accent-2), #8fefff);
+  border-radius: 999px;
+  padding: 0.4rem 1rem;
+  max-width: fit-content;
+}
+
+/* Optional YouTube clip player — audio-only (no title/thumbnail) until the
+   answer is revealed, then it expands into a normal video frame. */
+.clipPlayer {
+  position: relative;
+  overflow: hidden;
+  max-width: 520px;
+  margin: 1.2rem auto;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1rem 1.1rem;
+}
+
+/* The iframe itself always keeps a real, non-zero pixel size — YouTube's
+   player needs an actual rendering surface to initialize playback, and
+   shrinking it to ~0px (rather than just moving it off-screen) leaves it
+   stuck unable to play even after being resized back up later. So instead
+   of shrinking the iframe, the wrap is moved off-screen while compact. */
+.clipFrameWrap {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  width: 480px;
+  height: 270px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.clipPlayerRevealed .clipFrameWrap {
+  position: relative;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  opacity: 1;
+  pointer-events: auto;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 0.9rem;
+  border: 1px solid var(--border);
+  background: #000;
+}
+.clipYtMount { width: 100%; height: 100%; }
+.clipYtMount iframe { display: block; width: 100%; height: 100%; border: 0; }
+
+.clipControlsBar { display: flex; align-items: center; flex-wrap: wrap; gap: 0.7rem; }
+.clipBadge {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--accent-2);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  white-space: nowrap;
+}
+.clipBtns { display: flex; gap: 0.5rem; }
+.clipBtn {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--paper);
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 10px;
+  transition: border-color 0.2s;
+}
+.clipBtn:hover:not(:disabled) { border-color: var(--accent); }
+.clipBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+.clipProgress { flex: 1 1 100%; height: 6px; background: var(--panel-2); border-radius: 999px; overflow: hidden; }
+.clipProgressFill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width 0.2s linear; }
+.clipFallback { margin: 0.8rem 0 0; color: var(--paper-dim); font-size: 0.85rem; text-align: center; }
+
+@media (max-width: 480px) {
+  .clipControlsBar { justify-content: center; }
+}
+
+.themeStats { display: flex; flex-direction: column; gap: 1rem; margin: 2rem auto; max-width: 400px; }
+.statItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.2rem;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.statLabel { color: var(--paper-dim); font-size: 0.9rem; font-weight: 500; }
+.statValue { color: var(--paper); font-size: 1.1rem; font-weight: 700; font-family: var(--font-display); }
