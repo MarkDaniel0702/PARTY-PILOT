@@ -33,10 +33,10 @@
       <ol>
         <li>Pick a theme and add your teams below, then tap <strong>Start Quiz</strong>.</li>
         <li>Whoever's turn it is calls out a category and point value shown in the turn banner, and taps that tile.</li>
-        <li>Read the question out loud. The answer stays hidden until someone taps <strong>Show Answer</strong> &mdash; or the timer runs out in Automated mode.</li>
-        <li>Any team can tap their own <strong>+points</strong> button once they've answered correctly.</li>
+        <li>Read the question out loud, then mark it <strong>✅ Correct</strong> or <strong>❌ Incorrect</strong>. A correct answer keeps the turn &mdash; an incorrect one passes it to the next team.</li>
+        <li>If the timer runs out before anyone answers, a <strong>10-second steal</strong> opens for everyone else &mdash; first to answer right steals the points and the turn.</li>
         <li>Watch for <strong>⭐ BONUS</strong> tiles &mdash; they trigger a surprise event instead of a question.</li>
-        <li>The turn passes automatically to the next team. When the board is empty, the final results appear on their own.</li>
+        <li>When the board is empty, the final results appear on their own.</li>
       </ol>
     </details>
 
@@ -121,14 +121,21 @@
 <div id="overlay" class="overlay">
   <div class="question-card">
     <span class="q-meta" id="q-meta">Category &middot; 100</span>
+    <p class="q-turn hidden" id="q-turn"></p>
     <div id="game-timer" class="timer-mount"></div>
+    <div id="steal-zone" class="steal-zone hidden">
+      <p class="steal-heading">🚨 STEAL NOW</p>
+      <div id="steal-timer" class="timer-mount"></div>
+    </div>
     <p class="q-text" id="q-text">Question text goes here?</p>
     <div id="answer-block" class="answer-block hidden">
       <span class="a-label">Answer</span>
       <p class="a-text" id="a-text">Answer text</p>
     </div>
-    <button type="button" id="btn-show-answer" class="btn-primary">Show Answer</button>
+    <button type="button" id="btn-show-answer" class="btn-primary hidden">Show Answer</button>
     <div id="award-row" class="award-row hidden"></div>
+    <p class="q-outcome hidden" id="q-outcome"></p>
+    <p class="q-next hidden" id="q-next"></p>
 
     <div id="bonus-body" class="bonus-body hidden">
       <span class="bonus-icon" id="bonus-icon">⭐</span>

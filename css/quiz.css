@@ -294,8 +294,35 @@ button{font-family:inherit;border:none;cursor:pointer;}
 }
 .award-btn:hover{border-color:var(--teal);transform:translateY(-2px);}
 .award-btn .sw{width:10px;height:10px;border-radius:3px;}
+.award-btn.is-missed{opacity:0.45;text-decoration:line-through;pointer-events:none;transform:none;}
+.award-btn-correct{border-color:var(--teal);}
+.award-btn-incorrect{border-color:#ff6b6b;}
 
 #btn-show-answer{margin-bottom:1.2rem;}
+
+/* Turn / steal indicators */
+.q-turn{
+  font-size:0.95rem;font-weight:800;margin:0 0 1rem;
+}
+.steal-zone{
+  border:1px solid rgba(255,107,107,0.5);
+  background:rgba(255,107,107,0.1);
+  border-radius:14px;
+  padding:0.8rem 1rem;
+  margin-bottom:1.2rem;
+  animation:pulseTimer 1s ease infinite;
+}
+.steal-heading{
+  margin:0 0 0.4rem;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;
+  color:#ff6b6b;font-size:0.9rem;
+}
+.q-outcome{
+  font-size:1.05rem;font-weight:800;margin:0 0 0.4rem;
+}
+.q-outcome-correct{color:var(--teal);}
+.q-outcome-incorrect,.q-outcome-timeout{color:#ff6b6b;}
+.q-outcome-stolen{color:var(--gold);}
+.q-next{color:var(--paper-dim);font-size:0.9rem;margin:0 0 1.2rem;}
 
 /* How to Play */
 .how-to-play{

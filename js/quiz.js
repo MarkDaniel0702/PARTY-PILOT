@@ -9,12 +9,13 @@
 
   const MIN_BONUS = 1;
   const MAX_BONUS = 4;
+  const STEAL_SECONDS = 10;
 
   const state = {
     theme: null,
     teams: [], // { name, score, color, perks: { double, freePass } }
     answered: new Set(), // "categoryIndex-points"
-    current: null, // { catIndex, points, category, question }
+    current: null, // { catIndex, points, category, question, phase, resolved, timedOutTeamIndex }
     mode: "automated", // "automated" (timer on by default) or "gamemaster" (timer off by default)
     turnIndex: 0,
     bonusCount: 2,
@@ -229,10 +230,6 @@
   const turnBannerEl = document.getElementById("turn-banner");
 
   function updateTurnBanner() {
-    if (state.teams.length <= 1) {
-      turnBannerEl.classList.add("hidden");
-      return;
-    }
     const team = state.teams[state.turnIndex];
     turnBannerEl.innerHTML = `🎯 <span style="color:${team.color}">${team.name}</span>'s turn to pick a category!`;
     turnBannerEl.classList.remove("hidden");
@@ -330,10 +327,19 @@
   const bonusTitle = document.getElementById("bonus-title");
   const bonusDesc = document.getElementById("bonus-desc");
   const bonusInteractive = document.getElementById("bonus-interactive");
+  const qTurn = document.getElementById("q-turn");
+  const stealZone = document.getElementById("steal-zone");
+  const qOutcome = document.getElementById("q-outcome");
+  const qNext = document.getElementById("q-next");
 
   const questionTimer = createGameTimer({
     mount: document.getElementById("game-timer"),
-    onExpire: () => revealAnswer()
+    onExpire: () => beginSteal()
+  });
+  const stealTimer = createGameTimer({
+    mount: document.getElementById("steal-timer"),
+    showControls: false,
+    onExpire: () => endStealWindow()
   });
 
   function stopTimer() {
@@ -361,7 +367,15 @@
     const question = questionBank.pickUnused(bankKey, pool).item;
 
     state.answered.add(key);
-    state.current = { catIndex, points };
+    state.current = {
+      catIndex,
+      points,
+      category,
+      activeIndex: state.turnIndex,
+      phase: "answering",
+      resolved: false,
+      timedOutIndex: null
+    };
     renderBoard();
 
     bonusBody.classList.add("hidden");
@@ -373,66 +387,195 @@
     aText.textContent = question.a;
 
     answerBlock.classList.add("hidden");
-    awardRow.classList.add("hidden");
     btnBackBoard.classList.add("hidden");
-    btnShowAnswer.classList.remove("hidden");
+    btnShowAnswer.classList.add("hidden");
+    qOutcome.classList.add("hidden");
+    qNext.classList.add("hidden");
+    stealZone.classList.add("hidden");
 
     overlay.classList.add("active");
+    renderAnswering();
     startAnswerTimer();
   }
 
-  function revealAnswer() {
-    stopTimer();
-    answerBlock.classList.remove("hidden");
-    btnShowAnswer.classList.add("hidden");
+  function renderAnswering() {
+    const team = state.teams[state.current.activeIndex];
+    qTurn.textContent = `🎯 ${team.name}'s turn`;
+    qTurn.style.color = team.color;
+    qTurn.classList.remove("hidden");
+    stealZone.classList.add("hidden");
+
     awardRow.classList.remove("hidden");
-    btnBackBoard.classList.remove("hidden");
-
     awardRow.innerHTML = "";
-    state.teams.forEach((team) => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "award-btn";
-      const pts = team.perks.double ? state.current.points * 2 : state.current.points;
-      btn.innerHTML = `<span class="sw" style="background:${team.color}"></span> +${pts} ${team.name}${team.perks.double ? " (2x!)" : ""}`;
-      btn.addEventListener("click", () => {
-        team.score += pts;
-        if (team.perks.double) team.perks.double = false;
-        renderScoreboard();
-        closeOverlay();
-        afterQuestionClosed();
-      });
-      awardRow.appendChild(btn);
-    });
 
-    state.teams.forEach((team) => {
-      if (!team.perks.freePass) return;
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "award-btn award-btn-perk";
-      btn.innerHTML = `<span class="sw" style="background:${team.color}"></span> 🎟️ Free Pass: award ${state.current.points} to ${team.name}`;
-      btn.addEventListener("click", () => {
-        team.score += state.current.points;
-        team.perks.freePass = false;
-        renderScoreboard();
-        closeOverlay();
-        afterQuestionClosed();
+    const pts = team.perks.double ? state.current.points * 2 : state.current.points;
+
+    const correctBtn = document.createElement("button");
+    correctBtn.type = "button";
+    correctBtn.className = "award-btn award-btn-correct";
+    correctBtn.textContent = `✅ Correct (+${pts}${team.perks.double ? ", 2x!" : ""})`;
+    correctBtn.addEventListener("click", () => resolveQuestion("correct", team));
+    awardRow.appendChild(correctBtn);
+
+    const incorrectBtn = document.createElement("button");
+    incorrectBtn.type = "button";
+    incorrectBtn.className = "award-btn award-btn-incorrect";
+    incorrectBtn.textContent = "❌ Incorrect";
+    incorrectBtn.addEventListener("click", () => resolveQuestion("incorrect", team));
+    awardRow.appendChild(incorrectBtn);
+
+    if (team.perks.freePass) {
+      const passBtn = document.createElement("button");
+      passBtn.type = "button";
+      passBtn.className = "award-btn award-btn-perk";
+      passBtn.textContent = `🎟️ Free Pass: award ${state.current.points} to ${team.name}`;
+      passBtn.addEventListener("click", () => resolveQuestion("freepass", team));
+      awardRow.appendChild(passBtn);
+    }
+
+    const noAnswerBtn = document.createElement("button");
+    noAnswerBtn.type = "button";
+    noAnswerBtn.className = "award-btn";
+    noAnswerBtn.textContent = "⏭️ No answer — open steal";
+    noAnswerBtn.addEventListener("click", () => beginSteal());
+    awardRow.appendChild(noAnswerBtn);
+  }
+
+  function beginSteal() {
+    if (!state.current || state.current.resolved) return;
+    stopTimer();
+    state.current.phase = "steal";
+    state.current.timedOutIndex = state.current.activeIndex;
+    qTurn.classList.add("hidden");
+
+    const eligible = state.teams.filter((_, i) => i !== state.current.timedOutIndex);
+    if (eligible.length === 0) {
+      resolveQuestion("timeout", null);
+      return;
+    }
+
+    stealZone.classList.remove("hidden");
+    renderStealRow(eligible);
+    stealTimer.start(STEAL_SECONDS);
+  }
+
+  function renderStealRow(eligible) {
+    awardRow.innerHTML = "";
+    const missed = new Set();
+    eligible.forEach((team) => {
+      const pts = team.perks.double ? state.current.points * 2 : state.current.points;
+
+      const gotBtn = document.createElement("button");
+      gotBtn.type = "button";
+      gotBtn.className = "award-btn award-btn-correct";
+      gotBtn.innerHTML = `<span class="sw" style="background:${team.color}"></span> ✅ ${team.name} got it! (+${pts})`;
+      gotBtn.addEventListener("click", () => resolveQuestion("stolen", team));
+
+      const missBtn = document.createElement("button");
+      missBtn.type = "button";
+      missBtn.className = "award-btn award-btn-incorrect";
+      missBtn.textContent = `❌ ${team.name} missed`;
+      missBtn.addEventListener("click", () => {
+        if (missed.has(team)) return;
+        missed.add(team);
+        gotBtn.classList.add("is-missed");
+        missBtn.classList.add("is-missed");
+        if (missed.size >= eligible.length) {
+          resolveQuestion("timeout", null);
+        }
       });
-      awardRow.appendChild(btn);
+
+      awardRow.appendChild(gotBtn);
+      awardRow.appendChild(missBtn);
     });
   }
 
-  btnShowAnswer.addEventListener("click", revealAnswer);
+  function endStealWindow() {
+    if (!state.current || state.current.resolved) return;
+    resolveQuestion("timeout", null);
+  }
+
+  function resolveQuestion(outcome, team) {
+    if (!state.current || state.current.resolved) return;
+    state.current.resolved = true;
+    stopTimer();
+    stealTimer.hide();
+    stealZone.classList.add("hidden");
+
+    let nextIndex = state.turnIndex;
+    if (outcome === "correct" || outcome === "freepass") {
+      const pts = (outcome !== "freepass" && team.perks.double) ? state.current.points * 2 : state.current.points;
+      team.score += pts;
+      if (outcome !== "freepass" && team.perks.double) team.perks.double = false;
+      if (outcome === "freepass") team.perks.freePass = false;
+      // Same team answered directly (no steal involved) — they keep the turn.
+      nextIndex = state.teams.indexOf(team);
+    } else if (outcome === "stolen") {
+      const pts = team.perks.double ? state.current.points * 2 : state.current.points;
+      team.score += pts;
+      if (team.perks.double) team.perks.double = false;
+      // A steal only awards points — the fixed rotation still advances from
+      // whichever team originally held the turn, not from the stealing team.
+      const timedOut = state.current.timedOutIndex != null ? state.current.timedOutIndex : state.current.activeIndex;
+      nextIndex = (timedOut + 1) % state.teams.length;
+    } else if (outcome === "incorrect") {
+      nextIndex = (state.current.activeIndex + 1) % state.teams.length;
+    } else if (outcome === "timeout") {
+      const timedOut = state.current.timedOutIndex != null ? state.current.timedOutIndex : state.current.activeIndex;
+      nextIndex = (timedOut + 1) % state.teams.length;
+    }
+    state.turnIndex = nextIndex;
+
+    renderScoreboard();
+    renderResolved(outcome, team);
+  }
+
+  function renderResolved(outcome, team) {
+    answerBlock.classList.remove("hidden");
+    awardRow.classList.add("hidden");
+    awardRow.innerHTML = "";
+    btnBackBoard.classList.remove("hidden");
+
+    const labels = {
+      correct: "✅ Correct!",
+      incorrect: "❌ Incorrect.",
+      freepass: "🎟️ Free Pass!",
+      stolen: `⚡ Stolen by ${team ? team.name : ""}!`,
+      timeout: "⌛ Time's up — no steal."
+    };
+    const classes = {
+      correct: "q-outcome-correct",
+      freepass: "q-outcome-correct",
+      incorrect: "q-outcome-incorrect",
+      timeout: "q-outcome-timeout",
+      stolen: "q-outcome-stolen"
+    };
+    qOutcome.textContent = labels[outcome] || "";
+    qOutcome.className = `q-outcome ${classes[outcome] || ""}`;
+    qOutcome.classList.remove("hidden");
+
+    const nextTeam = state.teams[state.turnIndex];
+    qNext.textContent = `Next up: ${nextTeam.name}`;
+    qNext.style.color = nextTeam.color;
+    qNext.classList.remove("hidden");
+  }
 
   btnBackBoard.addEventListener("click", () => {
+    const wasBonus = !!(state.current && state.current.bonus);
     closeOverlay();
+    if (wasBonus) advanceTurn();
     afterQuestionClosed();
   });
 
   function closeOverlay() {
     stopTimer();
+    stealTimer.hide();
     overlay.classList.remove("active");
     bonusBody.classList.add("hidden");
+    stealZone.classList.add("hidden");
+    qTurn.classList.add("hidden");
+    qOutcome.classList.add("hidden");
+    qNext.classList.add("hidden");
     state.current = null;
   }
 
@@ -448,6 +591,10 @@
     qMeta.classList.remove("hidden");
     qText.classList.add("hidden");
     gameTimerMount.classList.add("hidden");
+    stealZone.classList.add("hidden");
+    qTurn.classList.add("hidden");
+    qOutcome.classList.add("hidden");
+    qNext.classList.add("hidden");
     answerBlock.classList.add("hidden");
     btnShowAnswer.classList.add("hidden");
     awardRow.classList.add("hidden");
@@ -538,7 +685,6 @@
   }
 
   function afterQuestionClosed() {
-    advanceTurn();
     if (state.answered.size >= totalTileCount()) {
       showResults();
     } else {
