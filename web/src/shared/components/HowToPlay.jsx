@@ -1,3 +1,4 @@
+import { HelpCircle } from "lucide-react";
 import styles from "./layout.module.css";
 
 // Ports the <details class="how-to-play"> rules block that's identical
@@ -6,7 +7,10 @@ import styles from "./layout.module.css";
 export function HowToPlay({ steps, summary = "How does this work?", children }) {
   return (
     <details className={styles.howToPlay}>
-      <summary>❓ {summary}</summary>
+      <summary>
+        <HelpCircle size={14} strokeWidth={2.5} aria-hidden="true" style={{ verticalAlign: "-0.15em" }} />{" "}
+        {summary}
+      </summary>
       {steps ? (
         <ol>
           {steps.map((step, i) => (

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Pause, Play, RotateCcw } from "lucide-react";
+import { Pause, Play, RotateCcw, Timer } from "lucide-react";
 import styles from "./timer.module.css";
 
 // In-game countdown HUD. Pass the object returned by hooks/useGameTimer.js.
@@ -26,7 +26,10 @@ export function GameTimer({ timer, showControls = true }) {
   return (
     <div className={styles.mount}>
       <div className={`${styles.hud} ${stageClass}`.trim()}>
-        <span>⏱️ {timer.remaining}s</span>
+        <span className={styles.hudTime}>
+          <Timer size={14} strokeWidth={2.5} aria-hidden="true" />
+          {timer.remaining}s
+        </span>
         {showControls && (
           <span className={styles.controls}>
             {!paused ? (

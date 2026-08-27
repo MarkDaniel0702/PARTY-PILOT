@@ -1,5 +1,27 @@
 import { Fragment, useEffect, useRef, useState } from "react";
-import { Tv } from "lucide-react";
+import {
+  Tv,
+  Target,
+  Check,
+  X,
+  Ticket,
+  Zap,
+  TimerOff,
+  Siren,
+  SkipForward,
+  Star,
+  Sparkles,
+  Flag,
+  Swords,
+  Plus,
+  Minus,
+  ArrowRight,
+  Bot,
+  Mic,
+  HandCoins,
+  Dices,
+  Clover,
+} from "lucide-react";
 import { GameShell } from "../../shared/components/GameShell";
 import { Screen, ScreenTitle, ScreenSub, BigIcon, SetupBlock } from "../../shared/components/Screen";
 import { HowToPlay } from "../../shared/components/HowToPlay";
@@ -43,26 +65,44 @@ const THEME_ITEMS_BY_GROUP = Object.fromEntries(
   ])
 );
 
+// One inline icon style for all of Quiz Night — same lucide set, size, and
+// stroke weight everywhere, tuned to sit on a line of bold UI text. Icons
+// are decorative here (the adjacent label carries the meaning), so they're
+// aria-hidden; icon-only controls get their own aria-label at the call site.
+function Ico({ icon: Glyph, size = 15 }) {
+  return (
+    <Glyph
+      size={size}
+      strokeWidth={2.5}
+      aria-hidden="true"
+      style={{ verticalAlign: "-0.15em", flexShrink: 0 }}
+    />
+  );
+}
+
 const MODE_ITEMS = [
   {
     key: "automated",
     name: "Automated",
-    icon: "🤖",
+    icon: <Bot size={20} strokeWidth={2} aria-hidden="true" />,
     meta: "Turn order runs automatically, with a customizable answer timer (30s recommended) — everyone just plays."
   },
   {
     key: "gamemaster",
     name: "Game Master",
-    icon: "🎙️",
+    icon: <Mic size={20} strokeWidth={2} aria-hidden="true" />,
     meta: "One person controls the pace manually — timer off by default, reveal answers whenever ready."
   }
 ];
 
-const OUTCOME_LABELS = {
-  correct: "✅ Correct!",
-  incorrect: "❌ Incorrect.",
-  freepass: "🎟️ Free Pass!",
-  timeout: "⌛ Time's up — no steal."
+// Outcome banner shown once a question resolves. `stolen` has no text here —
+// it's built with the stealing team's name at the call site.
+const OUTCOME_META = {
+  correct: { icon: Check, text: "Correct!" },
+  freepass: { icon: Ticket, text: "Free Pass!" },
+  incorrect: { icon: X, text: "Incorrect." },
+  timeout: { icon: TimerOff, text: "Time's up — no steal." },
+  stolen: { icon: Zap, text: null }
 };
 const OUTCOME_CLASSES = {
   correct: styles.qOutcomeCorrect,
@@ -72,6 +112,22 @@ const OUTCOME_CLASSES = {
   stolen: styles.qOutcomeStolen
 };
 
+// Bonus-event glyphs, keyed by the event's `type` (kept out of data.js so
+// that file stays pure content).
+const BONUS_ICONS = {
+  points: Star,
+  double: Sparkles,
+  steal: HandCoins,
+  risk: Dices,
+  freepass: Ticket,
+  lucky: Clover
+};
+
+function BonusGlyph({ type, size = 40 }) {
+  const Glyph = BONUS_ICONS[type];
+  return Glyph ? <Glyph size={size} strokeWidth={1.75} aria-hidden="true" /> : null;
+}
+
 function QuizScoreboard({ teams, onAdjust }) {
   return (
     <div className={rosterStyles.scoreboard}>
@@ -80,15 +136,23 @@ function QuizScoreboard({ teams, onAdjust }) {
           <span className={rosterStyles.scoreSwatch} style={{ background: team.color }} />
           <span className={rosterStyles.scoreName}>{team.name}</span>
           {team.perks.double && (
-            <span className={styles.perkBadge} title="Double Points active">✌️</span>
+            <span className={styles.perkBadge} role="img" aria-label="Double Points active" title="Double Points active">
+              <Ico icon={Sparkles} size={13} />
+            </span>
           )}
           {team.perks.freePass && (
-            <span className={styles.perkBadge} title="Free Pass banked">🎟️</span>
+            <span className={styles.perkBadge} role="img" aria-label="Free Pass banked" title="Free Pass banked">
+              <Ico icon={Ticket} size={13} />
+            </span>
           )}
           <span className={rosterStyles.scoreValue}>{team.score}</span>
           <span className={rosterStyles.scoreBtns}>
-            <button type="button" className={rosterStyles.scoreBtn} onClick={() => onAdjust(i, 10)}>+</button>
-            <button type="button" className={rosterStyles.scoreBtn} onClick={() => onAdjust(i, -10)}>−</button>
+            <button type="button" className={rosterStyles.scoreBtn} aria-label={`Add 10 points to ${team.name}`} onClick={() => onAdjust(i, 10)}>
+              <Plus size={11} strokeWidth={2.5} aria-hidden="true" />
+            </button>
+            <button type="button" className={rosterStyles.scoreBtn} aria-label={`Subtract 10 points from ${team.name}`} onClick={() => onAdjust(i, -10)}>
+              <Minus size={11} strokeWidth={2.5} aria-hidden="true" />
+            </button>
           </span>
         </div>
       ))}
@@ -479,9 +543,9 @@ export default function App() {
             steps={[
               <>Pick a theme and add your teams below, then tap <strong>Start Quiz</strong>.</>,
               "Whoever's turn it is calls out a category and point value shown in the turn banner, and taps that tile.",
-              <>Read the question out loud, then mark it <strong>✅ Correct</strong> or <strong>❌ Incorrect</strong>. A correct answer keeps the turn — an incorrect one passes it to the next team.</>,
+              <>Read the question out loud, then mark it <strong><Ico icon={Check} /> Correct</strong> or <strong><Ico icon={X} /> Incorrect</strong>. A correct answer keeps the turn — an incorrect one passes it to the next team.</>,
               <>If the timer runs out before anyone answers, a <strong>10-second steal</strong> opens for everyone else — first to answer right steals the points and the turn.</>,
-              <>Watch for <strong>⭐ BONUS</strong> tiles — they trigger a surprise event instead of a question.</>,
+              <>Watch for <strong><Ico icon={Star} /> BONUS</strong> tiles — they trigger a surprise event instead of a question.</>,
               "When the board is empty, the final results appear on their own."
             ]}
           />
@@ -519,7 +583,11 @@ export default function App() {
 
           <SetupBlock label="5. Bonus Slots">
             <div className={styles.bonusSetup}>
-              <ToggleCheck label="⭐ Add bonus slots to the board" checked={bonusEnabled} onChange={setBonusEnabled} />
+              <ToggleCheck
+                label={<><Ico icon={Star} /> Add bonus slots to the board</>}
+                checked={bonusEnabled}
+                onChange={setBonusEnabled}
+              />
               {bonusEnabled && (
                 <div className={styles.bonusCountRow}>
                   <span>How many?</span>
@@ -530,7 +598,7 @@ export default function App() {
           </SetupBlock>
 
           <Button disabled={!theme || teams.length < 1} onClick={handleStart}>
-            Start Quiz →
+            Start Quiz <Ico icon={ArrowRight} />
           </Button>
         </Screen>
 
@@ -538,12 +606,15 @@ export default function App() {
           <QuizScoreboard teams={teams} onAdjust={adjustScore} />
           {currentTurnTeam && (
             <p className={ingameStyles.turnBanner}>
-              🎯 <span style={{ color: currentTurnTeam.color }}>{currentTurnTeam.name}</span>'s turn to pick a
+              <Ico icon={Target} size={16} />{" "}
+              <span style={{ color: currentTurnTeam.color }}>{currentTurnTeam.name}</span>'s turn to pick a
               category!
             </p>
           )}
           {themeObj && themeObj.categories.length > 5 && (
-            <p className={styles.scrollHint}>Scroll sideways to see all categories →</p>
+            <p className={styles.scrollHint}>
+              Scroll sideways to see all categories <Ico icon={ArrowRight} size={13} />
+            </p>
           )}
           {themeObj && (
             <div className={styles.boardScroll}>
@@ -565,7 +636,10 @@ export default function App() {
                         onClick={() => openQuestion(catIndex, points)}
                       >
                         {isBonusTile ? (
-                          <>⭐<span className={styles.tileSub}>{used ? "USED" : "BONUS"}</span></>
+                          <>
+                            <Star size={18} strokeWidth={2} aria-hidden="true" style={{ verticalAlign: "-0.15em" }} />
+                            <span className={styles.tileSub}>{used ? "USED" : "BONUS"}</span>
+                          </>
                         ) : (
                           points
                         )}
@@ -583,7 +657,7 @@ export default function App() {
         </Screen>
 
         <Screen active={phase === "results"}>
-          <BigIcon>🏁</BigIcon>
+          <BigIcon><Flag size={46} strokeWidth={1.75} aria-hidden="true" /></BigIcon>
           <ScreenTitle>Board Complete!</ScreenTitle>
           <ScreenSub>Here's how everyone finished.</ScreenSub>
           {result && <ResultsList result={result} unit="pts" unitSingular="pt" showSwatch />}
@@ -594,7 +668,7 @@ export default function App() {
         </Screen>
 
         <Screen active={phase === "tiebreak"}>
-          <BigIcon>⚔️</BigIcon>
+          <BigIcon><Swords size={46} strokeWidth={1.75} aria-hidden="true" /></BigIcon>
           <ScreenTitle>It's a Tie!</ScreenTitle>
           <TieBreakerScreen tied={pendingTied} onResolved={handleTiebreakResolved} />
         </Screen>
@@ -608,13 +682,15 @@ export default function App() {
                 <span className={styles.qMeta}>{currentCategory?.name} · {currentPoints} pts</span>
                 {questionPhase !== "resolved" && activeTeam && (
                   <p className={styles.qTurn} style={{ color: activeTeam.color }}>
-                    🎯 {activeTeam.name}'s turn
+                    <Ico icon={Target} size={16} /> {activeTeam.name}'s turn
                   </p>
                 )}
                 {questionPhase === "answering" && timerSetup.enabled && <GameTimer timer={questionTimer} />}
                 {questionPhase === "steal" && (
                   <div className={styles.stealZone}>
-                    <p className={styles.stealHeading}>🚨 STEAL NOW</p>
+                    <p className={styles.stealHeading}>
+                      <Ico icon={Siren} size={15} /> STEAL NOW
+                    </p>
                     <GameTimer timer={stealTimer} showControls={false} />
                   </div>
                 )}
@@ -628,7 +704,7 @@ export default function App() {
                       className={`${styles.awardBtn} ${styles.awardBtnCorrect}`.trim()}
                       onClick={() => resolveQuestion("correct", activeTeam)}
                     >
-                      ✅ Correct (+{activeTeam.perks.double ? currentPoints * 2 : currentPoints}
+                      <Ico icon={Check} /> Correct (+{activeTeam.perks.double ? currentPoints * 2 : currentPoints}
                       {activeTeam.perks.double ? ", 2x!" : ""})
                     </button>
                     <button
@@ -636,7 +712,7 @@ export default function App() {
                       className={`${styles.awardBtn} ${styles.awardBtnIncorrect}`.trim()}
                       onClick={() => resolveQuestion("incorrect", activeTeam)}
                     >
-                      ❌ Incorrect
+                      <Ico icon={X} /> Incorrect
                     </button>
                     {activeTeam.perks.freePass && (
                       <button
@@ -644,11 +720,11 @@ export default function App() {
                         className={`${styles.awardBtn} ${styles.awardBtnPerk}`.trim()}
                         onClick={() => resolveQuestion("freepass", activeTeam)}
                       >
-                        🎟️ Free Pass: award {currentPoints} to {activeTeam.name}
+                        <Ico icon={Ticket} /> Free Pass: award {currentPoints} to {activeTeam.name}
                       </button>
                     )}
                     <button type="button" className={styles.awardBtn} onClick={beginSteal}>
-                      ⏭️ No answer — open steal
+                      <Ico icon={SkipForward} /> No answer — open steal
                     </button>
                   </div>
                 )}
@@ -666,14 +742,14 @@ export default function App() {
                             onClick={() => resolveQuestion("stolen", team)}
                           >
                             <span className={styles.sw} style={{ background: team.color }} />
-                            ✅ {team.name} got it! (+{pts})
+                            <Ico icon={Check} /> {team.name} got it! (+{pts})
                           </button>
                           <button
                             type="button"
                             className={`${styles.awardBtn} ${styles.awardBtnIncorrect} ${isMissed ? styles.awardBtnMissed : ""}`.trim()}
                             onClick={() => handleMiss(team)}
                           >
-                            ❌ {team.name} missed
+                            <Ico icon={X} /> {team.name} missed
                           </button>
                         </Fragment>
                       );
@@ -684,7 +760,10 @@ export default function App() {
                 {questionPhase === "resolved" && (
                   <>
                     <p className={`${styles.qOutcome} ${OUTCOME_CLASSES[outcome] || ""}`.trim()}>
-                      {outcome === "stolen" ? `⚡ Stolen by ${outcomeTeam ? outcomeTeam.name : ""}!` : OUTCOME_LABELS[outcome]}
+                      {outcome && OUTCOME_META[outcome] && <Ico icon={OUTCOME_META[outcome].icon} size={17} />}{" "}
+                      {outcome === "stolen"
+                        ? `Stolen by ${outcomeTeam ? outcomeTeam.name : ""}!`
+                        : OUTCOME_META[outcome]?.text}
                     </p>
                     {nextTeam && (
                       <p className={styles.qNext} style={{ color: nextTeam.color }}>
@@ -703,7 +782,9 @@ export default function App() {
               <>
                 <span className={styles.qMeta}>{currentCategory?.name} · {currentPoints} pts · BONUS</span>
                 <div className={styles.bonusBody}>
-                  <span className={styles.bonusIcon}>{bonusEvent?.icon}</span>
+                  <span className={styles.bonusIcon}>
+                    <BonusGlyph type={bonusEvent?.type} />
+                  </span>
                   <h3 className={styles.bonusTitle}>{bonusEvent?.name}</h3>
                   <p className={styles.bonusDesc}>{bonusEvent?.desc}</p>
                   <div className={styles.bonusInteractive}>
@@ -713,13 +794,14 @@ export default function App() {
                         .filter((t) => t !== bonusPickingTeam)
                         .map((t, i) => (
                           <button key={i} type="button" className={styles.awardBtn} onClick={() => handleBonusSteal(t)}>
-                            <span className={styles.sw} style={{ background: t.color }} /> Steal from {t.name}
+                            <span className={styles.sw} style={{ background: t.color }} />
+                            <Ico icon={HandCoins} /> Steal from {t.name}
                           </button>
                         ))}
                     {bonusInteractiveType === "risk" &&
                       [100, 200, 300].map((wager) => (
                         <button key={wager} type="button" className={styles.awardBtn} onClick={() => handleBonusRisk(wager)}>
-                          Risk {wager}
+                          <Ico icon={Dices} /> Risk {wager}
                         </button>
                       ))}
                   </div>
