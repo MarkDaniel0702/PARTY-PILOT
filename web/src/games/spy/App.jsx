@@ -10,6 +10,7 @@ import { TimerSetup } from "../../shared/components/TimerSetup";
 import { GameTimer } from "../../shared/components/GameTimer";
 import { PassCard } from "../../shared/components/PassCard";
 import { RevealCard, ProgressDots } from "../../shared/components/RevealCard";
+import { CompletionChime } from "../../shared/components/CompletionChime";
 import { useRoster } from "../../shared/hooks/useRoster";
 import { useTimerSetup } from "../../shared/hooks/useTimerSetup";
 import { useGameTimer } from "../../shared/hooks/useGameTimer";
@@ -218,6 +219,7 @@ export default function App() {
         </Screen>
 
         <Screen active={phase === "spyreveal"}>
+          <CompletionChime />
           <BigIcon>🎭</BigIcon>
           <ScreenTitle>The Spy Was...</ScreenTitle>
           <p className={styles.spyName}>{spy?.name}</p>

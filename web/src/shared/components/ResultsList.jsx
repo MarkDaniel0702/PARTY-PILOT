@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { playSound } from "../audio/sounds";
 import styles from "./results.module.css";
 
 const MEDALS = ["🥇", "🥈", "🥉"];
@@ -9,6 +11,13 @@ const MEDALS = ["🥇", "🥈", "🥉"];
 // on why entrant objects are never cloned).
 export function ResultsList({ result, unit = "pts", unitSingular, showSwatch = false }) {
   const { ranked, winner, shared, tiebreak } = result;
+
+  // Final scores just came up — play the completion fanfare once. Every
+  // game that ends on a <ResultsList> gets this for free.
+  useEffect(() => {
+    playSound("complete");
+  }, []);
+
   return (
     <div>
       <div className={styles.list}>

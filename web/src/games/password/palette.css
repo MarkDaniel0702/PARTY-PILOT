@@ -8,3 +8,14 @@
   --accent-2: #ffd23f;
   --border: rgba(238, 242, 251, 0.12);
 }
+
+:root[data-theme="light"] {
+  --ink: #ecf1fb;
+  --panel: #ffffff;
+  --panel-2: #f1f4fc;
+  --paper: #101a2e;
+  --paper-dim: #566080;
+  --accent: #2f6fe0;
+  --accent-2: #b5820c;
+  --border: rgba(14, 20, 32, 0.14);
+}

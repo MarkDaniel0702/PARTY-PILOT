@@ -17,6 +17,7 @@ import { useGameTimer } from "../../shared/hooks/useGameTimer";
 import { usePersistedUsedIndices } from "../../shared/hooks/usePersistedUsedIndices";
 import { shuffle, groupKeys } from "../../shared/utils/random";
 import { resolveStanding } from "../../shared/utils/resolveStanding";
+import { playSound } from "../../shared/audio/sounds";
 import rosterStyles from "../../shared/components/roster.module.css";
 import ingameStyles from "../../shared/components/ingame.module.css";
 import { QUIZ_THEMES, QUIZ_THEME_GROUPS, QUIZ_BONUS_EVENTS } from "./data";
@@ -273,6 +274,11 @@ export default function App() {
     questionTimer.stop();
     stealTimer.stop();
 
+    // Event feedback — timeout already got its buzzer from the steal timer.
+    if (outcomeType === "correct" || outcomeType === "freepass") playSound("correct");
+    else if (outcomeType === "stolen") playSound("steal");
+    else if (outcomeType === "incorrect") playSound("incorrect");
+
     let nextIndex = turnIndex;
     if (outcomeType === "correct" || outcomeType === "freepass") {
       const pts = outcomeType !== "freepass" && team.perks.double ? currentPoints * 2 : currentPoints;
@@ -319,6 +325,7 @@ export default function App() {
     setBonusInteractiveType(null);
     setBonusResolved(false);
     setOverlayOpen(true);
+    playSound("bonus");
 
     const pickingTeam = teams[turnIndex];
     setBonusPickingTeam(pickingTeam);

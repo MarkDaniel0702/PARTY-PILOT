@@ -10,6 +10,7 @@ import { TimerSetup } from "../../shared/components/TimerSetup";
 import { GameTimer } from "../../shared/components/GameTimer";
 import { PassCard } from "../../shared/components/PassCard";
 import { RevealCard, TurnBanner } from "../../shared/components/RevealCard";
+import { CompletionChime } from "../../shared/components/CompletionChime";
 import { useRoster } from "../../shared/hooks/useRoster";
 import { useTimerSetup } from "../../shared/hooks/useTimerSetup";
 import { useGameTimer } from "../../shared/hooks/useGameTimer";
@@ -175,6 +176,7 @@ export default function App() {
       </Screen>
 
       <Screen active={phase === "summary"}>
+        <CompletionChime />
         <BigIcon>🏁</BigIcon>
         <ScreenTitle>Everyone's Had a Turn!</ScreenTitle>
         <ScreenSub>Great game. Ready for another round?</ScreenSub>

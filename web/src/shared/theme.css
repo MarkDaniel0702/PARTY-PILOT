@@ -30,6 +30,28 @@
   --space-4: 1.6rem;
   --space-5: 2.2rem;
   --shadow-soft: 0 12px 30px -12px rgba(0, 0, 0, 0.45);
+
+  color-scheme: dark;
+}
+
+/* Light theme — base fallback values. Each game's palette.css adds its own
+   `:root[data-theme="light"]` block on top of this (loaded after), keeping
+   the game's hue identity while swapping the neutrals. Toggled site-wide by
+   the `data-theme` attribute on <html> (see shared/theme/themeStore.js). */
+:root[data-theme="light"] {
+  --ink: #eef0f7;
+  --panel: #ffffff;
+  --panel-2: #f4f5fb;
+  --paper: #1b1d2b;
+  --paper-dim: #5b6076;
+  --accent: #6a4bff;
+  --accent-2: #b57400;
+  --border: rgba(20, 22, 45, 0.14);
+  --danger: #d83a3a;
+  --success: #1f9d5f;
+  --shadow-soft: 0 12px 30px -12px rgba(20, 22, 45, 0.18);
+
+  color-scheme: light;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -42,6 +64,33 @@ body {
   font-family: var(--font-body);
   position: relative;
   overflow-x: hidden;
+}
+
+/* Cross-fade the whole page only while the theme is actually switching.
+   themeStore.js adds `.theme-transition` to <html> on toggle and removes it
+   ~0.5s later, so there's no permanent transition cost (a standing
+   transition on `body`'s viewport-propagated background is unreliable in
+   Chrome), and hover/focus states stay instant the rest of the time.
+   `body` is listed explicitly because the universal selector doesn't cover
+   the viewport background it paints. */
+:root.theme-transition,
+:root.theme-transition body,
+:root.theme-transition *,
+:root.theme-transition *::before,
+:root.theme-transition *::after {
+  transition: background-color 0.4s ease, background-image 0.4s ease,
+    border-color 0.4s ease, color 0.4s ease, fill 0.4s ease, box-shadow 0.4s ease !important;
+  transition-delay: 0s !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root.theme-transition,
+  :root.theme-transition body,
+  :root.theme-transition *,
+  :root.theme-transition *::before,
+  :root.theme-transition *::after {
+    transition: none !important;
+  }
 }
 
 a { color: inherit; }

@@ -1,4 +1,5 @@
 import { ArrowLeft } from "lucide-react";
+import { SettingsMenu } from "./SettingsMenu";
 import styles from "./layout.module.css";
 
 // Topbar (back link + game title) + content wrap — every game's outer
@@ -25,6 +26,7 @@ export function GameShell({ title, titleIcon: TitleIcon, backHref = "./index.htm
         </span>
       </header>
       <main className={styles.wrap}>{children}</main>
+      <SettingsMenu />
     </>
   );
 }

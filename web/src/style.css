@@ -13,6 +13,24 @@
   --font-body:"Manrope", system-ui, sans-serif;
 }
 
+:root{ color-scheme:dark; }
+
+/* Light theme for the homepage. Same B-Rotation identity — vivid accents,
+   big display type — on a bright ground. Toggled site-wide by the
+   `data-theme` attribute on <html> (see shared/theme/themeStore.js). */
+:root[data-theme="light"]{
+  --ink:#eef0f7;
+  --ink-2:#ffffff;
+  --paper:#1a1c2b;
+  --paper-dim:#565b74;
+  --magenta:#d62d6f;
+  --gold:#a97e12;
+  --cyan:#0f97a0;
+  --violet:#6a44e0;
+  --border:rgba(20,22,45,0.14);
+  color-scheme:light;
+}
+
 *,*::before,*::after{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
 body{
@@ -25,6 +43,54 @@ body{
   font-family:var(--font-body);
   overflow-x:hidden;
   position:relative;
+}
+
+/* Whole-page cross-fade only while the theme is switching (see
+   shared/theme/themeStore.js — mirrors the block in shared/theme.css, which
+   the homepage doesn't load). */
+:root.theme-transition,
+:root.theme-transition body,
+:root.theme-transition *,
+:root.theme-transition *::before,
+:root.theme-transition *::after{
+  transition:background-color 0.4s ease, background-image 0.4s ease,
+    border-color 0.4s ease, color 0.4s ease, fill 0.4s ease, box-shadow 0.4s ease !important;
+  transition-delay:0s !important;
+}
+@media (prefers-reduced-motion: reduce){
+  :root.theme-transition,
+  :root.theme-transition body,
+  :root.theme-transition *,
+  :root.theme-transition *::before,
+  :root.theme-transition *::after{ transition:none !important; }
+}
+
+:root[data-theme="light"] body{
+  background:
+    radial-gradient(circle at 15% 8%, rgba(138,92,255,0.14), transparent 45%),
+    radial-gradient(circle at 85% 0%, rgba(15,151,160,0.12), transparent 40%),
+    var(--ink);
+}
+:root[data-theme="light"] .noise-overlay{ opacity:0.03; }
+:root[data-theme="light"] .glow{ opacity:0.22; }
+:root[data-theme="light"] .glow-c{ opacity:0.12; }
+
+/* Vivid card accents come from gameData.js as raw hex; a few (yellows) are
+   too pale for text on white, so nudge the title/icon toward ink in light
+   mode while keeping the hue. */
+:root[data-theme="light"] .card-title{
+  color:color-mix(in srgb, var(--card-accent) 74%, #14121f);
+}
+:root[data-theme="light"] .card-icon{
+  color:color-mix(in srgb, var(--card-accent) 82%, #14121f);
+  filter:drop-shadow(0 4px 12px rgba(20,22,45,0.14));
+}
+:root[data-theme="light"] .meta-chip.meta-auto{
+  color:color-mix(in srgb, var(--card-accent) 66%, #14121f);
+}
+:root[data-theme="light"] .line-2{
+  background:linear-gradient(100deg,#d62d6f,#b07d0a 55%,#0f97a0);
+  -webkit-background-clip:text;background-clip:text;
 }
 
 a{color:inherit;text-decoration:none;}

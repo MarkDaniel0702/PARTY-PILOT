@@ -1,4 +1,5 @@
 import { GAME_GROUPS } from './gameData';
+import { SettingsMenu } from './shared/components/SettingsMenu';
 
 function MetaChip({ icon: Icon, label, variant }) {
   const className = variant ? `meta-chip meta-${variant}` : 'meta-chip';
@@ -65,6 +66,7 @@ export default function App() {
       </section>
 
       <footer className="home-footer">Works on one screen &middot; no install &middot; no accounts</footer>
+      <SettingsMenu />
     </main>
   );
 }

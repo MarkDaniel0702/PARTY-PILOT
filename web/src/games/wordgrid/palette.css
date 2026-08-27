@@ -16,3 +16,20 @@
   --tile-present: #ffd23f;
   --tile-absent: #3a3f4d;
 }
+
+:root[data-theme="light"] {
+  --ink: #eaf6f0;
+  --panel: #ffffff;
+  --panel-2: #eef8f2;
+  --paper: #0c1712;
+  --paper-dim: #4f6b5f;
+  --accent: #1aa864;
+  --accent-2: #b5820c;
+  --border: rgba(12, 23, 18, 0.14);
+
+  --tile-bg: #f0f2f5;
+  --tile-border: rgba(12, 23, 18, 0.2);
+  --tile-correct: #1aa864;
+  --tile-present: #cf9500;
+  --tile-absent: #9aa0ac;
+}

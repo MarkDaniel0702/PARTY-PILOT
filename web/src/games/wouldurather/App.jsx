@@ -10,6 +10,7 @@ import { TimerSetup } from "../../shared/components/TimerSetup";
 import { GameTimer } from "../../shared/components/GameTimer";
 import { TurnBanner } from "../../shared/components/RevealCard";
 import { BinaryVoteButtons, VoteBar, VoteBarRow } from "../../shared/components/Voting";
+import { CompletionChime } from "../../shared/components/CompletionChime";
 import { useRoster } from "../../shared/hooks/useRoster";
 import { useTimerSetup } from "../../shared/hooks/useTimerSetup";
 import { useGameTimer } from "../../shared/hooks/useGameTimer";
@@ -174,6 +175,7 @@ export default function App() {
       </Screen>
 
       <Screen active={phase === "summary"}>
+        <CompletionChime />
         <BigIcon>🏁</BigIcon>
         <ScreenTitle>Session Complete!</ScreenTitle>
         <ScreenSub>

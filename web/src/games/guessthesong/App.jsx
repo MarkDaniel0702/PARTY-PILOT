@@ -88,6 +88,9 @@ export default function App() {
   const [result, setResult] = useState(null);
 
   const gameTimer = useGameTimer({
+    // Each expiry just advances to the next clue rather than ending a turn,
+    // so use the gentle tone and skip the 5s warning beep.
+    timerSound: "soft",
     onExpire: () => {
       if (currentSong && clueLevel < currentSong.clues.length) advanceClue();
       else revealAnswer();

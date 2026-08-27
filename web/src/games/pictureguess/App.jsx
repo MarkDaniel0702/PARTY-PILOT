@@ -79,7 +79,9 @@ export default function App() {
   const [pendingRanked, setPendingRanked] = useState([]);
   const [result, setResult] = useState(null);
 
-  const gameTimer = useGameTimer({ onExpire: () => sharpen() });
+  // Each expiry just sharpens the image a step rather than ending a turn,
+  // so use the gentle tone and skip the 5s warning beep.
+  const gameTimer = useGameTimer({ timerSound: "soft", onExpire: () => sharpen() });
 
   function fetchWikiThumbnail(title) {
     const cache = thumbCacheRef.current;

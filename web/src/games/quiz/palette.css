@@ -18,3 +18,21 @@ body {
     radial-gradient(ellipse at 50% -10%, #1b2c66 0%, var(--ink) 55%),
     var(--ink);
 }
+
+:root[data-theme="light"] {
+  --ink: #ecf0fb;
+  --panel: #ffffff;
+  --panel-2: #f1f4fc;
+  --paper: #0a1128;
+  --paper-dim: #566089;
+  --accent: #c98a00;
+  --accent-2: #12a08f;
+  --border: rgba(10, 17, 40, 0.14);
+  --gold-2: #a97e12;
+}
+
+:root[data-theme="light"] body {
+  background:
+    radial-gradient(ellipse at 50% -10%, #ffffff 0%, #e6ecfa 55%),
+    var(--ink);
+}
