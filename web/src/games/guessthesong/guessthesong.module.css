@@ -15,6 +15,32 @@
 .revealBtnWrap { max-width: 640px; margin: 0.8rem auto 1.5rem; }
 .endWrap { max-width: 200px; margin: 1.5rem auto 0; }
 
+/* Artist Challenges — a visually distinct section of the theme picker. */
+.artistLaunch { margin: 1.4rem 0 0; text-align: center; }
+.artistLaunchHint { color: var(--paper-dim); font-size: 0.82rem; margin: 0.6rem auto 0; max-width: 44ch; line-height: 1.5; }
+
+.artistPanel {
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  border-radius: var(--radius-md);
+  padding: 1.3rem;
+}
+.artistPanelHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-bottom: 0.6rem;
+}
+.artistPanelTitle {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  letter-spacing: 0.03em;
+  color: var(--accent-2);
+}
+.artistPanelHint { color: var(--paper-dim); font-size: 0.84rem; margin: 0 0 1.1rem; line-height: 1.55; }
+
 .pointBadge {
   display: block;
   text-align: center;

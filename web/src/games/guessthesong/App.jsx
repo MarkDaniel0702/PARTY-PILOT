@@ -16,6 +16,7 @@ import { useTimerSetup } from "../../shared/hooks/useTimerSetup";
 import { useGameTimer } from "../../shared/hooks/useGameTimer";
 import { resolveStanding } from "../../shared/utils/resolveStanding";
 import { GUESSTHESONG_CATEGORIES, GUESSTHESONG_CATEGORY_ICONS } from "./data";
+import { getArtistThemes, ARTIST_THEME_PREFIX, MIN_ARTIST_SONGS } from "./artistThemes";
 import ingameStyles from "../../shared/components/ingame.module.css";
 import styles from "./guessthesong.module.css";
 
@@ -26,6 +27,27 @@ const CATEGORY_ITEMS = Object.keys(GUESSTHESONG_CATEGORIES).map((name) => ({
   name,
   icon: GUESSTHESONG_CATEGORY_ICONS[name] || "🎵"
 }));
+
+// Optional artist-specific themes, generated from the library: one per
+// artist with MIN_ARTIST_SONGS+ distinct songs. Empty if nobody qualifies.
+const ARTIST_THEMES = getArtistThemes();
+const ARTIST_ITEMS = ARTIST_THEMES.map((t) => ({
+  key: t.name,
+  name: t.artist,
+  icon: "🎤",
+  meta: `${t.count} songs`
+}));
+
+const GENRE_COUNT = CATEGORY_ITEMS.length;
+const TOTAL_SONGS = Object.values(GUESSTHESONG_CATEGORIES).reduce((n, list) => n + list.length, 0);
+
+function poolForTheme(name) {
+  if (GUESSTHESONG_CATEGORIES[name]) return GUESSTHESONG_CATEGORIES[name];
+  const artistTheme = ARTIST_THEMES.find((t) => t.name === name);
+  return artistTheme ? artistTheme.songs : [];
+}
+
+const isArtistThemeName = (name) => typeof name === "string" && name.startsWith(ARTIST_THEME_PREFIX);
 
 function finalizeWinner(winner) {
   return winner && winner.score > 0 ? winner : null;
@@ -56,6 +78,9 @@ function loadYouTubeAPI() {
 export default function App() {
   const [phase, setPhase] = useState("setup");
   const [category, setCategory] = useState(null);
+  // Which picker the setup screen is showing: the genre list, or the
+  // dedicated artist-challenge list.
+  const [pickerView, setPickerView] = useState("genres"); // 'genres' | 'artists'
 
   const teams = useTeams({ maxTeams: MAX_TEAMS });
   const timerSetup = useTimerSetup({ recommended: 12, defaultEnabled: true });
@@ -260,7 +285,8 @@ export default function App() {
   }
 
   function handleStart() {
-    const poolArr = GUESSTHESONG_CATEGORIES[category];
+    const poolArr = poolForTheme(category);
+    if (!poolArr.length) return;
     usedIndicesRef.current = new Set();
     setPool(poolArr);
     setSongsPlayed(0);
@@ -342,8 +368,12 @@ export default function App() {
 
   function handleNewGame() {
     setCategory(null);
+    setPickerView("genres");
     setPhase("setup");
   }
+
+  const artistTheme = isArtistThemeName(category);
+  const themeLabel = artistTheme ? category.slice(ARTIST_THEME_PREFIX.length) : category;
 
   const clipPlayerClass = `${styles.clipPlayer} ${clipDataState === "revealed" ? styles.clipPlayerRevealed : ""}`.trim();
   const showBadge = clipMode !== "error" && clipDataState !== "revealed";
@@ -355,22 +385,56 @@ export default function App() {
       <Screen active={phase === "setup"}>
         <ScreenTitle>Guess the Song</ScreenTitle>
         <ScreenSub>
-          Play the clip, or skip straight to the clues — no host needed either way. From 423 songs across 14
-          categories, spanning OPM to hip-hop to indie to K-pop to karaoke-night classics.
+          Play the clip, or skip straight to the clues — no host needed either way. {TOTAL_SONGS} songs across{" "}
+          {GENRE_COUNT} genres, spanning OPM to hip-hop to indie to K-pop to karaoke-night classics
+          {ARTIST_ITEMS.length > 0 && <> — plus {ARTIST_ITEMS.length} artist-only challenges</>}.
         </ScreenSub>
 
         <HowToPlay
           steps={[
-            <>Pick a category and add teams (optional — skip scoring if you just want to play for fun), then tap <strong>Start</strong>.</>,
+            <>Pick a theme and add teams (optional — skip scoring if you just want to play for fun), then tap <strong>Start</strong>.</>,
             "An emoji clue appears first. Shout the song the moment you know it!",
-            "More clues reveal over time — a description, then an artist/era hint — getting easier as it goes.",
+            "More clues reveal over time — getting easier as it goes.",
+            <><strong>🎤 Artist Challenges</strong> focus on a single artist (any artist with {MIN_ARTIST_SONGS}+ songs in the library) — the artist name is already given, so the clues stop at the description.</>,
             <>Tap <strong>Reveal Answer</strong> anytime, award that song's points (100–500, harder songs are worth more) to whoever got it, and move on.</>,
             "Songs with a 🎧 clip available can be played right in the browser — audio only until the answer's revealed, then the full video unlocks."
           ]}
         />
 
-        <SetupBlock label="1. Choose a category" wide>
-          <GroupedPicker groups={{ "Pick one": CATEGORY_ITEMS }} value={category} onChange={setCategory} />
+        <SetupBlock label="1. Choose a theme" wide>
+          {pickerView === "genres" ? (
+            <>
+              <GroupedPicker groups={{ "Genres": CATEGORY_ITEMS }} value={category} onChange={setCategory} />
+              {ARTIST_ITEMS.length > 0 && (
+                <div className={styles.artistLaunch}>
+                  <Button variant="secondary" onClick={() => setPickerView("artists")}>
+                    🎤 Artist Challenges ({ARTIST_ITEMS.length}) →
+                  </Button>
+                  <p className={styles.artistLaunchHint}>
+                    Guess songs from just one artist — one theme per artist with {MIN_ARTIST_SONGS}+ songs in the library.
+                  </p>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className={styles.artistPanel}>
+              <div className={styles.artistPanelHead}>
+                <span className={styles.artistPanelTitle}>🎤 Artist Challenges</span>
+                <Button variant="secondary" onClick={() => setPickerView("genres")}>
+                  ← Back to genres
+                </Button>
+              </div>
+              <p className={styles.artistPanelHint}>
+                One artist, {MIN_ARTIST_SONGS}+ songs. Only artists with enough songs in the library appear here — the list
+                grows on its own as songs are added.
+              </p>
+              <GroupedPicker
+                groups={{ "Pick an artist": ARTIST_ITEMS }}
+                value={category}
+                onChange={setCategory}
+              />
+            </div>
+          )}
         </SetupBlock>
 
         <SetupBlock label="2. Teams (optional scoring)">
@@ -402,7 +466,7 @@ export default function App() {
 
       <Screen active={phase === "play"}>
         <TeamScoreboard teams={teams.teams} onAdjust={teams.award} />
-        <CategoryBanner>🎵 {category}</CategoryBanner>
+        <CategoryBanner>{artistTheme ? "🎤" : "🎵"} {themeLabel}</CategoryBanner>
         <span className={styles.pointBadge}>💰 {currentSong?.pointValue} PTS</span>
         {timerSetup.enabled && !revealed && <GameTimer timer={gameTimer} />}
 
@@ -513,8 +577,8 @@ export default function App() {
         </ScreenSub>
         <div className={styles.themeStats}>
           <div className={styles.statItem}>
-            <span className={styles.statLabel}>Theme</span>
-            <span className={styles.statValue}>{category}</span>
+            <span className={styles.statLabel}>{artistTheme ? "Artist" : "Theme"}</span>
+            <span className={styles.statValue}>{themeLabel}</span>
           </div>
           <div className={styles.statItem}>
             <span className={styles.statLabel}>Songs Completed</span>
