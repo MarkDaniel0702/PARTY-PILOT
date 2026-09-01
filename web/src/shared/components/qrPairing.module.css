@@ -1,0 +1,89 @@
+.toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0.9rem 1.2rem;
+  background: var(--panel);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+  color: var(--paper);
+  font-weight: 700;
+  font-size: 0.92rem;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.toggle:hover { border-color: var(--accent-2); transform: translateY(-1px); }
+.optional { color: var(--paper-dim); font-weight: 500; }
+
+.card {
+  max-width: 640px;
+  margin: 0 auto;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.3rem;
+}
+
+.status {
+  text-align: center;
+  color: var(--paper-dim);
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  align-items: center;
+}
+
+.ready { display: flex; flex-direction: column; gap: 1.1rem; }
+
+.qrBlock { text-align: center; }
+.qrImg {
+  width: 160px;
+  height: 160px;
+  border-radius: var(--radius-sm);
+  background: #fff;
+  padding: 8px;
+}
+.code {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  letter-spacing: 0.12em;
+  color: var(--accent-2);
+  margin: 0.6rem 0 0.2rem;
+}
+.hint { color: var(--paper-dim); font-size: 0.8rem; margin: 0; }
+
+.players { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.empty { color: var(--paper-dim); font-size: 0.85rem; text-align: center; }
+.player {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.7rem;
+  background: var(--panel-2);
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+}
+.online { color: var(--success); flex-shrink: 0; }
+.offline { color: var(--paper-dim); flex-shrink: 0; }
+.playerName { flex: 1; font-weight: 700; }
+.teamSelect {
+  background: var(--panel);
+  color: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.3rem 0.5rem;
+  font-size: 0.8rem;
+}
+
+.dismiss {
+  display: block;
+  margin: 1rem auto 0;
+  color: var(--paper-dim);
+  font-size: 0.82rem;
+  text-decoration: underline;
+}
+.dismiss:hover { color: var(--paper); }

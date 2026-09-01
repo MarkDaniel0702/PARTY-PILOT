@@ -1,0 +1,82 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.1rem;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  color: var(--accent-2);
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.contentInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.form, .waiting, .buzzWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+}
+
+.lead {
+  font-size: 1.15rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+}
+.sub { color: var(--paper-dim); font-size: 0.95rem; margin: 0; }
+.online { color: var(--success); }
+
+.input {
+  width: 100%;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.9rem 1.1rem;
+  font-size: 1.1rem;
+  color: var(--paper);
+  text-align: center;
+}
+
+.buzzBtn {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--danger), color-mix(in srgb, var(--danger) 70%, black));
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  box-shadow: 0 20px 50px -18px color-mix(in srgb, var(--danger) 70%, transparent);
+  transition: transform 0.15s;
+}
+.buzzBtn:active:not(:disabled) { transform: scale(0.94); }
+.buzzBtn:disabled { opacity: 0.4; }
+
+.won { color: var(--success); font-weight: 800; font-size: 1.1rem; }
+.lost { color: var(--danger); font-weight: 800; font-size: 1.1rem; }

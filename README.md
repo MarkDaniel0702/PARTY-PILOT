@@ -66,7 +66,7 @@ The whole site — the homepage plus all 12 games — is a **single React 19 + V
 | **Styling** | CSS Modules + a shared design-token contract, per-game colour palettes |
 | **Persistence** | `localStorage` only (theme, sound settings, Quiz Night question history) |
 | **Hosting** | GitHub Pages via GitHub Actions |
-| **Network use** | Google Fonts (first load), Wikipedia photo lookups (Picture Guess), YouTube IFrame API (Guess the Song clips) — everything degrades gracefully offline |
+| **Network use** | Google Fonts (first load), Wikipedia photo lookups (Picture Guess), YouTube IFrame API (Guess the Song clips), and — only if you opt into pairing a phone — a one-time handshake with PeerJS's public broker to connect a controller. Everything degrades gracefully offline |
 
 ---
 
@@ -85,7 +85,8 @@ The whole site — the homepage plus all 12 games — is a **single React 19 + V
 | 🔊 **Sound effects** | Timer start / warning / buzzer cues plus event sounds (correct, incorrect, steal, bonus, completion), with a global mute and volume control. |
 | 🌗 **Light / dark mode** | A site-wide theme toggle that follows your system preference by default and remembers your choice. |
 | 📱 **Fully responsive** | Works on a laptop, tablet, or phone passed around a table. |
-| 🔒 **Private by design** | No accounts, no server. Nothing personal ever leaves your browser. |
+| 🎮 **Optional phone controllers** | Quiz Night, Guess the Song, and Picture Guess can pair players' phones over WebRTC (scan a QR code) so they can buzz in directly — entirely optional, and every game still plays exactly the same without it. |
+| 🔒 **Private by design** | No accounts, no server, no database. Pairing a phone briefly touches PeerJS's public broker to connect the two devices — no other game data ever leaves your browser. |
 
 ---
 
@@ -691,6 +692,12 @@ Browsers block audio until you interact with the page — the first tap or key p
 <summary><strong>My theme choice isn't remembered</strong></summary>
 
 The choice is stored in `localStorage`. Private/incognito windows and browsers set to clear site data on close won't keep it between sessions.
+</details>
+
+<details>
+<summary><strong>My phone won't connect to a QR pairing session</strong></summary>
+
+A few things to check, in order: the phone needs to be on the same Wi-Fi as the main screen (mobile data won't reach a device sitting on a home network); some corporate or public Wi-Fi networks block the peer-to-peer connection outright; and the pairing card's **Retry** button gets a fresh code if the first one failed to register. If phones still won't connect, every game plays exactly the same without them — tap **Play without phones** and use the on-screen buttons instead.
 </details>
 
 <details>

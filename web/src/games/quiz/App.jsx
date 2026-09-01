@@ -40,6 +40,10 @@ import { usePersistedUsedIndices } from "../../shared/hooks/usePersistedUsedIndi
 import { shuffle, groupKeys } from "../../shared/utils/random";
 import { resolveStanding } from "../../shared/utils/resolveStanding";
 import { playSound } from "../../shared/audio/sounds";
+import { useHostSession } from "../../shared/controller/useHostSession";
+import { indexOfTeamId } from "../../shared/controller/teamRef";
+import { VIEW, view, buzzResult } from "../../shared/controller/protocol";
+import { QRPairing } from "../../shared/components/QRPairing";
 import rosterStyles from "../../shared/components/roster.module.css";
 import ingameStyles from "../../shared/components/ingame.module.css";
 import { QUIZ_THEMES, QUIZ_THEME_GROUPS, QUIZ_BONUS_EVENTS } from "./data";
@@ -174,6 +178,7 @@ export default function App() {
       return [
         ...prev,
         {
+          id: crypto.randomUUID(),
           name: name || `Team ${prev.length + 1}`,
           score: 0,
           color: TEAM_COLORS[prev.length % TEAM_COLORS.length],
@@ -243,6 +248,102 @@ export default function App() {
   const questionTimer = useGameTimer({ onExpire: () => beginSteal() });
   const stealTimer = useGameTimer({ onExpire: () => endStealWindow() });
 
+  // ---------- Phone controller: buzz-to-steal ----------
+  const session = useHostSession(teams);
+  const { onMessage, sendTo, players: sessionPlayers } = session;
+  const [buzzedTeam, setBuzzedTeam] = useState(null);
+  const [buzzedPlayerId, setBuzzedPlayerId] = useState(null);
+  const buzzLockRef = useRef(false);
+
+  // onMessage's underlying subscription is stable regardless of how often
+  // this component re-renders (see useHostSession.js), so the listener
+  // itself is registered once and reads fresh state through this ref
+  // instead of resubscribing on every state change.
+  const buzzStateRef = useRef();
+  buzzStateRef.current = { questionPhase, teams, timedOutIndex, activeTeamIndex, missedTeams, buzzedTeam, sessionPlayers };
+
+  useEffect(() => {
+    return onMessage((msg) => {
+      if (msg.type !== "buzz") return;
+      const { questionPhase, teams, timedOutIndex, activeTeamIndex, missedTeams, buzzedTeam, sessionPlayers } =
+        buzzStateRef.current;
+      if (questionPhase !== "steal" || buzzedTeam || buzzLockRef.current) return;
+      const player = sessionPlayers.find((p) => p.playerId === msg.playerId);
+      if (!player) return;
+      const idx = indexOfTeamId(teams, player.teamId);
+      if (idx === -1) return;
+      const timedOut = timedOutIndex != null ? timedOutIndex : activeTeamIndex;
+      if (idx === timedOut) return;
+      const team = teams[idx];
+      if (missedTeams.has(team)) return;
+      buzzLockRef.current = true;
+      // Winning the buzz race isn't the same as answering correctly — the
+      // phone only learns "You're up!" here. The real buzzResult (right /
+      // wrong) is sent from resolvePhoneSteal once the host actually judges
+      // the spoken answer.
+      setBuzzedTeam(team);
+      setBuzzedPlayerId(msg.playerId);
+    });
+  }, [onMessage, sendTo]);
+
+  // Keeps every connected phone's screen in sync with who's eligible to buzz.
+  // Skipped entirely during setup so a phone that joins early keeps showing
+  // its natural lobby view instead of a premature "watch the main screen" —
+  // there's nothing to watch yet.
+  useEffect(() => {
+    if (sessionPlayers.length === 0 || phase === "setup") return;
+    if (phase === "board" && questionPhase === "steal") {
+      if (buzzedTeam) {
+        sessionPlayers.forEach((p) => {
+          if (!p.connected) return;
+          sendTo(
+            p.playerId,
+            p.playerId === buzzedPlayerId
+              ? view({ view: VIEW.LOCKED, title: "You're up!", subtitle: "Answer out loud." })
+              : view({ view: VIEW.LOCKED, title: "Standby", subtitle: `${buzzedTeam.name} is answering.` })
+          );
+        });
+      } else {
+        const timedOut = timedOutIndex != null ? timedOutIndex : activeTeamIndex;
+        sessionPlayers.forEach((p) => {
+          if (!p.connected) return;
+          const idx = indexOfTeamId(teams, p.teamId);
+          const eligible = idx !== -1 && idx !== timedOut && !missedTeams.has(teams[idx]);
+          sendTo(
+            p.playerId,
+            view(
+              eligible
+                ? { view: VIEW.BUZZ, title: "Steal it!", button: { label: "BUZZ" } }
+                : { view: VIEW.LOCKED, title: "Not eligible", subtitle: "Watch the main screen." }
+            )
+          );
+        });
+      }
+    } else {
+      sessionPlayers.forEach((p) => {
+        if (!p.connected) return;
+        sendTo(
+          p.playerId,
+          view({
+            view: VIEW.IDLE,
+            title: "Quiz Night",
+            subtitle: phase === "board" ? "Watch the main screen." : "Thanks for playing!"
+          })
+        );
+      });
+    }
+  }, [phase, questionPhase, buzzedTeam, buzzedPlayerId, timedOutIndex, activeTeamIndex, missedTeams, teams, sessionPlayers, sendTo]);
+
+  function resolvePhoneSteal(won) {
+    if (!buzzedTeam) return;
+    if (buzzedPlayerId) sendTo(buzzedPlayerId, buzzResult(won));
+    if (won) resolveQuestion("stolen", buzzedTeam);
+    else handleMiss(buzzedTeam);
+    setBuzzedTeam(null);
+    setBuzzedPlayerId(null);
+    buzzLockRef.current = false;
+  }
+
   function totalTileCount() {
     const themeObj = QUIZ_THEMES[theme];
     return themeObj.categories.length * POINT_VALUES.length;
@@ -300,6 +401,9 @@ export default function App() {
     setOutcomeTeam(null);
     setMissedTeams(new Set());
     setOverlayOpen(true);
+    setBuzzedTeam(null);
+    setBuzzedPlayerId(null);
+    buzzLockRef.current = false;
     startAnswerTimer();
   }
 
@@ -375,6 +479,9 @@ export default function App() {
     setOutcome(outcomeType);
     setOutcomeTeam(team);
     setQuestionPhase("resolved");
+    setBuzzedTeam(null);
+    setBuzzedPlayerId(null);
+    buzzLockRef.current = false;
   }
 
   // ---------- Bonus events ----------
@@ -597,6 +704,10 @@ export default function App() {
             </div>
           </SetupBlock>
 
+          <SetupBlock label="6. Phone controllers">
+            <QRPairing session={session} teams={teams} />
+          </SetupBlock>
+
           <Button disabled={!theme || teams.length < 1} onClick={handleStart}>
             Start Quiz <Ico icon={ArrowRight} />
           </Button>
@@ -729,7 +840,30 @@ export default function App() {
                   </div>
                 )}
 
-                {questionPhase === "steal" && (
+                {questionPhase === "steal" && buzzedTeam && (
+                  <div className={styles.awardRow}>
+                    <p className={styles.qTurn} style={{ color: buzzedTeam.color }}>
+                      <Ico icon={Siren} size={15} /> {buzzedTeam.name} buzzed in!
+                    </p>
+                    <button
+                      type="button"
+                      className={`${styles.awardBtn} ${styles.awardBtnCorrect}`.trim()}
+                      onClick={() => resolvePhoneSteal(true)}
+                    >
+                      <Ico icon={Check} /> {buzzedTeam.name} got it! (+
+                      {buzzedTeam.perks.double ? currentPoints * 2 : currentPoints})
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.awardBtn} ${styles.awardBtnIncorrect}`.trim()}
+                      onClick={() => resolvePhoneSteal(false)}
+                    >
+                      <Ico icon={X} /> {buzzedTeam.name} missed
+                    </button>
+                  </div>
+                )}
+
+                {questionPhase === "steal" && !buzzedTeam && (
                   <div className={styles.awardRow}>
                     {eligibleSteal.map((team, i) => {
                       const pts = team.perks.double ? currentPoints * 2 : currentPoints;

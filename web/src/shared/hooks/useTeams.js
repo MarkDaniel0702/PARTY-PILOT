@@ -15,6 +15,7 @@ export function useTeams({ maxTeams = 6 } = {}) {
         return [
           ...prev,
           {
+            id: crypto.randomUUID(),
             name: name || `Team ${prev.length + 1}`,
             score: 0,
             color: TEAM_COLORS[prev.length % TEAM_COLORS.length]

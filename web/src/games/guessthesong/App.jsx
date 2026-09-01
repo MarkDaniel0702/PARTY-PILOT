@@ -15,6 +15,10 @@ import { useTeams } from "../../shared/hooks/useTeams";
 import { useTimerSetup } from "../../shared/hooks/useTimerSetup";
 import { useGameTimer } from "../../shared/hooks/useGameTimer";
 import { resolveStanding } from "../../shared/utils/resolveStanding";
+import { useHostSession } from "../../shared/controller/useHostSession";
+import { indexOfTeamId } from "../../shared/controller/teamRef";
+import { VIEW, view, buzzResult } from "../../shared/controller/protocol";
+import { QRPairing } from "../../shared/components/QRPairing";
 import { GUESSTHESONG_CATEGORIES, GUESSTHESONG_CATEGORY_ICONS } from "./data";
 import { getArtistThemes, ARTIST_THEME_PREFIX, MIN_ARTIST_SONGS } from "./artistThemes";
 import ingameStyles from "../../shared/components/ingame.module.css";
@@ -121,6 +125,111 @@ export default function App() {
       else revealAnswer();
     }
   });
+
+  // ---------- Phone controller: buzz-in ----------
+  const session = useHostSession(teams.teams);
+  const { onMessage, sendTo, players: sessionPlayers } = session;
+  const [buzzedTeamId, setBuzzedTeamId] = useState(null);
+  const [buzzedPlayerId, setBuzzedPlayerId] = useState(null);
+  const [lockedTeamIds, setLockedTeamIds] = useState(() => new Set());
+  const buzzLockRef = useRef(false);
+
+  const buzzStateRef = useRef();
+  buzzStateRef.current = {
+    revealed,
+    teams: teams.teams,
+    lockedTeamIds,
+    buzzedTeamId,
+    sessionPlayers,
+    stopTimer: gameTimer.stop,
+    pauseClip: () => handleClipPause()
+  };
+
+  useEffect(() => {
+    return onMessage((msg) => {
+      if (msg.type !== "buzz") return;
+      const { revealed, teams: teamsArr, lockedTeamIds, buzzedTeamId, sessionPlayers, stopTimer, pauseClip } =
+        buzzStateRef.current;
+      if (revealed || buzzedTeamId || buzzLockRef.current) return;
+      const player = sessionPlayers.find((p) => p.playerId === msg.playerId);
+      if (!player) return;
+      const idx = indexOfTeamId(teamsArr, player.teamId);
+      if (idx === -1) return;
+      const team = teamsArr[idx];
+      if (lockedTeamIds.has(team.id)) return;
+      buzzLockRef.current = true;
+      // Winning the buzz race isn't the same as answering correctly — the
+      // real buzzResult (right / wrong) is sent from resolvePhoneBuzz once
+      // the host actually judges the spoken answer.
+      setBuzzedTeamId(team.id);
+      setBuzzedPlayerId(msg.playerId);
+      stopTimer();
+      pauseClip();
+    });
+  }, [onMessage, sendTo]);
+
+  // Skipped entirely during setup so a phone that joins early keeps showing
+  // its natural lobby view instead of a premature "watch the main screen".
+  useEffect(() => {
+    if (sessionPlayers.length === 0 || phase === "setup") return;
+    if (phase === "play" && !revealed && currentSong) {
+      if (buzzedTeamId) {
+        sessionPlayers.forEach((p) => {
+          if (!p.connected) return;
+          sendTo(
+            p.playerId,
+            p.playerId === buzzedPlayerId
+              ? view({ view: VIEW.LOCKED, title: "You're up!", subtitle: "Shout it out." })
+              : view({ view: VIEW.LOCKED, title: "Standby", subtitle: "Someone else buzzed in." })
+          );
+        });
+      } else {
+        sessionPlayers.forEach((p) => {
+          if (!p.connected) return;
+          const idx = indexOfTeamId(teams.teams, p.teamId);
+          const eligible = idx !== -1 && !lockedTeamIds.has(teams.teams[idx].id);
+          sendTo(
+            p.playerId,
+            view(
+              eligible
+                ? { view: VIEW.BUZZ, title: "Know it?", button: { label: "BUZZ" } }
+                : { view: VIEW.LOCKED, title: "Locked out", subtitle: "Wait for the next song." }
+            )
+          );
+        });
+      }
+    } else {
+      sessionPlayers.forEach((p) => {
+        if (!p.connected) return;
+        sendTo(
+          p.playerId,
+          view({
+            view: VIEW.IDLE,
+            title: "Guess the Song",
+            subtitle: phase === "play" ? "Watch the main screen." : "Thanks for playing!"
+          })
+        );
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, revealed, currentSong, buzzedTeamId, buzzedPlayerId, lockedTeamIds, teams.teams, sessionPlayers, sendTo]);
+
+  const buzzedTeam = buzzedTeamId ? teams.teams.find((t) => t.id === buzzedTeamId) : null;
+
+  function resolvePhoneBuzz(won) {
+    if (!buzzedTeam) return;
+    if (buzzedPlayerId) sendTo(buzzedPlayerId, buzzResult(won));
+    if (won) {
+      teams.award(teams.teams.indexOf(buzzedTeam), currentSong?.pointValue || 0);
+      revealAnswer();
+    } else {
+      setLockedTeamIds((prev) => new Set(prev).add(buzzedTeam.id));
+    }
+    setBuzzedTeamId(null);
+    setBuzzedPlayerId(null);
+    buzzLockRef.current = false;
+    if (!won && timerSetup.enabled) gameTimer.start(timerSetup.seconds);
+  }
 
   // ---------- Clip player state ----------
   const ytPlayerRef = useRef(null);
@@ -282,6 +391,10 @@ export default function App() {
     setClueLevel(1);
     setRevealed(false);
     setupClipPlayer(item);
+    setBuzzedTeamId(null);
+    setBuzzedPlayerId(null);
+    setLockedTeamIds(new Set());
+    buzzLockRef.current = false;
   }
 
   function handleStart() {
@@ -309,6 +422,9 @@ export default function App() {
     setSongsPlayed((p) => p + 1);
     setRevealed(true);
     revealClipPlayer();
+    setBuzzedTeamId(null);
+    setBuzzedPlayerId(null);
+    buzzLockRef.current = false;
   }
 
   function checkThemeComplete(poolArg) {
@@ -459,6 +575,10 @@ export default function App() {
           />
         </SetupBlock>
 
+        <SetupBlock label="4. Phone controllers">
+          <QRPairing session={session} teams={teams.teams} />
+        </SetupBlock>
+
         <Button disabled={!category} onClick={handleStart}>
           Start →
         </Button>
@@ -527,7 +647,21 @@ export default function App() {
 
         {revealed && <AnswerBlock label="Answer" text={currentSong?.answer} />}
 
-        {!revealed && (
+        {!revealed && buzzedTeam && (
+          <div className={styles.revealBtnWrap}>
+            <p className={ingameStyles.turnBanner} style={{ color: buzzedTeam.color }}>
+              🔔 {buzzedTeam.name} buzzed in!
+            </p>
+            <ButtonRow>
+              <Button onClick={() => resolvePhoneBuzz(true)}>✅ Got it! (+{currentSong?.pointValue})</Button>
+              <Button variant="secondary" onClick={() => resolvePhoneBuzz(false)}>
+                ❌ Missed
+              </Button>
+            </ButtonRow>
+          </div>
+        )}
+
+        {!revealed && !buzzedTeam && (
           <>
             <Button disabled={!currentSong || clueLevel >= currentSong.clues.length} onClick={handleNextClue}>
               🔓 Reveal Next Clue
