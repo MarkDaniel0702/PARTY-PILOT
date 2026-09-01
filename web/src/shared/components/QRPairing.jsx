@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Smartphone, RotateCcw, Wifi, WifiOff } from "lucide-react";
+import { Smartphone, RotateCcw, Wifi, WifiOff, Plus } from "lucide-react";
 import { Button } from "./Button";
 import styles from "./qrPairing.module.css";
 
@@ -56,8 +56,18 @@ export function QRPairing({ session, teams = [] }) {
   if (!expanded) {
     return (
       <button type="button" className={styles.toggle} onClick={() => setExpanded(true)}>
-        <Smartphone size={16} strokeWidth={2.25} />
-        Add phone controllers <span className={styles.optional}>(optional)</span>
+        <span className={styles.toggleBadge} aria-hidden="true">
+          <Smartphone size={18} strokeWidth={2.25} />
+        </span>
+        <span className={styles.toggleText}>
+          <span className={styles.toggleTitle}>
+            Add phone controllers <span className={styles.optional}>(optional)</span>
+          </span>
+          <span className={styles.toggleSub}>
+            Players scan a QR code to buzz in from their own phone.
+          </span>
+        </span>
+        <Plus size={18} strokeWidth={2.5} className={styles.togglePlus} aria-hidden="true" />
       </button>
     );
   }

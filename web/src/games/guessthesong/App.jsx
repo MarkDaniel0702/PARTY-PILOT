@@ -563,7 +563,13 @@ export default function App() {
           />
         </SetupBlock>
 
-        <SetupBlock label="3. Timer">
+        {/* Directly after teams: the pairing panel assigns each phone to a
+            team, so the team list has to exist above it to be meaningful. */}
+        <SetupBlock label="3. Phone controllers">
+          <QRPairing session={session} teams={teams.teams} />
+        </SetupBlock>
+
+        <SetupBlock label="4. Timer">
           <TimerSetup
             unitLabel="per clue"
             recommended={12}
@@ -573,10 +579,6 @@ export default function App() {
             seconds={timerSetup.seconds}
             onSecondsChange={timerSetup.setSeconds}
           />
-        </SetupBlock>
-
-        <SetupBlock label="4. Phone controllers">
-          <QRPairing session={session} teams={teams.teams} />
         </SetupBlock>
 
         <Button disabled={!category} onClick={handleStart}>

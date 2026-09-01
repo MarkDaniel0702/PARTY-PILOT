@@ -665,7 +665,13 @@ export default function App() {
             <TeamSetup teams={teams} maxTeams={MAX_TEAMS} onAdd={() => addTeam()} onRemove={removeTeam} onRename={renameTeam} />
           </SetupBlock>
 
-          <SetupBlock label="3. Play style">
+          {/* Directly after teams: the pairing panel assigns each phone to a
+              team, so the team list has to exist above it to be meaningful. */}
+          <SetupBlock label="3. Phone controllers">
+            <QRPairing session={session} teams={teams} />
+          </SetupBlock>
+
+          <SetupBlock label="4. Play style">
             <GroupedPicker
               groups={{ "Pick one": MODE_ITEMS }}
               value={mode}
@@ -676,7 +682,7 @@ export default function App() {
             />
           </SetupBlock>
 
-          <SetupBlock label="4. Timer">
+          <SetupBlock label="5. Timer">
             <TimerSetup
               unitLabel="per question"
               recommended={ANSWER_TIMER_RECOMMENDED}
@@ -688,7 +694,7 @@ export default function App() {
             />
           </SetupBlock>
 
-          <SetupBlock label="5. Bonus Slots">
+          <SetupBlock label="6. Bonus Slots">
             <div className={styles.bonusSetup}>
               <ToggleCheck
                 label={<><Ico icon={Star} /> Add bonus slots to the board</>}
@@ -702,10 +708,6 @@ export default function App() {
                 </div>
               )}
             </div>
-          </SetupBlock>
-
-          <SetupBlock label="6. Phone controllers">
-            <QRPairing session={session} teams={teams} />
           </SetupBlock>
 
           <Button disabled={!theme || teams.length < 1} onClick={handleStart}>
