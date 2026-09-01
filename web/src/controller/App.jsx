@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Gamepad2, Wifi, WifiOff, RotateCcw } from "lucide-react";
 import { useControllerClient } from "../shared/controller/useControllerClient";
-import { buzz, VIEW } from "../shared/controller/protocol";
+import { buzz, action, VIEW, ACTION } from "../shared/controller/protocol";
 import { Button } from "../shared/components/Button";
 import { SettingsMenu } from "../shared/components/SettingsMenu";
+import { UnoCard } from "../games/uno/UnoCard";
+import cardStyles from "../shared/cards/cards.module.css";
 import styles from "./controller.module.css";
 
 // The phone side of a pairing session. This page never runs any game
@@ -35,6 +37,18 @@ export default function App() {
     if (buzzed) return;
     setBuzzed(true);
     send(buzz(`${Date.now()}-${Math.random()}`));
+  }
+
+  function handlePlayCard(cardId) {
+    send(action(ACTION.PLAY_CARD, { cardId }));
+  }
+
+  function handleDrawCard() {
+    send(action(ACTION.DRAW_CARD, {}));
+  }
+
+  function handleChoice(optionId) {
+    send(action(ACTION.CHOOSE_COLOUR, { colour: optionId }));
   }
 
   // A fresh non-buzz view means a new round started — clear any stale lock.
@@ -123,7 +137,52 @@ export default function App() {
           </button>
         </div>
       );
-    } else if (view.view === VIEW.LOCKED) {
+    } else if (view.view === VIEW.HAND) {
+      // The only view carrying private state. The host sends it to exactly
+      // one player, so no other phone's channel ever receives these cards.
+      const playable = new Set(view.playable || []);
+      body = (
+        <div className={styles.handWrap}>
+          <p className={styles.lead}>{view.title || "Your turn"}</p>
+          {view.subtitle && <p className={styles.sub}>{view.subtitle}</p>}
+          <div className={cardStyles.fan}>
+            {(view.cards || []).map((card) => (
+              <UnoCard
+                key={card.id}
+                card={card}
+                disabled={!playable.has(card.id)}
+                onClick={playable.has(card.id) ? () => handlePlayCard(card.id) : undefined}
+              />
+            ))}
+          </div>
+          {view.canDraw && (
+            <Button variant="secondary" onClick={handleDrawCard}>
+              {view.drawLabel || "Draw a card"}
+            </Button>
+          )}
+        </div>
+      );
+    } else if (view.view === VIEW.CHOICE) {
+      body = (
+        <div className={styles.form}>
+          <p className={styles.lead}>{view.title || "Choose"}</p>
+          {view.subtitle && <p className={styles.sub}>{view.subtitle}</p>}
+          <div className={styles.choiceGrid}>
+            {(view.options || []).map((opt) => (
+              <button
+                key={opt.id}
+                type="button"
+                className={styles.choiceBtn}
+                style={opt.colour ? { background: opt.colour } : undefined}
+                onClick={() => handleChoice(opt.id)}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    } else if (view.view === VIEW.LOCKED || view.view === VIEW.WAIT) {
       body = (
         <div className={styles.waiting}>
           <p className={styles.lead}>{view.title || "Not your turn"}</p>

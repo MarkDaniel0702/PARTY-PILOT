@@ -1,0 +1,66 @@
+/* Generic card shell shared by every card game. Colour comes from the
+   specific card component (UnoCard, later PlayingCard) via inline style or a
+   modifier class, so this file only owns shape, size, and state. */
+
+.frame {
+  --card-w: 74px;
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: var(--card-w);
+  height: calc(var(--card-w) * 1.5);
+  padding: 0;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  border-radius: calc(var(--card-w) * 0.14);
+  background: var(--panel-2);
+  color: #fff;
+  box-shadow: var(--shadow-soft);
+  font-family: var(--font-display);
+  overflow: hidden;
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s, outline-color 0.15s;
+  outline: 3px solid transparent;
+  outline-offset: 2px;
+}
+
+.sm { --card-w: 46px; }
+.md { --card-w: 74px; }
+.lg { --card-w: 104px; }
+
+.clickable { cursor: pointer; }
+.clickable:hover:not(.disabled) { transform: translateY(-6px); }
+.clickable:active:not(.disabled) { transform: translateY(-2px); }
+
+/* Dimmed rather than hidden: players can still see the cards they hold,
+   they just can't play them this turn. */
+.disabled { opacity: 0.35; cursor: not-allowed; }
+
+.selected {
+  outline-color: var(--paper);
+  transform: translateY(-8px);
+}
+
+.faceDown {
+  background:
+    repeating-linear-gradient(45deg, #1b1d2b 0 6px, #262a3d 6px 12px);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* A hand or pile laid out in a row; wraps on small screens and scrolls
+   horizontally rather than letting the page scroll sideways. */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  max-width: 100%;
+}
+
+.fan {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  overflow-x: auto;
+  padding: 0.6rem 0.2rem 1rem;
+  max-width: 100%;
+}

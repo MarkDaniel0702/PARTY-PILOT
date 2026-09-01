@@ -2,7 +2,10 @@
 // phone (controller), sent over a PeerJS WebRTC data channel. Bumping
 // PROTOCOL_VERSION forces a phone on a stale cached bundle to show a
 // "refresh this page" error instead of silently misbehaving after a deploy.
-export const PROTOCOL_VERSION = 1;
+// v2 added the card-game views (HAND / CHOICE / WAIT) and the generic ACTION
+// message. A phone still running a cached v1 bundle is rejected with
+// "version-mismatch" and told to refresh, rather than silently misbehaving.
+export const PROTOCOL_VERSION = 2;
 
 export const MAX_PLAYERS = 8;
 
@@ -10,6 +13,9 @@ export const MAX_PLAYERS = 8;
 export const MSG = {
   JOIN: "join",
   BUZZ: "buzz",
+  // Generic card-game input. BUZZ is kept as its own type so the three
+  // already-shipped buzz games need no changes.
+  ACTION: "action",
   PONG: "pong"
 };
 
@@ -28,7 +34,19 @@ export const VIEW = {
   LOBBY: "lobby",
   IDLE: "idle",
   BUZZ: "buzz",
-  LOCKED: "locked"
+  LOCKED: "locked",
+  // Card games. HAND is the only view carrying private state — the host sends
+  // it to exactly one player, so nobody else's channel ever receives it.
+  HAND: "hand",
+  CHOICE: "choice",
+  WAIT: "wait"
+};
+
+// Action kinds carried by MSG.ACTION.
+export const ACTION = {
+  PLAY_CARD: "playCard",
+  DRAW_CARD: "drawCard",
+  CHOOSE_COLOUR: "chooseColour"
 };
 
 export function join(name, teamId, playerId) {
@@ -37,6 +55,10 @@ export function join(name, teamId, playerId) {
 
 export function buzz(nonce) {
   return { v: PROTOCOL_VERSION, t: MSG.BUZZ, nonce };
+}
+
+export function action(kind, payload) {
+  return { v: PROTOCOL_VERSION, t: MSG.ACTION, kind, payload };
 }
 
 export function pong() {

@@ -1,0 +1,33 @@
+:root {
+  --ink: #16111f;
+  --panel: #221a30;
+  --panel-2: #2c2240;
+  --paper: #f6f1ff;
+  --paper-dim: #a99cc4;
+  --accent: #e0293b;
+  --accent-2: #e8a91d;
+  --border: rgba(246, 241, 255, 0.13);
+}
+
+body {
+  background:
+    radial-gradient(ellipse at 50% -10%, #3a2a52 0%, var(--ink) 55%),
+    var(--ink);
+}
+
+:root[data-theme="light"] {
+  --ink: #f2eefb;
+  --panel: #ffffff;
+  --panel-2: #f5f1fd;
+  --paper: #1d1430;
+  --paper-dim: #6a5f85;
+  --accent: #c4192a;
+  --accent-2: #a97400;
+  --border: rgba(29, 20, 48, 0.14);
+}
+
+:root[data-theme="light"] body {
+  background:
+    radial-gradient(ellipse at 50% -10%, #ffffff 0%, #ece5fa 55%),
+    var(--ink);
+}

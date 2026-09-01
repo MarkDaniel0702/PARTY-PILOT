@@ -1,0 +1,172 @@
+.modeNote {
+  margin: 0.9rem 0 0;
+  padding: 0.6rem 0.8rem;
+  background: var(--panel-2);
+  border-radius: var(--radius-sm);
+  color: var(--paper-dim);
+  font-size: 0.83rem;
+  line-height: 1.5;
+}
+
+.startHint {
+  text-align: center;
+  color: var(--paper-dim);
+  font-size: 0.83rem;
+  margin: 0.8rem 0 0;
+}
+
+.table {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem;
+  margin-bottom: 1.4rem;
+}
+
+.seatStrip {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.1rem;
+}
+
+.seatChip {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.7rem;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.seatChipActive {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+.seatName { color: var(--paper); }
+.seatCount {
+  display: grid;
+  place-items: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 0.78rem;
+}
+.unoFlag {
+  color: var(--danger);
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+}
+
+.pileRow {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 2rem;
+}
+.pileSlot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  position: relative;
+}
+.pileLabel {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  font-weight: 800;
+}
+.pileCount { font-size: 0.75rem; color: var(--paper-dim); }
+.colourDot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--paper);
+}
+
+.turnBanner {
+  margin: 1.2rem 0 0;
+  text-align: center;
+  font-weight: 800;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.dirHint {
+  color: var(--paper-dim);
+  font-weight: 500;
+  font-size: 0.82rem;
+}
+
+.phoneNote {
+  text-align: center;
+  color: var(--paper-dim);
+  font-size: 0.9rem;
+  margin: 0 0 1.4rem;
+}
+
+.localHand {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem;
+  margin-bottom: 1.4rem;
+}
+.handTitle {
+  text-align: center;
+  font-weight: 800;
+  margin: 0 0 0.4rem;
+}
+
+.colourGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.7rem;
+  max-width: 380px;
+  margin: 0.8rem auto 0;
+}
+.colourBtn {
+  padding: 1.2rem 1rem;
+  border-radius: var(--radius-md);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.15s;
+}
+.colourBtn:active { transform: scale(0.96); }
+
+.endWrap { max-width: 320px; margin: 0 auto; }
+
+.finalList {
+  list-style: none;
+  margin: 0 auto 1.6rem;
+  padding: 0;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.finalRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.6rem 0.9rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+}
+.finalCount { color: var(--paper-dim); font-weight: 500; }

@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from "react";
-import { MAX_PLAYERS, MSG, welcome, ping, errorMsg } from "./protocol";
+import { PROTOCOL_VERSION, MAX_PLAYERS, MSG, welcome, ping, errorMsg } from "./protocol";
 
 // No ambiguous glyphs (0/O, 1/I) — this gets read aloud and typed by hand.
 const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -57,7 +57,7 @@ export function useHostSession(teams) {
 
   const handleData = useCallback(
     (conn, msg, existingPlayerId) => {
-      if (!msg || msg.v !== 1) {
+      if (!msg || msg.v !== PROTOCOL_VERSION) {
         conn.send(errorMsg("version-mismatch"));
         return;
       }

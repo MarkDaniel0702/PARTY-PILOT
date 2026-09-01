@@ -1,0 +1,29 @@
+/* The white oval every UNO card carries, with the value/symbol inside it. */
+.pill {
+  display: grid;
+  place-items: center;
+  width: 78%;
+  height: 58%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  transform: rotate(-20deg);
+}
+
+.face {
+  transform: rotate(20deg);
+  font-size: calc(var(--card-w) * 0.42);
+  line-height: 1;
+  color: #14162d;
+  font-family: var(--font-display);
+}
+
+/* Wilds get the four-colour quadrant treatment instead of a flat fill. */
+.wild {
+  background:
+    conic-gradient(
+      #e0293b 0deg 90deg,
+      #e8a91d 90deg 180deg,
+      #2fa84f 180deg 270deg,
+      #2f6fd0 270deg 360deg
+    );
+}

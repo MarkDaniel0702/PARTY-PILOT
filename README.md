@@ -1,7 +1,7 @@
 # 🎮 B-Rotation
 
 <p>
-  <img alt="Games" src="https://img.shields.io/badge/games-12-7c5cff">
+  <img alt="Games" src="https://img.shields.io/badge/games-13-7c5cff">
   <img alt="React" src="https://img.shields.io/badge/React-19-61dafb">
   <img alt="Vite" src="https://img.shields.io/badge/Vite-multi--page-646cff">
   <img alt="Sign-up" src="https://img.shields.io/badge/sign--up-not%20required-2fd67f">
@@ -18,7 +18,7 @@
   <img alt="Guess the Song genres" src="https://img.shields.io/badge/song%20genres-14-ff3d9a">
 </p>
 
-**B-Rotation** is a colourful, browser-based party-game platform. **12 games**, one shared screen, **no dedicated host required** — gather a group around a phone, tablet, or laptop and pick from social deduction, trivia, voting games, and classic party favourites. The app runs turns, timers, randomisation, hidden information, scoring, and results on its own.
+**B-Rotation** is a colourful, browser-based party-game platform. **13 games**, one shared screen, **no dedicated host required** — gather a group around a phone, tablet, or laptop and pick from social deduction, trivia, voting games, and classic party favourites. The app runs turns, timers, randomisation, hidden information, scoring, and results on its own.
 
 > [!TIP]
 > **▶️ Play now:** <https://markdaniel0702.github.io/PARTY-PILOT/> — free, no sign-up, works on any device.
@@ -37,6 +37,7 @@
   - [❓ Quiz Night](#-quiz-night)
   - [🎵 Guess the Song](#-guess-the-song)
   - [🖼️ Picture Guess](#️-picture-guess)
+  - [🃏 UNO](#-uno)
   - [🎲 Other Implemented Games](#-other-implemented-games)
 - [🤖 Automated Game System](#-automated-game-system)
 - [⏱️ Timers](#️-timers)
@@ -56,7 +57,7 @@
 
 ## 🧭 Project Overview
 
-The whole site — the homepage plus all 12 games — is a **single React 19 + Vite multi-page app** living in `web/`. Each game is its own HTML entry (`spy.html`, `quiz.html`, …) that mounts an independent React root, and every game is built from one shared component/hook library in `web/src/shared/`. There is no backend, no database, and no account system.
+The whole site — the homepage plus all 13 games — is a **single React 19 + Vite multi-page app** living in `web/`. Each game is its own HTML entry (`spy.html`, `quiz.html`, …) that mounts an independent React root, and every game is built from one shared component/hook library in `web/src/shared/`. There is no backend, no database, and no account system.
 
 | | |
 |---|---|
@@ -76,7 +77,7 @@ The whole site — the homepage plus all 12 games — is a **single React 19 + V
 |---|---|
 | 🙅 **No host required** | Every game runs itself — turn order, timers, hidden info, and results all happen automatically. |
 | 🎙️ **Game Master optional** | Some games also offer a manual mode where one person controls pacing. |
-| 🎲 **12 games, 3 categories** | Word & Deduction, Trivia & Knowledge, and Party & Voting. |
+| 🎲 **13 games, 4 categories** | Word & Deduction, Trivia & Knowledge, Party & Voting, and Card Games. |
 | ⏱️ **Universal customizable timers** | One shared timer system — a recommended duration you can override with a preset or a custom value (5–600 s), Pause / Resume / Reset controls, and a switch to turn it off entirely. |
 | 🔀 **Randomised content** | Words, questions, prompts, songs, and pictures are drawn at random each round; Quiz Night additionally remembers which questions a slot has shown and avoids repeats. |
 | ⭐ **Bonus events** | Quiz Night boards can include 1–4 surprise bonus tiles with random point swings. |
@@ -106,6 +107,28 @@ The whole site — the homepage plus all 12 games — is a **single React 19 + V
 | 🤷 [Would You Rather?](#-other-implemented-games) | Party & Voting | 2–10 | ✅ | — | — |
 | 👥 [Most Likely To](#-other-implemented-games) | Party & Voting | 3–10 | ✅ | — | — |
 | 🎭 [Charades](#-other-implemented-games) | Party & Voting | 3–10 | ✅ | ✅ | ✅ |
+| 🃏 [UNO](#-uno) | Card Games | 2–8 | ✅ | — | — |
+
+---
+
+### 🃏 UNO
+
+The classic colour-and-number card game, dealt and refereed by the app. Match the discard pile's **colour**, **number**, or **symbol** — wilds go on anything — and win by emptying your hand first.
+
+This is the first game built on the **phone controller** layer, and it plays two ways:
+
+- **📱 With phones** — pair a phone per player and each hand stays genuinely private. The host sends every hand down that player's own WebRTC channel, so nobody else's device ever receives your cards.
+- **🔄 Without phones** — pair nothing and it falls back to the same **pass-the-device** flow Spy Word uses: "Pass the device to [Name]", reveal your hand, play, hide, pass on.
+
+The shared screen always shows the public state — discard pile, active colour, play direction, whose turn it is, and everyone's remaining card count (with an **UNO!** flag at one card).
+
+- Full 108-card deck: four colours of 0–9, Skip, Reverse, and Draw Two, plus 4 Wild and 4 Wild Draw Four.
+- **Reverse** flips direction — and acts as a **Skip** in a two-player game.
+- No legal card? Draw one — you may play it immediately if it's legal, otherwise your turn passes.
+- The draw pile automatically reshuffles from the discard pile when it runs out.
+
+> [!NOTE]
+> Two deliberate simplifications: there's **no "UNO!" call-out penalty** (the screen just announces when someone is down to one card), and **+2/+4 stacking is off**, matching official rules rather than the common house rule.
 
 ---
 
@@ -446,6 +469,7 @@ npm run preview     # serves web/dist/ locally, exactly as deployed
 | `npm run dev` | Vite dev server with hot module reload |
 | `npm run build` | Builds every page into `web/dist/` |
 | `npm run preview` | Serves the built `web/dist/` locally |
+| `npm run test` | Runs the [Vitest](https://vitest.dev) unit tests for the pure game engines (currently UNO's rules) |
 
 > [!NOTE]
 > No accounts or backend are required. An internet connection is only needed for Google Fonts (first load), Picture Guess's Wikipedia photo lookups, and Guess the Song's YouTube clips — all of which degrade gracefully if unavailable.
@@ -639,7 +663,7 @@ The site is deployed on **GitHub Pages** via **GitHub Actions** — free, HTTPS 
 | Publish dir | `web/dist/` |
 | Env vars | None |
 
-**What the workflow does:** installs `web/`'s dependencies, runs the Vite build (outputting the homepage + all 12 games to `web/dist/`), marks it non-Jekyll, then uploads and deploys `web/dist/` with `actions/deploy-pages`.
+**What the workflow does:** installs `web/`'s dependencies, runs the Vite build (outputting the homepage + all 13 games to `web/dist/`), marks it non-Jekyll, then uploads and deploys `web/dist/` with `actions/deploy-pages`.
 
 **Redeploying:**
 

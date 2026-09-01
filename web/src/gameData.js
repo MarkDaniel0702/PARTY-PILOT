@@ -2,7 +2,8 @@ import {
   Fingerprint, Eye, HelpCircle, Lock, Brain, Grid3x3,
   Tv, Music, Image,
   PartyPopper, ListChecks, GitFork, Users, Drama,
-  Bot, Mic
+  Spade, Layers,
+  Bot, Mic, Smartphone
 } from 'lucide-react';
 
 // Same content as the original static index.html — only the emoji glyphs
@@ -158,6 +159,23 @@ export const GAME_GROUPS = [
           { icon: Users, label: '3–10 players' },
           { icon: Bot, label: 'Automated', variant: 'auto' },
           { icon: Mic, label: 'GM optional', variant: 'gm' }
+        ]
+      }
+    ]
+  },
+  {
+    label: 'Card Games',
+    icon: Spade,
+    games: [
+      {
+        href: 'uno.html',
+        icon: Layers,
+        title: 'UNO',
+        desc: 'Match the colour or the number and dump your hand first. Play from your own phone, or pass one device around.',
+        accent: '#e0293b',
+        meta: [
+          { icon: Users, label: '2–8 players' },
+          { icon: Smartphone, label: 'Phones optional', variant: 'auto' }
         ]
       }
     ]
