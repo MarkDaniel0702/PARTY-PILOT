@@ -75,7 +75,8 @@ export function createGame({ seed = 1, mode = "battle" } = {}) {
     pendingGarbage: 0,
     garbageSent: 0,
     over: false,
-    lastClear: 0
+    lastClear: 0,
+    clearId: 0
   };
 }
 
@@ -208,6 +209,11 @@ export function lockPiece(state) {
     lockSteps: 0,
     canHold: true,
     lastClear: cleared,
+    // Bumped once per clearing lock. The host samples boards ~12x a second
+    // and the engine clears lines the instant a piece locks, so without a
+    // counter to compare against, a clear can happen entirely between two
+    // snapshots and the TV has nothing to celebrate.
+    clearId: state.clearId + (cleared > 0 ? 1 : 0),
     garbageSent: state.garbageSent + Math.max(0, sent - cancelled),
     pendingGarbage: 0
   };
@@ -300,7 +306,16 @@ export function snapshot(state) {
     score: state.score,
     lines: state.lines,
     level: state.level,
-    over: state.over
+    over: state.over,
+    // Everything below exists for the TV: it can't see a clear happen, or
+    // know what's queued, unless the phone says so. A handful of bytes next
+    // to the cells string.
+    piece: state.over ? null : { t: state.piece.type, x: state.piece.x, y: state.piece.y, r: state.piece.rotation },
+    clear: state.lastClear,
+    clearId: state.clearId,
+    pending: state.pendingGarbage,
+    hold: state.hold,
+    next: state.bag.slice(0, 3)
   };
 }
 

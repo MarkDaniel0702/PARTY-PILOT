@@ -356,6 +356,32 @@ describe("snapshot", () => {
     expect(snap).toMatchObject({ score: 1200, lines: 7, level: 2, over: false });
   });
 
+  it("bumps clearId once per clearing lock, and not otherwise", () => {
+    // The TV animates a line clear by watching this counter, so it has to
+    // move exactly once per clear — a stall or a double-count either drops
+    // the celebration or plays it twice.
+    const base = { ...createGame({ seed: 5 }), piece: { type: "O", rotation: 0, x: 3, y: 0 } };
+    expect(snapshot(base).clearId).toBe(0);
+
+    const cleared = hardDrop(withRows(base, 2));
+    expect(cleared.lines).toBe(2);
+    expect(snapshot(cleared).clearId).toBe(1);
+    expect(snapshot(cleared).clear).toBe(2);
+
+    // A lock that clears nothing leaves the counter alone.
+    const idle = hardDrop({ ...cleared, piece: { type: "O", rotation: 0, x: 0, y: 0 } });
+    expect(snapshot(idle).clearId).toBe(1);
+    expect(snapshot(idle).clear).toBe(0);
+  });
+
+  it("reports the queue and incoming garbage for the TV rails", () => {
+    const g = queueGarbage(createGame({ seed: 3 }), 3);
+    const snap = snapshot(g);
+    expect(snap.pending).toBe(3);
+    expect(snap.next).toHaveLength(3);
+    expect(snap.hold).toBeNull();
+  });
+
   it("stays small enough to send several times a second", () => {
     // 20 rows + separators; comfortably under a WebRTC message budget even
     // for four players at 15Hz.

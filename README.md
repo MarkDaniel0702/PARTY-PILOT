@@ -128,6 +128,8 @@ Everyone plays at once, each on their own phone, while **every board appears sid
 - **Two modes.** *Battle* — clearing 2+ lines at once sends garbage to everyone else, and the last board standing wins. *Line Race* — no garbage, most lines before the clock runs out.
 - **Garbage cancels.** A clear of your own wipes out incoming garbage before it lands, so a well-timed Tetris can save you.
 - **Auto-repeat runs on the phone**, so a held direction stays smooth even if the network hiccups.
+- **The big screen is an arena.** Boards are sized off the screen's *height* so two to four wells fill a TV, each player owns a seat colour, and every pane carries its own hold/next previews, level and line count.
+- **You can see the fight.** Line clears burst as `SINGLE / DOUBLE / TRIPLE / TETRIS!`, garbage flies across the screen as a tracer from attacker to victim, incoming garbage climbs a warning bar beside the well, the top of a well glows red as the stack nears the ceiling, and a knockout gets a stamped placement.
 - 2–4 players.
 
 > [!NOTE]
@@ -139,12 +141,17 @@ Everyone plays at once, each on their own phone, while **every board appears sid
 
 Turn-based artillery. Two teams alternate turns; on yours you walk a little, pick a weapon, set angle and power, and fire. Shots blow real craters in the ground, and anyone left standing on nothing takes the fall. Last team with a survivor wins.
 
+**There is no aiming line.** The battlefield shows you the direction the shot leaves — a pointer whose length never changes with power — and nothing about where it will land. Judging the arc is the game, so you correct off where your last shot actually landed, which stays marked until the shot after it.
+
 - **6 battlefields** — Rolling Hills, Scattered Isles, Cat Caves, Canyon Standoff, Sky Platforms, and Crater Field.
 - **Nothing is a picture.** Every battlefield is *generated from a seed* at match start, so the same map is never the same twice — and the game ships no image files at all.
 - **Destructible terrain:** the ground is a bitmap the explosions cut holes into, so the battlefield genuinely erodes as the match goes on.
 - **Wind** is re-rolled every turn and pushes shots sideways — the Fish Lobber far more than the others.
 - **3 weapons:** Bone Bazooka (accurate, hard-hitting), Fish Lobber (wide blast, very wind-sensitive), Paw Whack (close range, knocks the target flying).
-- **Optional phone controllers** — the team on turn gets an aiming gamepad on their phone; everyone else is told to watch, so two people can't aim the same shot.
+- **Optional phone controllers** — the team on turn gets an aiming gamepad on their phone (angle dial, power meter, weapon picker); everyone else is told to watch, so two people can't aim the same shot.
+- **Live battlefields.** Clouds drift at the speed of the wind, a parallax skyline sits behind the ground, characters breathe, shots leave a burning trail, and blasts throw debris and shake the screen. All of it stands down under `prefers-reduced-motion`.
+- **A HUD you can read across a room** — turn card with the shooter's health, a wind gauge, a countdown ring, both squads with per-character health, and weapon tiles carrying their own damage and blast stats.
+- On the shared screen you can aim from the keyboard: `←/→` angle, `↑/↓` power, `A/D` walk, `Space` fire (hold Shift for bigger steps).
 - 1–4 characters per team, and a 45-second turn clock.
 
 > [!NOTE]

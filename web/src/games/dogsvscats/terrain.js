@@ -116,6 +116,13 @@ export const BATTLEFIELDS = [
     sky: ["#8fd0ee", "#dff1fb"],
     ground: "#5aa845",
     rock: "#3d7a30",
+    // Ambient decor — read by the renderer only; generation never sees it.
+    decor: {
+      light: { x: 0.18, y: 0.16, r: 52, colour: "#fff6c4" },
+      clouds: 5,
+      stars: 0,
+      hills: ["#4e9b3c", "#3c7c2f"]
+    },
     build(terrain, rng) {
       const h = smooth(midpointHeights(terrain.width, rng, 0.55, terrain.height * 0.55, 150, terrain.height * 0.3, terrain.height * 0.85), 2);
       return fillColumnsFromHeights(terrain, h);
@@ -128,6 +135,12 @@ export const BATTLEFIELDS = [
     sky: ["#7fc7e8", "#e8f6fb"],
     ground: "#d8c48a",
     rock: "#b09a5e",
+    decor: {
+      light: { x: 0.8, y: 0.14, r: 46, colour: "#fff1c0" },
+      clouds: 4,
+      stars: 0,
+      hills: ["#8fb9cf", "#6f9db6"]
+    },
     build(terrain, rng) {
       const { width, height } = terrain;
       const count = 3 + Math.floor(rng() * 2);
@@ -157,6 +170,12 @@ export const BATTLEFIELDS = [
     sky: ["#2f3550", "#4a5170"],
     ground: "#6b5f7a",
     rock: "#4b4159",
+    decor: {
+      light: { x: 0.76, y: 0.15, r: 30, colour: "#e6e9ff" },
+      clouds: 2,
+      stars: 46,
+      hills: ["#3a3f5c", "#2c3049"]
+    },
     build(terrain, rng) {
       const { width, height } = terrain;
       const h = smooth(midpointHeights(width, rng, 0.5, height * 0.3, 90, height * 0.18, height * 0.5), 3);
@@ -184,6 +203,12 @@ export const BATTLEFIELDS = [
     sky: ["#f0b27a", "#fce4c8"],
     ground: "#c0703f",
     rock: "#8f4f2a",
+    decor: {
+      light: { x: 0.24, y: 0.2, r: 58, colour: "#ffe0a8" },
+      clouds: 3,
+      stars: 0,
+      hills: ["#c98d5f", "#a86e44"]
+    },
     build(terrain, rng) {
       const { width, height } = terrain;
       const h = smooth(midpointHeights(width, rng, 0.6, height * 0.45, 60, height * 0.3, height * 0.7), 3);
@@ -205,6 +230,12 @@ export const BATTLEFIELDS = [
     sky: ["#a8b8ee", "#e6ecfb"],
     ground: "#7c8cc4",
     rock: "#5b6aa0",
+    decor: {
+      light: { x: 0.14, y: 0.12, r: 44, colour: "#fdfbff" },
+      clouds: 6,
+      stars: 0,
+      hills: ["#9fadd8", "#8494c4"]
+    },
     build(terrain, rng) {
       const { width, height } = terrain;
       const slabs = 5 + Math.floor(rng() * 3);
@@ -231,6 +262,12 @@ export const BATTLEFIELDS = [
     sky: ["#3b3f52", "#6d7183"],
     ground: "#9a9aa6",
     rock: "#6f6f7c",
+    decor: {
+      light: { x: 0.72, y: 0.18, r: 26, colour: "#dfe3f0" },
+      clouds: 1,
+      stars: 60,
+      hills: ["#4b4f63", "#3b3f52"]
+    },
     build(terrain, rng) {
       const { width, height } = terrain;
       const h = smooth(midpointHeights(width, rng, 0.55, height * 0.5, 110, height * 0.3, height * 0.8), 2);

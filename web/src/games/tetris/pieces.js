@@ -23,6 +23,20 @@ export const COLOURS = {
   G: "#6b7280"
 };
 
+// A darker companion for every piece colour. Blocks are drawn as a gradient
+// from COLOURS to SHADES with a lit top edge, which is what turns a flat
+// square into something that reads as a tile from across a room.
+export const SHADES = {
+  I: "#1a8b99",
+  O: "#a8880c",
+  T: "#6c37a0",
+  S: "#2a8a3d",
+  Z: "#a32b34",
+  J: "#2748a3",
+  L: "#a35b12",
+  G: "#414753"
+};
+
 export const SHAPES = {
   I: [
     [[0, 1], [1, 1], [2, 1], [3, 1]],

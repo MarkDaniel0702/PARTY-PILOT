@@ -1,4 +1,8 @@
-.row, .modeNote, .startHint { }
+/* Tetris Battle. The play screen is a TV arena, not a page: it breaks the
+   shared 1000px column and sizes the wells off viewport height, because a
+   board that four people are reading from a sofa has to be as tall as the
+   screen allows. Every player owns a `--seat` colour, threaded through the
+   pane rim, the name, the crown and the garbage tracer. */
 
 .row {
   display: flex;
@@ -22,84 +26,356 @@
 }
 .startHint { text-align: center; color: var(--paper-dim); font-size: 0.83rem; margin: 0.8rem auto 0; max-width: 48ch; }
 
+.seatStrip { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.9rem; }
+.seatChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.32rem 0.75rem;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid color-mix(in srgb, var(--seat) 55%, transparent);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.seatDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--seat, var(--accent));
+  box-shadow: 0 0 8px -1px var(--seat, var(--accent));
+  flex: none;
+}
+
 /* ---------- board ---------- */
 .board { width: 100%; border-radius: var(--radius-sm); overflow: hidden; line-height: 0; }
 .boardCanvas { display: block; width: 100%; }
+.previewEmpty {
+  display: block;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--paper) 8%, transparent);
+}
+.previewFaded { opacity: 0.55; }
 
-/* ---------- host: the TV grid ---------- */
+/* ---------- host: the TV arena ---------- */
+.arena {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  padding: 0 1rem;
+}
+
 .matchBar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 0.9rem;
+  max-width: 1400px;
+  margin: 0 auto 1rem;
   font-size: 0.9rem;
 }
-.modeTag { font-family: var(--font-display); color: var(--accent-2); letter-spacing: 0.04em; }
-.clock { font-family: var(--font-display); color: var(--accent); font-variant-numeric: tabular-nums; }
+.modeTag {
+  font-family: var(--font-display);
+  color: var(--accent-2);
+  letter-spacing: 0.04em;
+  font-size: 0.9rem;
+}
+.clock {
+  font-family: var(--font-display);
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  margin-right: auto;
+}
+.matchBar .endBtn { width: auto; padding: 0.4rem 0.9rem; font-size: 0.72rem; }
 
 .grid {
-  display: grid;
-  grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr));
+  /* Height-first sizing: a 10x20 well is exactly half as wide as it is tall,
+     so the pane width follows from the height the screen can give it. The
+     max() floor keeps four panes usable on a laptop, where they wrap. */
+  --boardH: max(180px, min(68vh, calc(((100vw - 2rem) / var(--cols, 2) - 5.5rem) * 2)));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
   gap: 0.9rem;
-  align-items: start;
-}
-@media (min-width: 900px) {
-  .grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
 }
 
 .pane {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 0.6rem;
   position: relative;
-  transition: opacity 0.3s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.55rem;
+  border-radius: var(--radius-md);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--seat) 12%, var(--panel)), var(--panel));
+  border: 1px solid color-mix(in srgb, var(--seat) 45%, transparent);
+  box-shadow: 0 0 22px -14px var(--seat);
+  transition: opacity 0.4s, filter 0.4s, box-shadow 0.3s;
 }
-.paneOut { opacity: 0.55; }
+/* Desaturate the well, not the pane — the KO plaque sits inside it and has
+   to stay readable. */
+.paneOut { opacity: 0.8; box-shadow: none; }
+.paneOut .boardCanvas { filter: saturate(0.2); }
+
 .paneHead {
   display: flex;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-bottom: 0.4rem;
-  font-size: 0.8rem;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
 }
-.paneName { font-weight: 800; }
-.paneScore { color: var(--paper-dim); font-variant-numeric: tabular-nums; }
-.koTag {
+.paneName {
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--seat);
+}
+.crown { font-size: 0.8rem; line-height: 1; }
+.paneScoreUnit {
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  margin-left: 0.25rem;
+}
+.paneScore {
+  margin-left: auto;
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.9rem;
+}
+
+.paneBody { display: flex; gap: 0.45rem; align-items: stretch; }
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.22rem;
+  width: 3.1rem;
+  padding: 0.35rem 0.2rem;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--ink) 55%, transparent);
+}
+.railLabel {
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 800;
+  color: var(--paper-dim);
+}
+.railValue { font-family: var(--font-display); font-size: 0.95rem; font-variant-numeric: tabular-nums; }
+.railSpacer { flex: 1; min-height: 0.2rem; }
+
+.boardWrap {
+  position: relative;
+  height: var(--boardH);
+  width: calc(var(--boardH) / 2);
+  flex: none;
+}
+
+/* Incoming garbage, rising up the side of the well. */
+.warnBar {
   position: absolute;
-  inset: auto 0 40% 0;
+  right: -5px;
+  bottom: 0;
+  width: 4px;
+  height: var(--fill, 0%);
+  border-radius: 999px;
+  background: linear-gradient(0deg, #ff5a52, #ffb36b);
+  box-shadow: 0 0 10px -1px #ff5a52;
+  animation: tbThrob 0.7s ease-in-out infinite;
+}
+
+.hitBadge {
+  position: absolute;
+  top: 8%;
+  right: 6%;
+  font-family: var(--font-display);
+  font-size: clamp(0.9rem, 2.2vh, 1.4rem);
+  color: #ff7a72;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+  animation: tbHit 0.9s ease-out both;
+  pointer-events: none;
+}
+
+.clearBurst {
+  position: absolute;
+  inset: 38% 0 auto 0;
   text-align: center;
   font-family: var(--font-display);
-  font-size: 0.8rem;
-  color: var(--danger);
-  letter-spacing: 0.08em;
+  font-size: clamp(0.75rem, 2.4vh, 1.35rem);
+  letter-spacing: 0.06em;
+  color: #fff;
+  text-shadow: 0 0 18px var(--seat), 0 2px 8px rgba(0, 0, 0, 0.9);
+  animation: tbBurst 1.1s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+  pointer-events: none;
+}
+/* A Tetris deserves to be seen from the back of the room. */
+.clearBurstBig {
+  font-size: clamp(1rem, 3.4vh, 2rem);
+  color: #fff4c6;
+  text-shadow: 0 0 26px #ffb020, 0 0 8px #fff, 0 2px 8px rgba(0, 0, 0, 0.9);
 }
 
-.endWrap { max-width: 320px; margin: 1.4rem auto 0; }
+.levelFlare {
+  position: absolute;
+  inset: auto 0 12% 0;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: clamp(0.6rem, 1.6vh, 0.85rem);
+  letter-spacing: 0.08em;
+  color: #ffd23f;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+  animation: tbBurst 1.3s ease-out both;
+  pointer-events: none;
+}
+
+.koStamp {
+  position: absolute;
+  top: 42%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-4deg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  padding: 0.5rem 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(0.62rem, 1.6vh, 0.85rem);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #ff7a72;
+  border: 2px solid rgba(255, 122, 114, 0.7);
+  border-radius: var(--radius-sm);
+  background: rgba(8, 10, 18, 0.72);
+  box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.9);
+  animation: tbStamp 0.45s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+  pointer-events: none;
+}
+.koStamp em {
+  font-style: normal;
+  font-size: 1.6em;
+  color: #ffffff;
+}
+
+.raceTrack {
+  display: block;
+  height: 5px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--paper) 12%, transparent);
+  overflow: hidden;
+}
+.raceFill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--seat);
+  transition: width 0.5s ease;
+}
+
+/* The garbage shell, flying attacker → victim. Both endpoints arrive as
+   inline custom properties measured when the attack lands. */
+.tracer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  min-width: 2.1rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  color: #fff;
+  background: var(--danger);
+  box-shadow: 0 0 18px -2px var(--danger);
+  pointer-events: none;
+  animation: tbTracer 0.85s cubic-bezier(0.35, 0, 0.6, 1) both;
+}
+
+@keyframes tbTracer {
+  0% { transform: translate(var(--x0), var(--y0)) translate(-50%, -50%) scale(0.5); opacity: 0; }
+  18% { transform: translate(calc(var(--x0) + (var(--x1) - var(--x0)) * 0.18), calc(var(--y0) + (var(--y1) - var(--y0)) * 0.18 - 30px)) translate(-50%, -50%) scale(1.1); opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translate(var(--x1), var(--y1)) translate(-50%, -50%) scale(1.35); opacity: 0; }
+}
+@keyframes tbBurst {
+  0% { opacity: 0; transform: scale(0.7); }
+  18% { opacity: 1; transform: scale(1.12); }
+  40% { transform: scale(1); }
+  75% { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.04); }
+}
+@keyframes tbHit {
+  0% { opacity: 0; transform: translateY(10px) scale(0.7); }
+  25% { opacity: 1; transform: translateY(0) scale(1.15); }
+  100% { opacity: 0; transform: translateY(-14px) scale(1); }
+}
+@keyframes tbStamp {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(1.7) rotate(-10deg); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(-4deg); }
+}
+@keyframes tbThrob {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
 
 /* ---------- phone ---------- */
-.phoneWrap { display: flex; flex-direction: column; gap: 0.5rem; width: 100%; max-width: 340px; align-items: stretch; }
+.phoneWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  width: 100%;
+  max-width: 360px;
+  align-items: stretch;
+  --seat: var(--accent);
+}
 .phoneStats {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  font-size: 0.82rem;
-  color: var(--paper-dim);
+  padding: 0.4rem 0.7rem;
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  font-size: 0.8rem;
   font-variant-numeric: tabular-nums;
 }
-.incoming { color: var(--danger); font-weight: 800; }
-.phoneBoard { max-width: 260px; margin: 0 auto; }
-.phoneMeta {
-  display: grid;
-  grid-template-columns: auto 1fr auto 1fr;
-  gap: 0.3rem 0.5rem;
-  align-items: center;
-  font-size: 0.75rem;
+.phoneScore { font-family: var(--font-display); font-size: 1rem; color: var(--seat); }
+.phoneLines { color: var(--paper-dim); }
+.incoming {
+  color: var(--danger);
+  font-weight: 800;
+  animation: tbThrob 0.7s ease-in-out infinite;
 }
-.metaLabel { color: var(--paper-dim); text-transform: uppercase; letter-spacing: 0.06em; }
-.metaVal { font-weight: 800; }
-.phoneOver { text-align: center; color: var(--danger); font-weight: 800; }
+
+.phoneBoardRow { display: flex; gap: 0.5rem; align-items: flex-start; justify-content: center; }
+.phoneBoard { width: min(64vw, 260px); }
+.phoneRail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  width: 3.2rem;
+  padding: 0.4rem 0.2rem;
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  border: 1px solid var(--border);
+}
+.metaLabel {
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 800;
+  color: var(--paper-dim);
+}
+.metaVal { font-family: var(--font-display); font-size: 0.9rem; }
+.phoneOver { text-align: center; color: var(--danger); font-weight: 800; margin: 0.4rem 0 0; }
 
 /* Big, thumb-friendly targets — this is the one screen played on, not read. */
 .pad {
@@ -109,7 +385,7 @@
   touch-action: none;
 }
 .padBtn {
-  min-height: 62px;
+  min-height: 64px;
   border-radius: var(--radius-md);
   background: var(--panel-2);
   border: 1px solid var(--border);
@@ -118,7 +394,41 @@
   font-size: 1.1rem;
   user-select: none;
   -webkit-user-select: none;
-  transition: transform 0.08s, background 0.08s;
+  transition: transform 0.08s, background 0.08s, border-color 0.08s;
 }
-.padBtn:active { transform: scale(0.95); background: var(--panel); }
-.padDrop { grid-column: span 2; background: var(--accent); color: #101018; }
+.padBtn:active { transform: scale(0.95); background: var(--panel); border-color: var(--seat); }
+.padWord { font-size: 0.82rem; letter-spacing: 0.06em; }
+.padSub { display: block; font-family: var(--font-body); font-size: 0.55rem; letter-spacing: 0.1em; color: var(--paper-dim); }
+.padDrop {
+  grid-column: span 2;
+  background: var(--seat);
+  border-color: var(--seat);
+  color: #0b1020;
+}
+.padDrop .padSub { color: rgba(11, 16, 32, 0.65); }
+
+@media (prefers-reduced-motion: reduce) {
+  .tracer, .clearBurst, .levelFlare, .hitBadge, .koStamp, .warnBar, .incoming {
+    animation: none;
+  }
+  .tracer { opacity: 0; }
+}
+
+/* Light theme. Seat colours are picked to sing against the dark wells, so on
+   a white page anything using one as *text* is nudged toward ink to keep it
+   legible; the wells themselves stay dark in both themes. */
+:global(:root[data-theme="light"]) .paneName,
+:global(:root[data-theme="light"]) .seatChip,
+:global(:root[data-theme="light"]) .phoneScore {
+  color: color-mix(in srgb, var(--seat) 72%, #0b1020);
+}
+:global(:root[data-theme="light"]) .pane {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--seat) 14%, var(--panel)), var(--panel));
+  box-shadow: 0 10px 26px -18px color-mix(in srgb, var(--seat) 70%, transparent);
+}
+:global(:root[data-theme="light"]) .rail {
+  background: color-mix(in srgb, var(--paper) 6%, transparent);
+}
+:global(:root[data-theme="light"]) .padDrop {
+  color: #08121f;
+}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Gamepad2, Wifi, WifiOff, RotateCcw } from "lucide-react";
 import { useControllerClient } from "../shared/controller/useControllerClient";
 import { buzz, action, VIEW, ACTION } from "../shared/controller/protocol";
@@ -9,6 +9,7 @@ import { StrokeCanvas } from "../shared/draw/StrokeCanvas";
 import { useStrokeBatcher } from "../shared/draw/useStrokeBatcher";
 import { PALETTE, WIDTHS } from "../shared/draw/strokes";
 import { PhoneTetris } from "../games/tetris/PhoneTetris";
+import { AngleDial, PowerMeter } from "../games/dogsvscats/AimControls";
 import cardStyles from "../shared/cards/cards.module.css";
 import styles from "./controller.module.css";
 
@@ -104,6 +105,21 @@ export default function App() {
     setGuessText("");
     send(action(ACTION.GUESS, { text }));
   }
+
+  // Aiming: re-sync the sliders with the host on a change of turn only. The
+  // host echoes back whatever this phone last sent, so syncing on every AIM
+  // view would fight the player's own drag.
+  const aimTurnRef = useRef(null);
+  useEffect(() => {
+    if (!view || view.view !== VIEW.AIM) {
+      aimTurnRef.current = null;
+      return;
+    }
+    if (aimTurnRef.current === view.title) return;
+    aimTurnRef.current = view.title;
+    if (typeof view.angle === "number") setAimAngle(view.angle);
+    if (typeof view.power === "number") setAimPower(view.power);
+  }, [view]);
 
   // A fresh non-buzz view means a new round started — clear any stale lock.
   useEffect(() => {
@@ -346,6 +362,7 @@ export default function App() {
           key={view.seed}
           seed={view.seed}
           mode={view.mode}
+          colour={view.colour}
           garbageEvent={lastEvent && lastEvent.kind === "garbage" ? lastEvent.payload : null}
           onState={(snap) => send(action(ACTION.TETRIS_STATE, snap))}
           onGarbage={(rows) => send(action(ACTION.TETRIS_GARBAGE, { rows }))}
@@ -353,10 +370,13 @@ export default function App() {
         />
       );
     } else if (view.view === VIEW.AIM) {
+      // Deliberately no trajectory preview here either — the phone must not
+      // become the cheat sheet the big screen refuses to be.
       body = (
-        <div className={styles.form}>
+        <div className={styles.aimWrap} style={{ "--team": view.colour || "var(--accent)" }}>
           <p className={styles.lead}>{view.title}</p>
           {view.subtitle && <p className={styles.sub}>{view.subtitle}</p>}
+
           <div className={styles.weaponRow}>
             {(view.weapons || []).map((w) => (
               <button
@@ -365,13 +385,19 @@ export default function App() {
                 className={`${styles.weaponPick} ${w.id === view.weaponId ? styles.weaponPickOn : ""}`.trim()}
                 onClick={() => send(action(ACTION.SELECT_WEAPON, { weaponId: w.id }))}
               >
-                <span aria-hidden="true">{w.emoji}</span>
+                <span className={styles.weaponPickEmoji} aria-hidden="true">{w.emoji}</span>
                 <span className={styles.weaponPickName}>{w.name}</span>
               </button>
             ))}
           </div>
+
+          <div className={styles.aimReadouts}>
+            <AngleDial angle={aimAngle} colour={view.colour} size={96} />
+            <PowerMeter power={aimPower} />
+          </div>
+
           <label className={styles.aimSlider}>
-            <span>Angle {aimAngle}&deg;</span>
+            <span>Angle</span>
             <input
               type="range"
               min={-20}
@@ -385,7 +411,7 @@ export default function App() {
             />
           </label>
           <label className={styles.aimSlider}>
-            <span>Power {aimPower}</span>
+            <span>Power</span>
             <input
               type="range"
               min={10}
@@ -398,19 +424,24 @@ export default function App() {
               }}
             />
           </label>
+
           <div className={styles.moveRow}>
             <button type="button" className={styles.toolBtn} onClick={() => send(action(ACTION.MOVE, { dir: -1 }))}>
-              ← Walk
+              &larr; Walk
             </button>
             <button type="button" className={styles.toolBtn} onClick={() => send(action(ACTION.MOVE, { dir: 1 }))}>
-              Walk →
+              Walk &rarr;
             </button>
           </div>
+
           <Button
             onClick={() => send(action(ACTION.FIRE, { angle: aimAngle, power: aimPower, weaponId: view.weaponId }))}
           >
             🔥 Fire
           </Button>
+          <p className={styles.aimHint}>
+            No aiming line — watch the big screen and correct off where your last shot landed.
+          </p>
         </div>
       );
     } else if (view.view === VIEW.LOCKED || view.view === VIEW.WAIT) {

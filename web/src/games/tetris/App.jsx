@@ -11,12 +11,19 @@ import { ResultsList } from "../../shared/components/ResultsList";
 import { useHostSession } from "../../shared/controller/useHostSession";
 import { VIEW, MSG, ACTION, view as viewMsg, event as eventMsg } from "../../shared/controller/protocol";
 import { playSound } from "../../shared/audio/sounds";
-import { BoardView } from "./BoardView";
+import { BoardView, PiecePreview } from "./BoardView";
 import styles from "./tetris.module.css";
 
 const MIN_PLAYERS = 2;
 const MAX_PLAYERS = 4;
-const RACE_SECONDS = 180;
+
+// One accent per seat. Everything that belongs to a player — pane rim, name,
+// garbage tracer, their own phone — wears the same colour, which is the only
+// way four boards on one screen stay tellable apart at a glance.
+const SEAT_COLOURS = ["#31d0e0", "#e8c31d", "#e8434f", "#7ee06a"];
+
+const TRACER_MS = 850;
+const CLEAR_LABELS = { 1: "SINGLE", 2: "DOUBLE", 3: "TRIPLE", 4: "TETRIS!" };
 
 const MODE_ITEMS = [
   { key: "battle", name: "Battle", icon: "💥", meta: "Clears send garbage · last board standing wins" },
@@ -34,6 +41,14 @@ export default function App() {
   const [knockouts, setKnockouts] = useState([]);
   const [clock, setClock] = useState(0);
 
+  // Presentation-only: none of it can change the outcome of a match.
+  const [attacks, setAttacks] = useState([]);
+  const [hits, setHits] = useState({});
+  const [bursts, setBursts] = useState({});
+  const arenaRef = useRef(null);
+  const paneRefs = useRef({});
+  const seenRef = useRef({});
+
   const session = useHostSession([]);
   const { onMessage, sendTo, players: sessionPlayers } = session;
 
@@ -42,6 +57,46 @@ export default function App() {
 
   const ref = useRef();
   ref.current = { phase, mode, boards, order, knockouts };
+
+  // A garbage attack, drawn as a shell flying from the attacker's pane to
+  // each victim's. Positions are measured at the moment it fires, so the
+  // tracer stays right whatever the layout is doing.
+  const spawnAttacks = useCallback((from, targets, rows) => {
+    const arena = arenaRef.current;
+    const src = paneRefs.current[from];
+    if (!arena || !src) return;
+    const ab = arena.getBoundingClientRect();
+    const sb = src.getBoundingClientRect();
+    const made = targets
+      .map((pid) => {
+        const el = paneRefs.current[pid];
+        if (!el) return null;
+        const tb = el.getBoundingClientRect();
+        return {
+          id: from + "-" + pid + "-" + Date.now() + "-" + Math.random(),
+          rows,
+          x0: sb.left - ab.left + sb.width / 2,
+          y0: sb.top - ab.top + sb.height / 2,
+          x1: tb.left - ab.left + tb.width / 2,
+          y1: tb.top - ab.top + tb.height / 2
+        };
+      })
+      .filter(Boolean);
+    if (made.length === 0) return;
+    setAttacks((a) => [...a, ...made]);
+    const ids = new Set(made.map((m) => m.id));
+    setTimeout(() => setAttacks((a) => a.filter((x) => !ids.has(x.id))), TRACER_MS + 120);
+    setTimeout(() => {
+      const at = Date.now();
+      setHits((h) => {
+        const next = { ...h };
+        targets.forEach((pid) => {
+          next[pid] = { rows, at };
+        });
+        return next;
+      });
+    }, TRACER_MS * 0.7);
+  }, []);
 
   // ---------- messages from the phones ----------
   useEffect(() => {
@@ -64,6 +119,7 @@ export default function App() {
         const rows = msg.payload?.rows || 0;
         targets.forEach((pid) => sendTo(pid, eventMsg("garbage", { rows, at: Date.now() })));
         playSound("steal");
+        spawnAttacks(id, targets, rows);
         return;
       }
 
@@ -72,7 +128,7 @@ export default function App() {
         setKnockouts((k) => (k.includes(id) ? k : [...k, id]));
       }
     });
-  }, [onMessage, sendTo]);
+  }, [onMessage, sendTo, spawnAttacks]);
 
   // ---------- match lifecycle ----------
   const startMatch = useCallback(() => {
@@ -85,14 +141,18 @@ export default function App() {
     setOrder(players.map((p) => p.playerId));
     setBoards(
       Object.fromEntries(
-        players.map((p) => [p.playerId, { name: p.name, snap: null, over: false, score: 0, lines: 0 }])
+        players.map((p) => [p.playerId, { name: p.name, snap: null, over: false, score: 0, lines: 0, level: 1 }])
       )
     );
     setKnockouts([]);
+    setAttacks([]);
+    setHits({});
+    setBursts({});
+    seenRef.current = {};
     setClock(mode === "race" ? raceSeconds * 60 : 0);
     setPhase("play");
-    players.forEach((p) => {
-      sendTo(p.playerId, viewMsg({ view: VIEW.TETRIS, seed: s, mode }));
+    players.forEach((p, i) => {
+      sendTo(p.playerId, viewMsg({ view: VIEW.TETRIS, seed: s, mode, colour: SEAT_COLOURS[i % SEAT_COLOURS.length] }));
     });
   }, [sessionPlayers, mode, raceSeconds, sendTo]);
 
@@ -117,6 +177,32 @@ export default function App() {
     }, 1000);
     return () => clearInterval(id);
   }, [phase, mode]);
+
+  // Line clears and level-ups, spotted by diffing successive snapshots. The
+  // engine clears lines the instant a piece locks, so without `clearId` in
+  // the snapshot a clear can happen entirely between two samples and the TV
+  // would never know it had anything to celebrate.
+  useEffect(() => {
+    if (phase !== "play") return;
+    const fresh = {};
+    let changed = false;
+    order.forEach((id) => {
+      const b = boards[id];
+      if (!b) return;
+      const seen = seenRef.current[id] || { clearId: 0, level: 1 };
+      const clearId = b.clearId ?? 0;
+      const level = b.level ?? 1;
+      if (clearId > seen.clearId && b.clear > 0) {
+        fresh[id] = { kind: "clear", n: b.clear, at: Date.now() };
+        changed = true;
+      } else if (level > seen.level) {
+        fresh[id] = { kind: "level", n: level, at: Date.now() };
+        changed = true;
+      }
+      seenRef.current[id] = { clearId, level };
+    });
+    if (changed) setBursts((prev) => ({ ...prev, ...fresh }));
+  }, [boards, order, phase]);
 
   // End conditions.
   useEffect(() => {
@@ -156,6 +242,14 @@ export default function App() {
 
   const result = { ranked, winner: ranked[0] || null, shared: false, tiebreak: null };
 
+  const aliveCount = order.filter((id) => !boards[id]?.over).length;
+  const topLines = Math.max(1, ...order.map((id) => boards[id]?.lines || 0));
+  const leaderId = order.reduce((best, id) => {
+    if (boards[id]?.over) return best;
+    if (!best) return id;
+    return (boards[id]?.lines || 0) > (boards[best]?.lines || 0) ? id : best;
+  }, null);
+
   return (
     <GameShell title="TETRIS BATTLE" titleIcon={Grid3x3}>
       <Screen active={phase === "setup"}>
@@ -190,6 +284,16 @@ export default function App() {
 
         <SetupBlock label={mode === "race" ? "3. Players" : "2. Players"}>
           <QRPairing session={session} teams={[]} />
+          {connected.length > 0 && (
+            <div className={styles.seatStrip}>
+              {connected.slice(0, MAX_PLAYERS).map((p, i) => (
+                <span key={p.playerId} className={styles.seatChip} style={{ "--seat": SEAT_COLOURS[i] }}>
+                  <span className={styles.seatDot} />
+                  {p.name}
+                </span>
+              ))}
+            </div>
+          )}
           <p className={styles.modeNote}>
             {connected.length === 0
               ? `Everyone needs a phone for this one — pair at least ${MIN_PLAYERS}.`
@@ -208,35 +312,124 @@ export default function App() {
       </Screen>
 
       <Screen active={phase === "play"}>
-        <div className={styles.matchBar}>
-          <span className={styles.modeTag}>{mode === "race" ? "🏁 Line Race" : "💥 Battle"}</span>
-          <span className={styles.clock}>
-            {mode === "race"
-              ? `${Math.floor(clock / 60)}:${String(clock % 60).padStart(2, "0")}`
-              : `${order.filter((id) => !boards[id]?.over).length} still standing`}
-          </span>
-        </div>
+        {/* Breaks out of the shared 1000px column: four wells on a TV need the
+            whole width, and their height is what decides how big they can be. */}
+        <div className={styles.arena} ref={arenaRef}>
+          <div className={styles.matchBar}>
+            <span className={styles.modeTag}>{mode === "race" ? "🏁 Line Race" : "💥 Battle"}</span>
+            <span className={styles.clock}>
+              {mode === "race"
+                ? `${Math.floor(clock / 60)}:${String(clock % 60).padStart(2, "0")}`
+                : `${aliveCount} still standing`}
+            </span>
+            <Button variant="secondary" className={styles.endBtn} onClick={handleNewMatch}>
+              <Flag size={13} strokeWidth={2.5} style={{ verticalAlign: "-0.1em" }} /> End match
+            </Button>
+          </div>
 
-        <div className={styles.grid} style={{ "--cols": Math.min(order.length, 2) }}>
-          {order.map((id) => {
-            const b = boards[id] || {};
-            return (
-              <div key={id} className={`${styles.pane} ${b.over ? styles.paneOut : ""}`.trim()}>
-                <div className={styles.paneHead}>
-                  <span className={styles.paneName}>{b.name}</span>
-                  <span className={styles.paneScore}>{b.lines || 0} lines</span>
+          <div className={styles.grid} style={{ "--cols": Math.max(1, order.length) }}>
+            {order.map((id, i) => {
+              const b = boards[id] || {};
+              const seat = SEAT_COLOURS[i % SEAT_COLOURS.length];
+              const burst = bursts[id];
+              const hit = hits[id];
+              const place = b.over ? order.length - knockouts.indexOf(id) : null;
+              return (
+                <div
+                  key={id}
+                  ref={(el) => {
+                    paneRefs.current[id] = el;
+                  }}
+                  className={`${styles.pane} ${b.over ? styles.paneOut : ""}`.trim()}
+                  style={{ "--seat": seat }}
+                >
+                  <div className={styles.paneHead}>
+                    <span className={styles.seatDot} />
+                    <span className={styles.paneName}>{b.name}</span>
+                    {id === leaderId && order.length > 1 && (
+                      <span className={styles.crown} title="Most lines">👑</span>
+                    )}
+                    <span className={styles.paneScore}>
+                      {b.lines || 0}
+                      <span className={styles.paneScoreUnit}>lines</span>
+                    </span>
+                  </div>
+
+                  <div className={styles.paneBody}>
+                    <div className={styles.rail}>
+                      <span className={styles.railLabel}>Hold</span>
+                      <PiecePreview type={b.hold} size={26} faded />
+                      <span className={styles.railLabel}>Next</span>
+                      {(b.next || []).slice(0, 3).map((t, n) => (
+                        <PiecePreview key={n} type={t} size={n === 0 ? 26 : 20} />
+                      ))}
+                      <span className={styles.railSpacer} />
+                      <span className={styles.railLabel}>Lv</span>
+                      <span className={styles.railValue}>{b.level || 1}</span>
+                    </div>
+
+                    <div className={styles.boardWrap}>
+                      <BoardView cells={b.cells} piece={b.piece} dimmed={b.over} label={`${b.name}'s board`} />
+                      {b.pending > 0 && !b.over && (
+                        <span
+                          className={styles.warnBar}
+                          style={{ "--fill": `${Math.min(100, (b.pending / 10) * 100)}%` }}
+                          title={`${b.pending} garbage rows incoming`}
+                        />
+                      )}
+                      {hit && (
+                        <span key={hit.at} className={styles.hitBadge}>
+                          +{hit.rows}
+                        </span>
+                      )}
+                      {burst && !b.over && (
+                        <span
+                          key={burst.at}
+                          className={
+                            burst.kind === "level"
+                              ? styles.levelFlare
+                              : `${styles.clearBurst} ${burst.n === 4 ? styles.clearBurstBig : ""}`.trim()
+                          }
+                        >
+                          {burst.kind === "level" ? `LEVEL ${burst.n} · SPEED UP` : CLEAR_LABELS[burst.n]}
+                        </span>
+                      )}
+                      {b.over && (
+                        <span className={styles.koStamp}>
+                          Knocked out
+                          <em>#{place}</em>
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {mode === "race" && (
+                    <span className={styles.raceTrack}>
+                      <span
+                        className={styles.raceFill}
+                        style={{ width: `${Math.min(100, ((b.lines || 0) / topLines) * 100)}%` }}
+                      />
+                    </span>
+                  )}
                 </div>
-                <BoardView cells={b.cells} dimmed={b.over} label={`${b.name}'s board`} />
-                {b.over && <span className={styles.koTag}>KNOCKED OUT</span>}
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
 
-        <div className={styles.endWrap}>
-          <Button variant="secondary" onClick={handleNewMatch}>
-            <Flag size={14} strokeWidth={2.5} style={{ verticalAlign: "-0.1em" }} /> End match
-          </Button>
+          {attacks.map((a) => (
+            <span
+              key={a.id}
+              className={styles.tracer}
+              style={{
+                "--x0": `${a.x0}px`,
+                "--y0": `${a.y0}px`,
+                "--x1": `${a.x1}px`,
+                "--y1": `${a.y1}px`
+              }}
+            >
+              +{a.rows}
+            </span>
+          ))}
         </div>
       </Screen>
 

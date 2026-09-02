@@ -1,25 +1,37 @@
+/* Neon on deep navy. The wells are painted dark by the canvas in both themes
+   (piece colours need it), so the page around them is pitched to match rather
+   than fight it — and the accents are pushed bright enough to hold their own
+   next to seven saturated tetromino colours. */
 :root {
-  --ink: #0e1220;
-  --panel: #182034;
-  --panel-2: #212b44;
+  --ink: #080b16;
+  --panel: #121a2e;
+  --panel-2: #1b2542;
   --paper: #eef2fb;
-  --paper-dim: #94a1bd;
-  --accent: #31d0e0;
-  --accent-2: #e8c31d;
-  --border: rgba(238, 242, 251, 0.13);
+  --paper-dim: #8b99b8;
+  --accent: #35e0f0;
+  --accent-2: #ffd23f;
+  --border: rgba(238, 242, 251, 0.12);
 }
-body { background: radial-gradient(ellipse at 50% -10%, #1d2740 0%, var(--ink) 55%), var(--ink); }
+body {
+  background:
+    radial-gradient(ellipse at 50% -20%, rgba(53, 224, 240, 0.16) 0%, transparent 55%),
+    radial-gradient(ellipse at 90% 110%, rgba(255, 210, 63, 0.1) 0%, transparent 45%),
+    var(--ink);
+}
 
 :root[data-theme="light"] {
-  --ink: #eaeef7;
+  --ink: #e9edf7;
   --panel: #ffffff;
-  --panel-2: #f2f5fb;
-  --paper: #0e1220;
-  --paper-dim: #5a6784;
-  --accent: #0f8fa0;
-  --accent-2: #9a7c00;
-  --border: rgba(14, 18, 32, 0.14);
+  --panel-2: #f1f4fb;
+  --paper: #0b1020;
+  --paper-dim: #56637f;
+  --accent: #0e8b9c;
+  --accent-2: #8f7000;
+  --border: rgba(11, 16, 32, 0.14);
 }
 :root[data-theme="light"] body {
-  background: radial-gradient(ellipse at 50% -10%, #ffffff 0%, #dfe6f4 55%), var(--ink);
+  background:
+    radial-gradient(ellipse at 50% -20%, rgba(14, 139, 156, 0.12) 0%, transparent 55%),
+    radial-gradient(ellipse at 90% 110%, rgba(143, 112, 0, 0.08) 0%, transparent 45%),
+    var(--ink);
 }

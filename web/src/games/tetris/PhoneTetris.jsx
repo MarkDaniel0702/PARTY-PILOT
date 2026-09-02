@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { BoardView } from "./BoardView";
+import { BoardView, PiecePreview } from "./BoardView";
 import {
   createGame,
   move,
@@ -28,7 +28,17 @@ const DAS_MS = 170; // delay before a held direction starts repeating
 const ARR_MS = 45; // repeat interval once it does
 const SNAPSHOT_MS = 80; // ~12 board updates a second to the TV
 
-export function PhoneTetris({ seed, mode, garbageEvent, onState, onGarbage, onOver }) {
+// A short tick on a hard drop. Feature-detected because iOS Safari has no
+// vibration API at all, and a thrown error mid-drop would be a real bug.
+function thud() {
+  try {
+    navigator.vibrate?.(12);
+  } catch {
+    /* nothing to do — haptics are a nicety */
+  }
+}
+
+export function PhoneTetris({ seed, mode, colour, garbageEvent, onState, onGarbage, onOver }) {
   const [game, setGame] = useState(() => createGame({ seed, mode }));
   const gameRef = useRef(game);
   gameRef.current = game;
@@ -136,20 +146,31 @@ export function PhoneTetris({ seed, mode, garbageEvent, onState, onGarbage, onOv
   });
 
   return (
-    <div className={styles.phoneWrap}>
+    <div className={styles.phoneWrap} style={colour ? { "--seat": colour } : undefined}>
       <div className={styles.phoneStats}>
-        <span>{game.score}</span>
-        <span>{game.lines} lines</span>
+        <span className={styles.phoneScore}>{game.score}</span>
+        <span className={styles.phoneLines}>{game.lines} lines · lv {game.level}</span>
         {game.pendingGarbage > 0 && <span className={styles.incoming}>▲ {game.pendingGarbage}</span>}
       </div>
 
-      <BoardView cells={snap.cells} dimmed={game.over} label="Your board" className={styles.phoneBoard} />
-
-      <div className={styles.phoneMeta}>
-        <span className={styles.metaLabel}>Hold</span>
-        <span className={styles.metaVal}>{game.hold || "—"}</span>
-        <span className={styles.metaLabel}>Next</span>
-        <span className={styles.metaVal}>{queue.join(" ")}</span>
+      <div className={styles.phoneBoardRow}>
+        <BoardView
+          cells={snap.cells}
+          piece={snap.piece}
+          dimmed={game.over}
+          label="Your board"
+          className={styles.phoneBoard}
+        />
+        {/* Hold and the queue as actual shapes: a bare letter is a lookup
+            table, and you don't have time for one mid-drop. */}
+        <div className={styles.phoneRail}>
+          <span className={styles.metaLabel}>Hold</span>
+          <PiecePreview type={game.hold} size={28} faded={!game.canHold} />
+          <span className={styles.metaLabel}>Next</span>
+          {queue.map((t, i) => (
+            <PiecePreview key={i} type={t} size={i === 0 ? 28 : 22} />
+          ))}
+        </div>
       </div>
 
       {game.over ? (
@@ -182,7 +203,7 @@ export function PhoneTetris({ seed, mode, garbageEvent, onState, onGarbage, onOv
               apply(holdPiece);
             }}
           >
-            ⇩H
+            <span className={styles.padWord}>HOLD</span>
           </button>
           <button
             type="button"
@@ -194,6 +215,7 @@ export function PhoneTetris({ seed, mode, garbageEvent, onState, onGarbage, onOv
             }}
           >
             ↓
+            <span className={styles.padSub}>Soft</span>
           </button>
           <button
             type="button"
@@ -201,10 +223,12 @@ export function PhoneTetris({ seed, mode, garbageEvent, onState, onGarbage, onOv
             aria-label="Hard drop"
             onPointerDown={(e) => {
               e.preventDefault();
+              thud();
               apply(hardDrop);
             }}
           >
             DROP
+            <span className={styles.padSub}>Hard</span>
           </button>
         </div>
       )}
