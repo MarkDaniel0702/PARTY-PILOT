@@ -3,6 +3,7 @@ import {
   Tv, Music, Image,
   PartyPopper, ListChecks, GitFork, Users, Drama,
   Spade, Layers, Brush,
+  Swords, Gamepad2,
   Bot, Mic, Smartphone
 } from 'lucide-react';
 
@@ -186,6 +187,23 @@ export const GAME_GROUPS = [
         accent: '#2fd1c5',
         meta: [
           { icon: Users, label: '3–8 players' },
+          { icon: Smartphone, label: 'Phones optional', variant: 'auto' }
+        ]
+      }
+    ]
+  },
+  {
+    label: 'Arcade',
+    icon: Gamepad2,
+    games: [
+      {
+        href: 'dogsvscats.html',
+        icon: Swords,
+        title: 'Dogs vs Cats',
+        desc: 'Turn-based artillery. Mind the wind, blow craters in the ground, and knock the other team off the map.',
+        accent: '#e8a91d',
+        meta: [
+          { icon: Users, label: '2 teams' },
           { icon: Smartphone, label: 'Phones optional', variant: 'auto' }
         ]
       }

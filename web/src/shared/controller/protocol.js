@@ -43,7 +43,9 @@ export const VIEW = {
   // Drawing games. DRAW carries the secret word and goes to the drawer alone;
   // GUESS carries only the masked word, so the answer never reaches a guesser.
   DRAW: "draw",
-  GUESS: "guess"
+  GUESS: "guess",
+  // Artillery: the aiming gamepad, sent only to the team whose turn it is.
+  AIM: "aim"
 };
 
 // Action kinds carried by MSG.ACTION.
@@ -58,7 +60,13 @@ export const ACTION = {
   STROKE_END: "strokeEnd",
   UNDO: "undo",
   CLEAR: "clear",
-  GUESS: "guess"
+  GUESS: "guess",
+  // Artillery. AIM streams the live angle/power so the shared screen shows
+  // the arc building; FIRE commits the shot.
+  AIM: "aim",
+  FIRE: "fire",
+  MOVE: "move",
+  SELECT_WEAPON: "selectWeapon"
 };
 
 export function join(name, teamId, playerId) {

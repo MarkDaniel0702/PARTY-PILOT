@@ -28,6 +28,8 @@ export default function App() {
   const [drawColour, setDrawColour] = useState(PALETTE[0]);
   const [drawWidth, setDrawWidth] = useState(WIDTHS[1]);
   const [guessText, setGuessText] = useState("");
+  const [aimAngle, setAimAngle] = useState(45);
+  const [aimPower, setAimPower] = useState(70);
 
   function handleJoin(e) {
     e.preventDefault();
@@ -332,6 +334,67 @@ export default function App() {
               ))}
             </div>
           )}
+        </div>
+      );
+    } else if (view.view === VIEW.AIM) {
+      body = (
+        <div className={styles.form}>
+          <p className={styles.lead}>{view.title}</p>
+          {view.subtitle && <p className={styles.sub}>{view.subtitle}</p>}
+          <div className={styles.weaponRow}>
+            {(view.weapons || []).map((w) => (
+              <button
+                key={w.id}
+                type="button"
+                className={`${styles.weaponPick} ${w.id === view.weaponId ? styles.weaponPickOn : ""}`.trim()}
+                onClick={() => send(action(ACTION.SELECT_WEAPON, { weaponId: w.id }))}
+              >
+                <span aria-hidden="true">{w.emoji}</span>
+                <span className={styles.weaponPickName}>{w.name}</span>
+              </button>
+            ))}
+          </div>
+          <label className={styles.aimSlider}>
+            <span>Angle {aimAngle}&deg;</span>
+            <input
+              type="range"
+              min={-20}
+              max={200}
+              value={aimAngle}
+              onChange={(e) => {
+                const v = Number(e.target.value);
+                setAimAngle(v);
+                send(action(ACTION.AIM, { angle: v, power: aimPower }));
+              }}
+            />
+          </label>
+          <label className={styles.aimSlider}>
+            <span>Power {aimPower}</span>
+            <input
+              type="range"
+              min={10}
+              max={100}
+              value={aimPower}
+              onChange={(e) => {
+                const v = Number(e.target.value);
+                setAimPower(v);
+                send(action(ACTION.AIM, { angle: aimAngle, power: v }));
+              }}
+            />
+          </label>
+          <div className={styles.moveRow}>
+            <button type="button" className={styles.toolBtn} onClick={() => send(action(ACTION.MOVE, { dir: -1 }))}>
+              ← Walk
+            </button>
+            <button type="button" className={styles.toolBtn} onClick={() => send(action(ACTION.MOVE, { dir: 1 }))}>
+              Walk →
+            </button>
+          </div>
+          <Button
+            onClick={() => send(action(ACTION.FIRE, { angle: aimAngle, power: aimPower, weaponId: view.weaponId }))}
+          >
+            🔥 Fire
+          </Button>
         </div>
       );
     } else if (view.view === VIEW.LOCKED || view.view === VIEW.WAIT) {

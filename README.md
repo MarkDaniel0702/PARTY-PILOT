@@ -1,7 +1,7 @@
 # 🎮 B-Rotation
 
 <p>
-  <img alt="Games" src="https://img.shields.io/badge/games-14-7c5cff">
+  <img alt="Games" src="https://img.shields.io/badge/games-15-7c5cff">
   <img alt="React" src="https://img.shields.io/badge/React-19-61dafb">
   <img alt="Vite" src="https://img.shields.io/badge/Vite-multi--page-646cff">
   <img alt="Sign-up" src="https://img.shields.io/badge/sign--up-not%20required-2fd67f">
@@ -18,7 +18,7 @@
   <img alt="Guess the Song genres" src="https://img.shields.io/badge/song%20genres-14-ff3d9a">
 </p>
 
-**B-Rotation** is a colourful, browser-based party-game platform. **14 games**, one shared screen, **no dedicated host required** — gather a group around a phone, tablet, or laptop and pick from social deduction, trivia, voting games, and classic party favourites. The app runs turns, timers, randomisation, hidden information, scoring, and results on its own.
+**B-Rotation** is a colourful, browser-based party-game platform. **15 games**, one shared screen, **no dedicated host required** — gather a group around a phone, tablet, or laptop and pick from social deduction, trivia, voting games, and classic party favourites. The app runs turns, timers, randomisation, hidden information, scoring, and results on its own.
 
 > [!TIP]
 > **▶️ Play now:** <https://markdaniel0702.github.io/PARTY-PILOT/> — free, no sign-up, works on any device.
@@ -39,6 +39,7 @@
   - [🖼️ Picture Guess](#️-picture-guess)
   - [🃏 UNO](#-uno)
   - [🎨 Draw & Guess](#-draw--guess)
+  - [⚔️ Dogs vs Cats](#️-dogs-vs-cats)
   - [🎲 Other Implemented Games](#-other-implemented-games)
 - [🤖 Automated Game System](#-automated-game-system)
 - [⏱️ Timers](#️-timers)
@@ -58,7 +59,7 @@
 
 ## 🧭 Project Overview
 
-The whole site — the homepage plus all 14 games — is a **single React 19 + Vite multi-page app** living in `web/`. Each game is its own HTML entry (`spy.html`, `quiz.html`, …) that mounts an independent React root, and every game is built from one shared component/hook library in `web/src/shared/`. There is no backend, no database, and no account system.
+The whole site — the homepage plus all 15 games — is a **single React 19 + Vite multi-page app** living in `web/`. Each game is its own HTML entry (`spy.html`, `quiz.html`, …) that mounts an independent React root, and every game is built from one shared component/hook library in `web/src/shared/`. There is no backend, no database, and no account system.
 
 | | |
 |---|---|
@@ -78,7 +79,7 @@ The whole site — the homepage plus all 14 games — is a **single React 19 + V
 |---|---|
 | 🙅 **No host required** | Every game runs itself — turn order, timers, hidden info, and results all happen automatically. |
 | 🎙️ **Game Master optional** | Some games also offer a manual mode where one person controls pacing. |
-| 🎲 **14 games, 4 categories** | Word & Deduction, Trivia & Knowledge, Party & Voting, and Card Games. |
+| 🎲 **15 games, 5 categories** | Word & Deduction, Trivia & Knowledge, Party & Voting, Card Games, and Arcade. |
 | ⏱️ **Universal customizable timers** | One shared timer system — a recommended duration you can override with a preset or a custom value (5–600 s), Pause / Resume / Reset controls, and a switch to turn it off entirely. |
 | 🔀 **Randomised content** | Words, questions, prompts, songs, and pictures are drawn at random each round; Quiz Night additionally remembers which questions a slot has shown and avoids repeats. |
 | ⭐ **Bonus events** | Quiz Night boards can include 1–4 surprise bonus tiles with random point swings. |
@@ -110,6 +111,24 @@ The whole site — the homepage plus all 14 games — is a **single React 19 + V
 | 🎭 [Charades](#-other-implemented-games) | Party & Voting | 3–10 | ✅ | ✅ | ✅ |
 | 🃏 [UNO](#-uno) | Card Games | 2–8 | ✅ | — | — |
 | 🎨 [Draw & Guess](#-draw--guess) | Card Games | 3–8 | ✅ | — | ✅ |
+| ⚔️ [Dogs vs Cats](#️-dogs-vs-cats) | Arcade | 2 teams | ✅ | — | ✅ |
+
+---
+
+### ⚔️ Dogs vs Cats
+
+Turn-based artillery. Two teams alternate turns; on yours you walk a little, pick a weapon, set angle and power, and fire. Shots blow real craters in the ground, and anyone left standing on nothing takes the fall. Last team with a survivor wins.
+
+- **6 battlefields** — Rolling Hills, Scattered Isles, Cat Caves, Canyon Standoff, Sky Platforms, and Crater Field.
+- **Nothing is a picture.** Every battlefield is *generated from a seed* at match start, so the same map is never the same twice — and the game ships no image files at all.
+- **Destructible terrain:** the ground is a bitmap the explosions cut holes into, so the battlefield genuinely erodes as the match goes on.
+- **Wind** is re-rolled every turn and pushes shots sideways — the Fish Lobber far more than the others.
+- **3 weapons:** Bone Bazooka (accurate, hard-hitting), Fish Lobber (wide blast, very wind-sensitive), Paw Whack (close range, knocks the target flying).
+- **Optional phone controllers** — the team on turn gets an aiming gamepad on their phone; everyone else is told to watch, so two people can't aim the same shot.
+- 1–4 characters per team, and a 45-second turn clock.
+
+> [!NOTE]
+> Original dog and cat characters, generated terrain, and hand-written physics — inspired by the turn-based artillery genre rather than copied from any particular game.
 
 ---
 
@@ -685,7 +704,7 @@ The site is deployed on **GitHub Pages** via **GitHub Actions** — free, HTTPS 
 | Publish dir | `web/dist/` |
 | Env vars | None |
 
-**What the workflow does:** installs `web/`'s dependencies, runs the Vite build (outputting the homepage + all 14 games to `web/dist/`), marks it non-Jekyll, then uploads and deploys `web/dist/` with `actions/deploy-pages`.
+**What the workflow does:** installs `web/`'s dependencies, runs the Vite build (outputting the homepage + all 15 games to `web/dist/`), marks it non-Jekyll, then uploads and deploys `web/dist/` with `actions/deploy-pages`.
 
 **Redeploying:**
 
