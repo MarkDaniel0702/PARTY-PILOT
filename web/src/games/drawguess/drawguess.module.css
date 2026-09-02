@@ -1,0 +1,175 @@
+.customInput {
+  width: 100%;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.8rem 1rem;
+  color: var(--paper);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  resize: vertical;
+}
+.customHint { color: var(--paper-dim); font-size: 0.82rem; margin: 0.5rem 0 0; }
+
+.modeNote {
+  margin: 0.9rem 0 0;
+  padding: 0.6rem 0.8rem;
+  background: var(--panel-2);
+  border-radius: var(--radius-sm);
+  color: var(--paper-dim);
+  font-size: 0.83rem;
+  line-height: 1.5;
+}
+
+.roundsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.9rem 1.1rem;
+  font-size: 0.92rem;
+}
+
+.startHint { text-align: center; color: var(--paper-dim); font-size: 0.83rem; margin: 0.8rem 0 0; }
+
+.roundBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.9rem;
+  font-size: 0.85rem;
+  color: var(--paper-dim);
+}
+.drawerName { font-weight: 800; color: var(--accent-2); }
+
+/* Monospace so the blanks line up as a fixed grid rather than jittering as
+   letters appear. */
+.maskedWord {
+  text-align: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: clamp(1.3rem, 6vw, 2rem);
+  letter-spacing: 0.18em;
+  margin: 0.4rem 0 1rem;
+  font-variant-numeric: tabular-nums;
+}
+.blank { color: var(--paper-dim); }
+.letter { color: var(--accent); font-weight: 700; }
+
+.localWord {
+  text-align: center;
+  margin: 0 0 0.9rem;
+  color: var(--paper-dim);
+  font-size: 0.95rem;
+}
+
+.tools {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  align-items: center;
+  margin-top: 0.9rem;
+}
+.swatches, .widths, .toolActions { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
+
+.swatch {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  transition: transform 0.15s, border-color 0.15s;
+}
+.swatchOn { border-color: var(--paper); transform: scale(1.15); }
+
+.widthBtn {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+}
+.widthBtn span { display: block; border-radius: 50%; background: var(--paper); }
+.widthOn { border-color: var(--accent); background: var(--panel); }
+
+.toolBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--radius-sm);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--paper);
+  font-weight: 700;
+  font-size: 0.85rem;
+  min-height: 44px;
+}
+.toolBtn:hover { border-color: var(--paper-dim); }
+
+.feed {
+  margin: 1rem auto 0;
+  max-width: 520px;
+  min-height: 4rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.7rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.feedEmpty { color: var(--paper-dim); font-size: 0.85rem; margin: 0; text-align: center; }
+.feedLine { margin: 0; font-size: 0.9rem; color: var(--paper-dim); }
+.feedLine strong { color: var(--paper); }
+.feedHit { margin: 0; font-size: 0.9rem; color: var(--success); font-weight: 700; }
+
+.awardRow {
+  margin: 1rem auto 0;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.awardHint { color: var(--paper-dim); font-size: 0.85rem; margin: 0 0 0.2rem; text-align: center; }
+.awardBtn {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--paper);
+  font-weight: 700;
+  font-size: 0.92rem;
+  min-height: 44px;
+}
+.awardBtn:hover:not(:disabled) { border-color: var(--success); }
+.awardBtn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.endWrap { max-width: 320px; margin: 1.2rem auto 0; }
+
+.scoreList {
+  list-style: none;
+  margin: 1.2rem auto;
+  padding: 0;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.scoreRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.55rem 0.9rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+.scoreVal { color: var(--accent); font-variant-numeric: tabular-nums; }

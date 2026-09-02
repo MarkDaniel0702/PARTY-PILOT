@@ -5,6 +5,9 @@ import { buzz, action, VIEW, ACTION } from "../shared/controller/protocol";
 import { Button } from "../shared/components/Button";
 import { SettingsMenu } from "../shared/components/SettingsMenu";
 import { UnoCard } from "../games/uno/UnoCard";
+import { StrokeCanvas } from "../shared/draw/StrokeCanvas";
+import { useStrokeBatcher } from "../shared/draw/useStrokeBatcher";
+import { PALETTE, WIDTHS } from "../shared/draw/strokes";
 import cardStyles from "../shared/cards/cards.module.css";
 import styles from "./controller.module.css";
 
@@ -20,6 +23,11 @@ export default function App() {
   const [manualCode, setManualCode] = useState("");
   const [flash, setFlash] = useState(null); // "won" | "lost" | null
   const [leavingId, setLeavingId] = useState(null);
+  const [myStrokes, setMyStrokes] = useState([]);
+  const [liveStroke, setLiveStroke] = useState(null);
+  const [drawColour, setDrawColour] = useState(PALETTE[0]);
+  const [drawWidth, setDrawWidth] = useState(WIDTHS[1]);
+  const [guessText, setGuessText] = useState("");
 
   function handleJoin(e) {
     e.preventDefault();
@@ -56,6 +64,43 @@ export default function App() {
     send(action(ACTION.CHOOSE_COLOUR, { colour: optionId }));
   }
 
+  // ---------- drawing ----------
+  // The batcher keeps the local line perfectly responsive (onLocal) while
+  // shipping points to the host ~20x a second instead of once per event.
+  const batcher = useStrokeBatcher({
+    onStart: (id, c, w, x, y) => send(action(ACTION.STROKE_START, { id, colour: c, width: w, x, y })),
+    onPoints: (id, pts) => send(action(ACTION.STROKE_POINTS, { id, pts })),
+    onEnd: (id) => send(action(ACTION.STROKE_END, { id })),
+    onLocal: setLiveStroke
+  });
+
+  function handleUndo() {
+    setMyStrokes((prev) => prev.slice(0, -1));
+    send(action(ACTION.UNDO, {}));
+  }
+
+  function handleClear() {
+    setMyStrokes([]);
+    setLiveStroke(null);
+    send(action(ACTION.CLEAR, {}));
+  }
+
+  function handleStrokeEnd() {
+    // Keep a local copy so the drawer's own pad shows the finished line
+    // without waiting for anything to come back from the host.
+    const finished = liveStroke;
+    batcher.end();
+    if (finished) setMyStrokes((prev) => [...prev, finished]);
+  }
+
+  function handleGuess(e) {
+    e.preventDefault();
+    const text = guessText.trim();
+    if (!text) return;
+    setGuessText("");
+    send(action(ACTION.GUESS, { text }));
+  }
+
   // A fresh non-buzz view means a new round started — clear any stale lock.
   useEffect(() => {
     if (view && view.view !== VIEW.BUZZ && view.view !== VIEW.LOCKED) setBuzzed(false);
@@ -64,6 +109,15 @@ export default function App() {
   // Any new view means the host has acted, so the optimistic lift is spent.
   useEffect(() => {
     setLeavingId(null);
+  }, [view]);
+
+  // Leaving the sketch pad means a new turn — drop the local drawing so the
+  // next drawer doesn't inherit the last one.
+  useEffect(() => {
+    if (view && view.view !== VIEW.DRAW) {
+      setMyStrokes([]);
+      setLiveStroke(null);
+    }
   }, [view]);
 
   // The host almost always pushes a fresh `view` right after this (next
@@ -196,6 +250,88 @@ export default function App() {
               </button>
             ))}
           </div>
+        </div>
+      );
+    } else if (view.view === VIEW.DRAW) {
+      body = (
+        <div className={styles.drawWrap}>
+          <p className={styles.drawWord}>{view.word}</p>
+          <p className={styles.sub}>{view.title || "Draw it — no letters or numbers!"}</p>
+          <StrokeCanvas
+            strokes={myStrokes}
+            liveStroke={liveStroke}
+            interactive
+            colour={drawColour}
+            width={drawWidth}
+            onStrokeStart={batcher.start}
+            onStrokePoint={batcher.point}
+            onStrokeEnd={handleStrokeEnd}
+            label="Your sketch pad"
+          />
+          <div className={styles.swatches}>
+            {(view.colours || PALETTE).map((c) => (
+              <button
+                key={c}
+                type="button"
+                aria-label={`colour ${c}`}
+                className={`${styles.swatch} ${c === drawColour ? styles.swatchOn : ""}`.trim()}
+                style={{ background: c }}
+                onClick={() => setDrawColour(c)}
+              />
+            ))}
+          </div>
+          <div className={styles.drawTools}>
+            {(view.widths || WIDTHS).map((w) => (
+              <button
+                key={w}
+                type="button"
+                aria-label={`brush ${w}`}
+                className={`${styles.widthBtn} ${w === drawWidth ? styles.widthOn : ""}`.trim()}
+                onClick={() => setDrawWidth(w)}
+              >
+                <span style={{ width: w / 2 + 4, height: w / 2 + 4 }} />
+              </button>
+            ))}
+            <button type="button" className={styles.toolBtn} onClick={handleUndo}>
+              Undo
+            </button>
+            <button type="button" className={styles.toolBtn} onClick={handleClear}>
+              Clear
+            </button>
+          </div>
+        </div>
+      );
+    } else if (view.view === VIEW.GUESS) {
+      body = (
+        <div className={styles.form}>
+          <p className={styles.lead}>{view.title || "What is it?"}</p>
+          {view.hint && <p className={styles.hintWord}>{view.hint}</p>}
+          {!view.locked && (
+            <form className={styles.guessForm} onSubmit={handleGuess}>
+              <input
+                className={styles.input}
+                value={guessText}
+                onChange={(e) => setGuessText(e.target.value)}
+                maxLength={40}
+                placeholder="Type your guess"
+                autoComplete="off"
+                autoCapitalize="none"
+              />
+              <Button type="submit" disabled={!guessText.trim()}>
+                Guess
+              </Button>
+            </form>
+          )}
+          {view.locked && <p className={styles.won}>Nice — sit tight for the next round.</p>}
+          {(view.feed || []).length > 0 && (
+            <div className={styles.guessFeed}>
+              {view.feed.map((f, i) => (
+                <p key={i} className={f.correct ? styles.feedHit : styles.feedLine}>
+                  <strong>{f.name}</strong> {f.correct ? "got it!" : f.text}
+                </p>
+              ))}
+            </div>
+          )}
         </div>
       );
     } else if (view.view === VIEW.LOCKED || view.view === VIEW.WAIT) {

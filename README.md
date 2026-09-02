@@ -1,7 +1,7 @@
 # 🎮 B-Rotation
 
 <p>
-  <img alt="Games" src="https://img.shields.io/badge/games-13-7c5cff">
+  <img alt="Games" src="https://img.shields.io/badge/games-14-7c5cff">
   <img alt="React" src="https://img.shields.io/badge/React-19-61dafb">
   <img alt="Vite" src="https://img.shields.io/badge/Vite-multi--page-646cff">
   <img alt="Sign-up" src="https://img.shields.io/badge/sign--up-not%20required-2fd67f">
@@ -18,7 +18,7 @@
   <img alt="Guess the Song genres" src="https://img.shields.io/badge/song%20genres-14-ff3d9a">
 </p>
 
-**B-Rotation** is a colourful, browser-based party-game platform. **13 games**, one shared screen, **no dedicated host required** — gather a group around a phone, tablet, or laptop and pick from social deduction, trivia, voting games, and classic party favourites. The app runs turns, timers, randomisation, hidden information, scoring, and results on its own.
+**B-Rotation** is a colourful, browser-based party-game platform. **14 games**, one shared screen, **no dedicated host required** — gather a group around a phone, tablet, or laptop and pick from social deduction, trivia, voting games, and classic party favourites. The app runs turns, timers, randomisation, hidden information, scoring, and results on its own.
 
 > [!TIP]
 > **▶️ Play now:** <https://markdaniel0702.github.io/PARTY-PILOT/> — free, no sign-up, works on any device.
@@ -38,6 +38,7 @@
   - [🎵 Guess the Song](#-guess-the-song)
   - [🖼️ Picture Guess](#️-picture-guess)
   - [🃏 UNO](#-uno)
+  - [🎨 Draw & Guess](#-draw--guess)
   - [🎲 Other Implemented Games](#-other-implemented-games)
 - [🤖 Automated Game System](#-automated-game-system)
 - [⏱️ Timers](#️-timers)
@@ -57,7 +58,7 @@
 
 ## 🧭 Project Overview
 
-The whole site — the homepage plus all 13 games — is a **single React 19 + Vite multi-page app** living in `web/`. Each game is its own HTML entry (`spy.html`, `quiz.html`, …) that mounts an independent React root, and every game is built from one shared component/hook library in `web/src/shared/`. There is no backend, no database, and no account system.
+The whole site — the homepage plus all 14 games — is a **single React 19 + Vite multi-page app** living in `web/`. Each game is its own HTML entry (`spy.html`, `quiz.html`, …) that mounts an independent React root, and every game is built from one shared component/hook library in `web/src/shared/`. There is no backend, no database, and no account system.
 
 | | |
 |---|---|
@@ -77,7 +78,7 @@ The whole site — the homepage plus all 13 games — is a **single React 19 + V
 |---|---|
 | 🙅 **No host required** | Every game runs itself — turn order, timers, hidden info, and results all happen automatically. |
 | 🎙️ **Game Master optional** | Some games also offer a manual mode where one person controls pacing. |
-| 🎲 **13 games, 4 categories** | Word & Deduction, Trivia & Knowledge, Party & Voting, and Card Games. |
+| 🎲 **14 games, 4 categories** | Word & Deduction, Trivia & Knowledge, Party & Voting, and Card Games. |
 | ⏱️ **Universal customizable timers** | One shared timer system — a recommended duration you can override with a preset or a custom value (5–600 s), Pause / Resume / Reset controls, and a switch to turn it off entirely. |
 | 🔀 **Randomised content** | Words, questions, prompts, songs, and pictures are drawn at random each round; Quiz Night additionally remembers which questions a slot has shown and avoids repeats. |
 | ⭐ **Bonus events** | Quiz Night boards can include 1–4 surprise bonus tiles with random point swings. |
@@ -108,6 +109,27 @@ The whole site — the homepage plus all 13 games — is a **single React 19 + V
 | 👥 [Most Likely To](#-other-implemented-games) | Party & Voting | 3–10 | ✅ | — | — |
 | 🎭 [Charades](#-other-implemented-games) | Party & Voting | 3–10 | ✅ | ✅ | ✅ |
 | 🃏 [UNO](#-uno) | Card Games | 2–8 | ✅ | — | — |
+| 🎨 [Draw & Guess](#-draw--guess) | Card Games | 3–8 | ✅ | — | ✅ |
+
+---
+
+### 🎨 Draw & Guess
+
+One player gets a secret word and draws it; everyone else races to guess. The app deals the words, runs the clock, scores by speed, and rotates the turn.
+
+Like UNO, it plays two ways:
+
+- **📱 With phones** — the drawer sketches on their **own phone** and the strokes appear live on the shared screen, so they can sit down instead of hunching over it. Everyone else types guesses into a live feed, and the app matches and scores them automatically.
+- **🔄 Without phones** — pass the device to each drawer (the word is revealed privately first), they draw straight on the shared screen, and the group shouts guesses while someone taps who got it.
+
+- **6 categories** — Everyday Objects, Animals, Food & Drink, Places & Buildings, Actions & Sports, and Movies & Fantasy — plus **your own word list**, typed in at setup.
+- **Drawing tools:** a six-colour palette, three brush widths, undo, and clear.
+- **Speed scoring:** a guesser earns 50–100 points depending on how much time is left; the drawer earns 25 per player who gets it, capped at 100 — so a clear drawing pays.
+- **Letter hints** start filling in the blanks once the clock passes 60%, capped at a third of the word.
+- Set **1–3 rounds** so everyone draws once per round.
+
+> [!NOTE]
+> Guesses are matched loosely — case, spacing, punctuation, and accents are all ignored, and a one-letter typo is quietly reported to that player alone as "so close!". It's never broadcast, because telling the room you're one letter away gives the answer away.
 
 ---
 
@@ -663,7 +685,7 @@ The site is deployed on **GitHub Pages** via **GitHub Actions** — free, HTTPS 
 | Publish dir | `web/dist/` |
 | Env vars | None |
 
-**What the workflow does:** installs `web/`'s dependencies, runs the Vite build (outputting the homepage + all 13 games to `web/dist/`), marks it non-Jekyll, then uploads and deploys `web/dist/` with `actions/deploy-pages`.
+**What the workflow does:** installs `web/`'s dependencies, runs the Vite build (outputting the homepage + all 14 games to `web/dist/`), marks it non-Jekyll, then uploads and deploys `web/dist/` with `actions/deploy-pages`.
 
 **Redeploying:**
 

@@ -2,7 +2,7 @@ import {
   Fingerprint, Eye, HelpCircle, Lock, Brain, Grid3x3,
   Tv, Music, Image,
   PartyPopper, ListChecks, GitFork, Users, Drama,
-  Spade, Layers,
+  Spade, Layers, Brush,
   Bot, Mic, Smartphone
 } from 'lucide-react';
 
@@ -175,6 +175,17 @@ export const GAME_GROUPS = [
         accent: '#e0293b',
         meta: [
           { icon: Users, label: '2–8 players' },
+          { icon: Smartphone, label: 'Phones optional', variant: 'auto' }
+        ]
+      },
+      {
+        href: 'drawguess.html',
+        icon: Brush,
+        title: 'Draw & Guess',
+        desc: 'Sketch the secret word on your phone while it appears on the big screen — everyone else races to guess it.',
+        accent: '#2fd1c5',
+        meta: [
+          { icon: Users, label: '3–8 players' },
           { icon: Smartphone, label: 'Phones optional', variant: 'auto' }
         ]
       }

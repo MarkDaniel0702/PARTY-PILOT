@@ -9,7 +9,7 @@ import { PassCard } from "../../shared/components/PassCard";
 import { QRPairing } from "../../shared/components/QRPairing";
 import { useRoster } from "../../shared/hooks/useRoster";
 import { useHostSession } from "../../shared/controller/useHostSession";
-import { useSeats, seatsMode } from "../../shared/cards/useSeats";
+import { useSeats, seatsMode } from "../../shared/controller/useSeats";
 import { VIEW, MSG, ACTION, view as viewMsg } from "../../shared/controller/protocol";
 import { playSound } from "../../shared/audio/sounds";
 import { CardFrame } from "../../shared/cards/CardFrame";

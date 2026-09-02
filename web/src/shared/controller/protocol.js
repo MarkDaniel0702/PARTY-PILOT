@@ -39,14 +39,26 @@ export const VIEW = {
   // it to exactly one player, so nobody else's channel ever receives it.
   HAND: "hand",
   CHOICE: "choice",
-  WAIT: "wait"
+  WAIT: "wait",
+  // Drawing games. DRAW carries the secret word and goes to the drawer alone;
+  // GUESS carries only the masked word, so the answer never reaches a guesser.
+  DRAW: "draw",
+  GUESS: "guess"
 };
 
 // Action kinds carried by MSG.ACTION.
 export const ACTION = {
   PLAY_CARD: "playCard",
   DRAW_CARD: "drawCard",
-  CHOOSE_COLOUR: "chooseColour"
+  CHOOSE_COLOUR: "chooseColour",
+  // Drawing. Points are batched by the sender rather than sent per pointer
+  // event — see shared/draw/useStrokeBatcher.js.
+  STROKE_START: "strokeStart",
+  STROKE_POINTS: "strokePoints",
+  STROKE_END: "strokeEnd",
+  UNDO: "undo",
+  CLEAR: "clear",
+  GUESS: "guess"
 };
 
 export function join(name, teamId, playerId) {

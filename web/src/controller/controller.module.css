@@ -131,6 +131,86 @@
 }
 .choiceBtn:active { transform: scale(0.96); }
 
+/* ---------- drawing ---------- */
+.drawWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  max-width: 520px;
+}
+.drawWord {
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 6vw, 1.7rem);
+  color: var(--accent-2);
+  margin: 0;
+  text-align: center;
+  letter-spacing: 0.03em;
+}
+
+.swatches, .drawTools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  justify-content: center;
+}
+.swatch {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  transition: transform 0.15s, border-color 0.15s;
+}
+.swatchOn { border-color: var(--paper); transform: scale(1.14); }
+
+.widthBtn {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+}
+.widthBtn span { display: block; border-radius: 50%; background: var(--paper); }
+.widthOn { border-color: var(--accent); }
+
+.toolBtn {
+  min-height: 44px;
+  padding: 0 0.9rem;
+  border-radius: var(--radius-sm);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--paper);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+/* ---------- guessing ---------- */
+.hintWord {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: clamp(1.1rem, 5.5vw, 1.5rem);
+  letter-spacing: 0.2em;
+  color: var(--paper-dim);
+  margin: 0;
+}
+.guessForm { display: flex; flex-direction: column; gap: 0.7rem; width: 100%; }
+.guessFeed {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+}
+.feedLine { margin: 0; font-size: 0.85rem; color: var(--paper-dim); }
+.feedLine strong { color: var(--paper); }
+.feedHit { margin: 0; font-size: 0.85rem; color: var(--success); font-weight: 700; }
+
 /* Landscape phones: reclaim vertical space so the primary control still fits. */
 @media (orientation: landscape) and (max-height: 460px) {
   .header { padding: 0.4rem; }
