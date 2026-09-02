@@ -170,3 +170,66 @@
   font-weight: 700;
 }
 .finalCount { color: var(--paper-dim); font-weight: 500; }
+
+/* ---------- motion ----------
+   Each of these is replayed by remounting its element (a React key that
+   includes the engine's lastEvent.seq), so no animation state or timers are
+   needed. See games/uno/App.jsx. */
+
+/* Took a +2 or +4. */
+.seatHit { animation: seatPulse 420ms ease both; }
+@keyframes seatPulse {
+  0%, 100% { transform: scale(1); box-shadow: none; }
+  35% {
+    transform: scale(1.12);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 55%, transparent);
+  }
+}
+
+/* Turn was skipped. */
+.seatSkipped { animation: seatDim 320ms ease both; }
+@keyframes seatDim {
+  0%, 100% { opacity: 1; }
+  45% { opacity: 0.3; }
+}
+
+.dirHint > span { display: inline-block; }
+.dirFlip { animation: dirFlip 300ms cubic-bezier(0.2, 0.8, 0.3, 1) both; }
+@keyframes dirFlip {
+  from { transform: rotate(-180deg) scale(0.7); opacity: 0; }
+  to   { transform: rotate(0deg) scale(1); opacity: 1; }
+}
+
+/* The one celebration: a single pop plus an expanding ring, then done. */
+.winBurst {
+  position: relative;
+  display: inline-block;
+  animation: winPop 600ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+.winBurst::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-2);
+  transform: translate(-50%, -50%);
+  animation: winRing 620ms ease-out both;
+  pointer-events: none;
+}
+@keyframes winPop {
+  0%   { transform: scale(0.86); opacity: 0; }
+  55%  { transform: scale(1.04); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes winRing {
+  from { width: 10px; height: 10px; opacity: 0.85; }
+  to   { width: 320px; height: 320px; opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seatHit, .seatSkipped, .dirFlip, .winBurst { animation: none; }
+  .winBurst::before { animation: none; content: none; }
+}

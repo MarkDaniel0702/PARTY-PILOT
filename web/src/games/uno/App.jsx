@@ -33,6 +33,13 @@ import styles from "./uno.module.css";
 const MIN_PLAYERS = 2;
 const MAX_PLAYERS = 8;
 
+// The card this seat was just dealt, if any — used only to animate its
+// reveal. Null for everyone who didn't just draw.
+function justDrawnFor(game, seatId) {
+  const ev = game.lastEvent;
+  return ev && ev.kind === "draw" && ev.seatId === seatId ? ev.cardId : null;
+}
+
 export default function App() {
   const [phase, setPhase] = useState("setup"); // setup | pass | play | results
   const [game, setGame] = useState(null);
@@ -128,7 +135,11 @@ export default function App() {
             cards: handFor(game, seat.seatId),
             playable,
             canDraw: !game.drawnCardId,
-            drawLabel: "Draw a card"
+            drawLabel: "Draw a card",
+            // Lets the phone flip-reveal just the card it was dealt. Taken
+            // from lastEvent rather than drawnCardId so it also covers a
+            // drawn card that turned out to be unplayable.
+            justDrawnId: justDrawnFor(game, seat.seatId)
           })
         );
         return;
@@ -281,10 +292,23 @@ export default function App() {
               <div className={styles.seatStrip}>
                 {activeSeats.map((seat) => {
                   const count = pub.counts.find((c) => c.seatId === seat.seatId)?.count ?? 0;
+                  const ev = game.lastEvent;
+                  const hit = ev?.kind === "penalty" && ev.targetSeatId === seat.seatId;
+                  const skipped = ev?.kind === "skip" && ev.targetSeatId === seat.seatId;
+                  // Including the event seq in the key remounts just this chip
+                  // when it's the target, which replays the animation without
+                  // any animation state or timers.
                   return (
                     <div
-                      key={seat.seatId}
-                      className={`${styles.seatChip} ${seat.seatId === turnSeatId ? styles.seatChipActive : ""}`.trim()}
+                      key={hit || skipped ? `${seat.seatId}-e${ev.seq}` : seat.seatId}
+                      className={[
+                        styles.seatChip,
+                        seat.seatId === turnSeatId ? styles.seatChipActive : "",
+                        hit ? styles.seatHit : "",
+                        skipped ? styles.seatSkipped : ""
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
                     >
                       <span className={styles.seatName}>{seat.name}</span>
                       <span className={styles.seatCount}>{count}</span>
@@ -302,14 +326,26 @@ export default function App() {
                 </div>
                 <div className={styles.pileSlot}>
                   <span className={styles.pileLabel}>Discard</span>
-                  <UnoCard card={topCard(game)} size="lg" />
+                  {/* Keyed on the card id so a new top card remounts and
+                      replays the settle animation. */}
+                  <UnoCard
+                    key={topCard(game).id}
+                    card={topCard(game)}
+                    size="lg"
+                    className={cardStyles.played}
+                  />
                   <span className={styles.colourDot} style={{ background: UNO_COLOUR_HEX[pub.activeColour] }} />
                 </div>
               </div>
 
               <p className={styles.turnBanner}>
                 <span style={{ color: UNO_COLOUR_HEX[pub.activeColour] }}>●</span> {turnSeat?.name || "—"}'s turn
-                <span className={styles.dirHint}>{pub.direction === 1 ? "↻ clockwise" : "↺ counter-clockwise"}</span>
+                <span className={styles.dirHint}>
+                  {/* Keyed on direction so a Reverse remounts and flips. */}
+                  <span key={pub.direction} className={styles.dirFlip}>
+                    {pub.direction === 1 ? "↻ clockwise" : "↺ counter-clockwise"}
+                  </span>
+                </span>
               </p>
             </div>
 
@@ -362,6 +398,7 @@ export default function App() {
                             key={card.id}
                             card={card}
                             disabled={!playable}
+                            className={card.id === justDrawnFor(game, turnSeatId) ? cardStyles.dealt : ""}
                             onClick={playable ? () => localPlay(card.id) : undefined}
                           />
                         );
@@ -391,7 +428,9 @@ export default function App() {
 
       <Screen active={phase === "results"}>
         <BigIcon>🏁</BigIcon>
-        <ScreenTitle>{winnerName} wins!</ScreenTitle>
+        <ScreenTitle>
+          <span className={styles.winBurst}>{winnerName} wins!</span>
+        </ScreenTitle>
         <ScreenSub>Hand emptied first. Cards left with everyone else:</ScreenSub>
         {game && (
           <ul className={styles.finalList}>

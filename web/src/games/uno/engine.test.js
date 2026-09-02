@@ -268,6 +268,69 @@ describe("winning", () => {
   });
 });
 
+describe("lastEvent", () => {
+  it("starts null and reports a plain play", () => {
+    const s = stateWith({ hands: { a: [card("red", KIND.NUMBER, 3, "x"), spare()], b: [], c: [] } });
+    expect(s.lastEvent).toBeUndefined();
+    const next = playCard(s, "a", "x");
+    expect(next.lastEvent).toMatchObject({ kind: "play", seatId: "a", cardId: "x" });
+  });
+
+  it("names the skipped seat", () => {
+    const s = stateWith({ hands: { a: [card("red", KIND.SKIP, null, "x"), spare()], b: [], c: [] } });
+    expect(playCard(s, "a", "x").lastEvent).toMatchObject({
+      kind: "skip",
+      seatId: "a",
+      targetSeatId: "b"
+    });
+  });
+
+  it("reports the new direction on a reverse", () => {
+    const s = stateWith({ hands: { a: [card("red", KIND.REVERSE, null, "x"), spare()], b: [], c: [] } });
+    expect(playCard(s, "a", "x").lastEvent).toMatchObject({ kind: "reverse", direction: -1 });
+  });
+
+  it("reports who was penalised and by how much", () => {
+    const s = stateWith({ hands: { a: [card("red", KIND.DRAW2, null, "x"), spare()], b: [], c: [] } });
+    expect(playCard(s, "a", "x").lastEvent).toMatchObject({
+      kind: "penalty",
+      targetSeatId: "b",
+      count: 2
+    });
+
+    const w = stateWith({ hands: { a: [card("wild", KIND.WILD4, null, "w"), spare()], b: [], c: [] } });
+    const chosen = chooseColour(playCard(w, "a", "w"), "a", "blue");
+    expect(chosen.lastEvent).toMatchObject({ kind: "penalty", targetSeatId: "b", count: 4 });
+  });
+
+  it("reports a plain wild colour choice without a penalty", () => {
+    const s = stateWith({ hands: { a: [card("wild", KIND.WILD, null, "w"), spare()], b: [], c: [] } });
+    const chosen = chooseColour(playCard(s, "a", "w"), "a", "green");
+    expect(chosen.lastEvent).toMatchObject({ kind: "colour", colour: "green" });
+  });
+
+  it("reports the win", () => {
+    const s = stateWith({ hands: { a: [card("red", KIND.NUMBER, 3, "x")], b: [], c: [] } });
+    expect(playCard(s, "a", "x").lastEvent).toMatchObject({ kind: "win", seatId: "a" });
+  });
+
+  it("increments seq so a repeated event still reads as a change", () => {
+    const s = stateWith({
+      hands: { a: [card("red", KIND.NUMBER, 3, "x"), spare()], b: [card("red", KIND.NUMBER, 4, "y"), spare("s2")], c: [] }
+    });
+    const one = playCard(s, "a", "x");
+    const two = playCard(one, "b", "y");
+    expect(one.lastEvent.kind).toBe("play");
+    expect(two.lastEvent.kind).toBe("play");
+    expect(two.lastEvent.seq).toBe(one.lastEvent.seq + 1);
+  });
+
+  it("is not touched by a rejected action", () => {
+    const s = stateWith({ hands: { a: [card("blue", KIND.NUMBER, 2, "x")], b: [], c: [] } });
+    expect(playCard(s, "a", "x")).toBe(s);
+  });
+});
+
 describe("publicView", () => {
   it("exposes counts but never any hand contents", () => {
     const s = stateWith({

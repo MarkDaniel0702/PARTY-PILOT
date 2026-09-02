@@ -88,8 +88,16 @@ export function createGame(seatIds, { handSize = 7, shuffleFn = defaultShuffle }
     // play, per official rules. Cleared when the turn ends.
     drawnCardId: null,
     winner: null,
+    // What just happened, for the UI to react to (chip pulses, direction
+    // flips). `seq` increments on every event so the same event twice in a
+    // row is still a distinct change React can key an animation on.
+    lastEvent: null,
     shuffleFn
   };
+}
+
+function withEvent(state, event) {
+  return { ...event, seq: (state.lastEvent ? state.lastEvent.seq : 0) + 1 };
 }
 
 export function canPlay(card, state) {
@@ -188,28 +196,40 @@ export function playCard(state, seatId, cardId) {
   // A wild freezes the turn until a colour is chosen — unless it was the
   // winning card, in which case the colour no longer matters.
   if (card.colour === "wild") {
-    if (nextHand.length === 0) return { ...next, winner: seatId, pendingWild: null };
-    return { ...next, pendingWild: { seatId, cardId, kind: card.kind } };
+    if (nextHand.length === 0) {
+      return { ...next, winner: seatId, pendingWild: null, lastEvent: withEvent(state, { kind: "win", seatId }) };
+    }
+    return {
+      ...next,
+      pendingWild: { seatId, cardId, kind: card.kind },
+      lastEvent: withEvent(state, { kind: "wildPlayed", seatId, cardId })
+    };
   }
 
   next.activeColour = card.colour;
 
   const twoPlayer = state.seatOrder.length === 2;
   let advance = 1;
+  let event = { kind: "play", seatId, cardId };
   if (card.kind === KIND.SKIP) {
     advance = 2;
+    event = { kind: "skip", seatId, targetSeatId: state.seatOrder[step(next, 1)] };
   } else if (card.kind === KIND.REVERSE) {
     // With two players a Reverse simply acts as a Skip.
     next.direction = twoPlayer ? state.direction : -state.direction;
     advance = twoPlayer ? 2 : 1;
+    event = { kind: "reverse", seatId, direction: next.direction };
   } else if (card.kind === KIND.DRAW2) {
     const victim = state.seatOrder[step(next, 1)];
     next = { ...next, ...drawMany(next, victim, 2) };
     advance = 2;
+    event = { kind: "penalty", seatId, targetSeatId: victim, count: 2 };
   }
 
-  if (nextHand.length === 0) return { ...next, winner: seatId };
-  return { ...next, turnIndex: step(next, advance) };
+  if (nextHand.length === 0) {
+    return { ...next, winner: seatId, lastEvent: withEvent(state, { kind: "win", seatId }) };
+  }
+  return { ...next, turnIndex: step(next, advance), lastEvent: withEvent(state, event) };
 }
 
 export function chooseColour(state, seatId, colour) {
@@ -218,12 +238,14 @@ export function chooseColour(state, seatId, colour) {
 
   let next = { ...state, activeColour: colour, pendingWild: null };
   let advance = 1;
+  let event = { kind: "colour", seatId, colour };
   if (state.pendingWild.kind === KIND.WILD4) {
     const victim = state.seatOrder[step(next, 1)];
     next = { ...next, ...drawMany(next, victim, 4) };
     advance = 2;
+    event = { kind: "penalty", seatId, targetSeatId: victim, count: 4, colour };
   }
-  return { ...next, turnIndex: step(next, advance) };
+  return { ...next, turnIndex: step(next, advance), lastEvent: withEvent(state, event) };
 }
 
 // Draw one card. If it happens to be playable the seat keeps the turn and
@@ -237,12 +259,18 @@ export function drawCard(state, seatId) {
   const card = hand[hand.length - 1];
   const next = { ...state, ...drawn };
 
-  if (card && canPlay(card, next)) return { ...next, drawnCardId: card.id };
-  return { ...next, drawnCardId: null, turnIndex: step(next, 1) };
+  const event = withEvent(state, { kind: "draw", seatId, cardId: card ? card.id : null });
+  if (card && canPlay(card, next)) return { ...next, drawnCardId: card.id, lastEvent: event };
+  return { ...next, drawnCardId: null, turnIndex: step(next, 1), lastEvent: event };
 }
 
 export function passTurn(state, seatId) {
   if (state.winner || state.pendingWild) return state;
   if (currentSeat(state) !== seatId || !state.drawnCardId) return state;
-  return { ...state, drawnCardId: null, turnIndex: step(state, 1) };
+  return {
+    ...state,
+    drawnCardId: null,
+    turnIndex: step(state, 1),
+    lastEvent: withEvent(state, { kind: "pass", seatId })
+  };
 }

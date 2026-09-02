@@ -14,7 +14,10 @@
   border: 2px solid rgba(255, 255, 255, 0.85);
   border-radius: calc(var(--card-w) * 0.14);
   background: var(--panel-2);
-  color: #fff;
+  /* Token, not #fff: the default background is a theme token, so white text
+     would sit on near-white in light mode. Cards that paint their own
+     (non-theme) background set their own text colour on top of this. */
+  color: var(--paper);
   box-shadow: var(--shadow-soft);
   font-family: var(--font-display);
   overflow: hidden;
@@ -23,9 +26,11 @@
   outline-offset: 2px;
 }
 
+/* Fluid so a hand still fits on a 320px phone. Floors keep the tap target
+   past the 44px minimum — cards are 1.5x tall, so width is the tight axis. */
 .sm { --card-w: 46px; }
-.md { --card-w: 74px; }
-.lg { --card-w: 104px; }
+.md { --card-w: clamp(52px, 19vw, 74px); }
+.lg { --card-w: clamp(72px, 26vw, 104px); }
 
 .clickable { cursor: pointer; }
 .clickable:hover:not(.disabled) { transform: translateY(-6px); }
@@ -56,11 +61,73 @@
   max-width: 100%;
 }
 
+/* A player's hand.
+   Wraps rather than scrolls. A centred flex row that overflows puts its own
+   start at a negative scroll offset that scrollLeft:0 cannot reach (and the
+   browser under-reports scrollWidth by the clipped amount), so the leftmost
+   cards became unreachable and untappable on a phone. Wrapping removes the
+   overflow entirely, and vertical space is the plentiful axis in portrait. */
 .fan {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
+  align-content: flex-start;
   gap: 0.4rem;
-  overflow-x: auto;
   padding: 0.6rem 0.2rem 1rem;
   max-width: 100%;
+}
+
+/* Landscape phones have almost no vertical room, so fall back to a single
+   scrolling row. `safe center` is essential here: it degrades to flex-start
+   when the content overflows, keeping the first card reachable. Plain
+   `center` is declared first as the fallback for browsers without `safe`. */
+@media (orientation: landscape) and (max-height: 460px) {
+  .fan {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-content: center;
+    justify-content: safe center;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ---------- motion ----------
+   Replayed by remounting the element (React key), not by timers — see
+   games/uno/App.jsx. Kept short so they read as responsiveness, not delay. */
+
+/* A freshly drawn card turning face-up in your hand. */
+.dealt {
+  animation: cardFlipIn 250ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  transform-origin: center;
+}
+@keyframes cardFlipIn {
+  from { transform: rotateY(90deg) scale(0.92); opacity: 0; }
+  to   { transform: rotateY(0deg) scale(1); opacity: 1; }
+}
+
+/* A card landing on the discard pile on the shared screen. */
+.played {
+  animation: cardSettle 300ms cubic-bezier(0.2, 0.8, 0.25, 1) both;
+}
+@keyframes cardSettle {
+  from { transform: translateY(-16px) rotate(-7deg) scale(1.08); opacity: 0; }
+  60%  { transform: translateY(2px) rotate(1.5deg) scale(1); opacity: 1; }
+  to   { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+}
+
+/* Leaving the hand after you tap it. */
+.leaving {
+  animation: cardLift 200ms ease-in both;
+  pointer-events: none;
+}
+@keyframes cardLift {
+  from { transform: translateY(0) scale(1); opacity: 1; }
+  to   { transform: translateY(-28px) scale(0.9); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dealt, .played, .leaving { animation: none; }
+  .frame { transition: none; }
+  .clickable:hover:not(.disabled),
+  .clickable:active:not(.disabled) { transform: none; }
 }

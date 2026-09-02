@@ -1,5 +1,16 @@
+/* This page only ever runs on a phone, so every size here is fluid.
+   100dvh follows the mobile browser chrome as it collapses; 100vh is the
+   fallback for browsers without dynamic viewport units. env() keeps content
+   clear of the notch and home indicator (including the side notch in
+   landscape). */
 .page {
   min-height: 100vh;
+  min-height: 100dvh;
+  padding:
+    env(safe-area-inset-top)
+    env(safe-area-inset-right)
+    env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
   display: flex;
   flex-direction: column;
 }
@@ -9,7 +20,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 1.1rem;
+  padding: clamp(0.6rem, 3vw, 1.1rem);
   font-family: var(--font-display);
   font-size: 0.8rem;
   letter-spacing: 0.06em;
@@ -21,7 +32,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem;
+  padding: clamp(0.9rem, 4vw, 1.5rem);
 }
 
 .contentInner {
@@ -43,14 +54,15 @@
 }
 
 .lead {
-  font-size: 1.15rem;
+  font-size: clamp(1.02rem, 4.5vw, 1.15rem);
   font-weight: 800;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   justify-content: center;
+  text-wrap: balance;
 }
-.sub { color: var(--paper-dim); font-size: 0.95rem; margin: 0; }
+.sub { color: var(--paper-dim); font-size: clamp(0.86rem, 3.6vw, 0.95rem); margin: 0; }
 .online { color: var(--success); }
 
 .input {
@@ -59,19 +71,24 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 0.9rem 1.1rem;
+  /* Must stay >= 16px: iOS auto-zooms the page on focus below that. */
   font-size: 1.1rem;
   color: var(--paper);
   text-align: center;
 }
 
+/* Bounded by both axes so it can never outgrow a small portrait screen or a
+   short landscape one, where the header and padding also need room. */
 .buzzBtn {
-  width: 220px;
-  height: 220px;
+  width: min(60vw, 45vh, 220px);
+  height: min(60vw, 45vh, 220px);
   border-radius: 50%;
   background: radial-gradient(circle at 35% 30%, var(--danger), color-mix(in srgb, var(--danger) 70%, black));
+  /* Fixed #fff is correct here: the surface is a --danger gradient in both
+     themes, not a theme-neutral panel. */
   color: #fff;
   font-family: var(--font-display);
-  font-size: 1.6rem;
+  font-size: clamp(1.2rem, 6vw, 1.6rem);
   box-shadow: 0 20px 50px -18px color-mix(in srgb, var(--danger) 70%, transparent);
   transition: transform 0.15s;
 }
@@ -92,15 +109,32 @@
   width: 100%;
 }
 
+/* Default (untinted) sits on a theme token, so its text must come from one
+   too — white here would be invisible on light mode's near-white panel. */
 .choiceBtn {
-  padding: 1.4rem 1rem;
+  padding: clamp(1rem, 5vw, 1.4rem) 1rem;
   border-radius: var(--radius-md);
   background: var(--panel-2);
-  color: #fff;
+  color: var(--paper);
   font-family: var(--font-display);
-  font-size: 1rem;
-  border: 2px solid rgba(255, 255, 255, 0.7);
+  font-size: clamp(0.88rem, 4vw, 1rem);
+  border: 2px solid var(--border);
   box-shadow: var(--shadow-soft);
   transition: transform 0.15s;
+  min-height: 44px;
+}
+/* Applied when the host supplies its own background (e.g. UNO's colour
+   picker) — that surface is a fixed colour, so white text is right. */
+.choiceBtnTinted {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.7);
 }
 .choiceBtn:active { transform: scale(0.96); }
+
+/* Landscape phones: reclaim vertical space so the primary control still fits. */
+@media (orientation: landscape) and (max-height: 460px) {
+  .header { padding: 0.4rem; }
+  .content { padding: 0.5rem 1rem; }
+  .form, .waiting, .buzzWrap, .handWrap { gap: 0.6rem; }
+  .choiceBtn { padding: 0.8rem 1rem; }
+}

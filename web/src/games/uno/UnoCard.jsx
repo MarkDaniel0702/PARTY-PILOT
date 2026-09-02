@@ -31,7 +31,7 @@ export function cardLabel(card) {
   return `${card.colour} ${card.kind}`;
 }
 
-export function UnoCard({ card, size = "md", faceDown = false, selected, disabled, onClick }) {
+export function UnoCard({ card, size = "md", faceDown = false, selected, disabled, onClick, className = "" }) {
   if (!card) return null;
 
   const isWild = card.colour === "wild";
@@ -47,7 +47,7 @@ export function UnoCard({ card, size = "md", faceDown = false, selected, disable
       label={faceDown ? "face-down card" : cardLabel(card)}
       // Face-down must not carry a colour: an inline background would beat
       // the .faceDown card-back pattern in the cascade and leak the colour.
-      className={!faceDown && isWild ? styles.wild : ""}
+      className={`${!faceDown && isWild ? styles.wild : ""} ${className}`.trim()}
       style={faceDown || isWild ? undefined : { background: UNO_COLOUR_HEX[card.colour] }}
     >
       <span className={styles.pill}>

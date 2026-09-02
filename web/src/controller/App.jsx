@@ -19,6 +19,7 @@ export default function App() {
   const [buzzed, setBuzzed] = useState(false);
   const [manualCode, setManualCode] = useState("");
   const [flash, setFlash] = useState(null); // "won" | "lost" | null
+  const [leavingId, setLeavingId] = useState(null);
 
   function handleJoin(e) {
     e.preventDefault();
@@ -40,6 +41,10 @@ export default function App() {
   }
 
   function handlePlayCard(cardId) {
+    // Lift it immediately rather than waiting on the host round-trip, so the
+    // tap feels answered; the card leaves the hand for real when the next
+    // HAND view arrives.
+    setLeavingId(cardId);
     send(action(ACTION.PLAY_CARD, { cardId }));
   }
 
@@ -54,6 +59,11 @@ export default function App() {
   // A fresh non-buzz view means a new round started — clear any stale lock.
   useEffect(() => {
     if (view && view.view !== VIEW.BUZZ && view.view !== VIEW.LOCKED) setBuzzed(false);
+  }, [view]);
+
+  // Any new view means the host has acted, so the optimistic lift is spent.
+  useEffect(() => {
+    setLeavingId(null);
   }, [view]);
 
   // The host almost always pushes a fresh `view` right after this (next
@@ -151,6 +161,12 @@ export default function App() {
                 key={card.id}
                 card={card}
                 disabled={!playable.has(card.id)}
+                className={[
+                  card.id === view.justDrawnId ? cardStyles.dealt : "",
+                  card.id === leavingId ? cardStyles.leaving : ""
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
                 onClick={playable.has(card.id) ? () => handlePlayCard(card.id) : undefined}
               />
             ))}
@@ -172,7 +188,7 @@ export default function App() {
               <button
                 key={opt.id}
                 type="button"
-                className={styles.choiceBtn}
+                className={`${styles.choiceBtn} ${opt.colour ? styles.choiceBtnTinted : ""}`.trim()}
                 style={opt.colour ? { background: opt.colour } : undefined}
                 onClick={() => handleChoice(opt.id)}
               >
