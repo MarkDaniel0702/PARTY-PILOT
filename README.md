@@ -1,7 +1,7 @@
 # 🎮 B-Rotation
 
 <p>
-  <img alt="Games" src="https://img.shields.io/badge/games-15-7c5cff">
+  <img alt="Games" src="https://img.shields.io/badge/games-16-7c5cff">
   <img alt="React" src="https://img.shields.io/badge/React-19-61dafb">
   <img alt="Vite" src="https://img.shields.io/badge/Vite-multi--page-646cff">
   <img alt="Sign-up" src="https://img.shields.io/badge/sign--up-not%20required-2fd67f">
@@ -18,7 +18,7 @@
   <img alt="Guess the Song genres" src="https://img.shields.io/badge/song%20genres-14-ff3d9a">
 </p>
 
-**B-Rotation** is a colourful, browser-based party-game platform. **15 games**, one shared screen, **no dedicated host required** — gather a group around a phone, tablet, or laptop and pick from social deduction, trivia, voting games, and classic party favourites. The app runs turns, timers, randomisation, hidden information, scoring, and results on its own.
+**B-Rotation** is a colourful, browser-based party-game platform. **16 games**, one shared screen, **no dedicated host required** — gather a group around a phone, tablet, or laptop and pick from social deduction, trivia, voting games, and classic party favourites. The app runs turns, timers, randomisation, hidden information, scoring, and results on its own.
 
 > [!TIP]
 > **▶️ Play now:** <https://markdaniel0702.github.io/PARTY-PILOT/> — free, no sign-up, works on any device.
@@ -40,6 +40,7 @@
   - [🃏 UNO](#-uno)
   - [🎨 Draw & Guess](#-draw--guess)
   - [⚔️ Dogs vs Cats](#️-dogs-vs-cats)
+  - [🧱 Tetris Battle](#-tetris-battle)
   - [🎲 Other Implemented Games](#-other-implemented-games)
 - [🤖 Automated Game System](#-automated-game-system)
 - [⏱️ Timers](#️-timers)
@@ -59,7 +60,7 @@
 
 ## 🧭 Project Overview
 
-The whole site — the homepage plus all 15 games — is a **single React 19 + Vite multi-page app** living in `web/`. Each game is its own HTML entry (`spy.html`, `quiz.html`, …) that mounts an independent React root, and every game is built from one shared component/hook library in `web/src/shared/`. There is no backend, no database, and no account system.
+The whole site — the homepage plus all 16 games — is a **single React 19 + Vite multi-page app** living in `web/`. Each game is its own HTML entry (`spy.html`, `quiz.html`, …) that mounts an independent React root, and every game is built from one shared component/hook library in `web/src/shared/`. There is no backend, no database, and no account system.
 
 | | |
 |---|---|
@@ -79,7 +80,7 @@ The whole site — the homepage plus all 15 games — is a **single React 19 + V
 |---|---|
 | 🙅 **No host required** | Every game runs itself — turn order, timers, hidden info, and results all happen automatically. |
 | 🎙️ **Game Master optional** | Some games also offer a manual mode where one person controls pacing. |
-| 🎲 **15 games, 5 categories** | Word & Deduction, Trivia & Knowledge, Party & Voting, Card Games, and Arcade. |
+| 🎲 **16 games, 5 categories** | Word & Deduction, Trivia & Knowledge, Party & Voting, Card Games, and Arcade. |
 | ⏱️ **Universal customizable timers** | One shared timer system — a recommended duration you can override with a preset or a custom value (5–600 s), Pause / Resume / Reset controls, and a switch to turn it off entirely. |
 | 🔀 **Randomised content** | Words, questions, prompts, songs, and pictures are drawn at random each round; Quiz Night additionally remembers which questions a slot has shown and avoids repeats. |
 | ⭐ **Bonus events** | Quiz Night boards can include 1–4 surprise bonus tiles with random point swings. |
@@ -112,6 +113,25 @@ The whole site — the homepage plus all 15 games — is a **single React 19 + V
 | 🃏 [UNO](#-uno) | Card Games | 2–8 | ✅ | — | — |
 | 🎨 [Draw & Guess](#-draw--guess) | Card Games | 3–8 | ✅ | — | ✅ |
 | ⚔️ [Dogs vs Cats](#️-dogs-vs-cats) | Arcade | 2 teams | ✅ | — | ✅ |
+| 🧱 [Tetris Battle](#-tetris-battle) | Arcade | 2–4 | ✅ | — | ✅ |
+
+---
+
+### 🧱 Tetris Battle
+
+Everyone plays at once, each on their own phone, while **every board appears side by side on the big screen**. Clear lines to bury your friends in garbage.
+
+**This is the one game where the phone runs the game itself.** Every other game keeps the rules on the shared screen and treats phones as controllers. Here your board is simulated *on your phone*, because that's the only way input can feel instant — your eyes are on the phone, so nothing has to cross the network before you see your piece move. The host receives board snapshots purely to draw the TV, where a little delay costs nothing because nobody plays off it.
+
+- **Modern rules:** SRS rotation with wall kicks (so T-spins work), a 7-bag randomiser, hold piece, ghost piece, lock delay, and a next-piece queue.
+- **Everyone gets the same pieces.** One shared seed per match, so a loss is never down to a worse bag.
+- **Two modes.** *Battle* — clearing 2+ lines at once sends garbage to everyone else, and the last board standing wins. *Line Race* — no garbage, most lines before the clock runs out.
+- **Garbage cancels.** A clear of your own wipes out incoming garbage before it lands, so a well-timed Tetris can save you.
+- **Auto-repeat runs on the phone**, so a held direction stays smooth even if the network hiccups.
+- 2–4 players.
+
+> [!NOTE]
+> This is the only game on the site that **needs** phones — there's no shared-screen fallback, because every player needs their own private board and their own controls at the same time.
 
 ---
 
@@ -704,7 +724,7 @@ The site is deployed on **GitHub Pages** via **GitHub Actions** — free, HTTPS 
 | Publish dir | `web/dist/` |
 | Env vars | None |
 
-**What the workflow does:** installs `web/`'s dependencies, runs the Vite build (outputting the homepage + all 15 games to `web/dist/`), marks it non-Jekyll, then uploads and deploys `web/dist/` with `actions/deploy-pages`.
+**What the workflow does:** installs `web/`'s dependencies, runs the Vite build (outputting the homepage + all 16 games to `web/dist/`), marks it non-Jekyll, then uploads and deploys `web/dist/` with `actions/deploy-pages`.
 
 **Redeploying:**
 

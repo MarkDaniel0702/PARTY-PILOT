@@ -8,6 +8,7 @@ import { UnoCard } from "../games/uno/UnoCard";
 import { StrokeCanvas } from "../shared/draw/StrokeCanvas";
 import { useStrokeBatcher } from "../shared/draw/useStrokeBatcher";
 import { PALETTE, WIDTHS } from "../shared/draw/strokes";
+import { PhoneTetris } from "../games/tetris/PhoneTetris";
 import cardStyles from "../shared/cards/cards.module.css";
 import styles from "./controller.module.css";
 
@@ -17,7 +18,8 @@ import styles from "./controller.module.css";
 const RESULT_FLASH_MS = 2500;
 
 export default function App() {
-  const { status, error, code, view, send, joinWithName, retry, lastBuzzResult } = useControllerClient();
+  const { status, error, code, view, send, joinWithName, retry, lastBuzzResult, lastEvent } =
+    useControllerClient();
   const [name, setName] = useState("");
   const [buzzed, setBuzzed] = useState(false);
   const [manualCode, setManualCode] = useState("");
@@ -335,6 +337,20 @@ export default function App() {
             </div>
           )}
         </div>
+      );
+    } else if (view.view === VIEW.TETRIS) {
+      // The only view where the phone runs the game itself — see PhoneTetris.
+      // Keyed on the seed so a rematch starts a genuinely fresh board.
+      body = (
+        <PhoneTetris
+          key={view.seed}
+          seed={view.seed}
+          mode={view.mode}
+          garbageEvent={lastEvent && lastEvent.kind === "garbage" ? lastEvent.payload : null}
+          onState={(snap) => send(action(ACTION.TETRIS_STATE, snap))}
+          onGarbage={(rows) => send(action(ACTION.TETRIS_GARBAGE, { rows }))}
+          onOver={(res) => send(action(ACTION.TETRIS_OVER, res))}
+        />
       );
     } else if (view.view === VIEW.AIM) {
       body = (

@@ -17,6 +17,9 @@ export function useControllerClient() {
   // the current view. A plain boolean would also fail to re-fire an effect
   // when the same outcome (e.g. two misses in a row) repeats.
   const [lastBuzzResult, setLastBuzzResult] = useState(null);
+  // Host events that aren't view changes (Tetris garbage, match end). A new
+  // object each time so repeated identical events still fire an effect.
+  const [lastEvent, setLastEvent] = useState(null);
 
   const code = useMemo(() => {
     const raw = window.location.hash.replace("#", "").trim().toUpperCase();
@@ -84,6 +87,8 @@ export function useControllerClient() {
             setView(msg);
           } else if (msg.t === HOST_MSG.BUZZ_RESULT) {
             setLastBuzzResult({ won: msg.won });
+          } else if (msg.t === HOST_MSG.EVENT) {
+            setLastEvent({ kind: msg.kind, payload: msg.payload, at: performance.now() });
           } else if (msg.t === HOST_MSG.PING) {
             conn.send(pong());
           } else if (msg.t === HOST_MSG.ERROR) {
@@ -138,5 +143,5 @@ export function useControllerClient() {
     if (nameRef.current) joinWithName(nameRef.current);
   }, [joinWithName]);
 
-  return { status, error, code, view, playerId, teamId, lastBuzzResult, joinWithName, send, retry };
+  return { status, error, code, view, playerId, teamId, lastBuzzResult, lastEvent, joinWithName, send, retry };
 }

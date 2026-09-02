@@ -25,6 +25,9 @@ export const HOST_MSG = {
   VIEW: "view",
   BUZZ_RESULT: "buzzResult",
   PING: "ping",
+  // A one-off message to a phone that isn't a view change — used to deliver
+  // garbage lines and end-of-match signals without redrawing its screen.
+  EVENT: "event",
   ERROR: "error"
 };
 
@@ -45,7 +48,11 @@ export const VIEW = {
   DRAW: "draw",
   GUESS: "guess",
   // Artillery: the aiming gamepad, sent only to the team whose turn it is.
-  AIM: "aim"
+  AIM: "aim",
+  // Tetris is the one game the phone simulates itself — this view hands it
+  // the seed and mode, then the phone runs its own board and streams
+  // snapshots back for the TV.
+  TETRIS: "tetris"
 };
 
 // Action kinds carried by MSG.ACTION.
@@ -66,7 +73,11 @@ export const ACTION = {
   AIM: "aim",
   FIRE: "fire",
   MOVE: "move",
-  SELECT_WEAPON: "selectWeapon"
+  SELECT_WEAPON: "selectWeapon",
+  // Tetris, phone -> host.
+  TETRIS_STATE: "tetrisState",
+  TETRIS_GARBAGE: "tetrisGarbage",
+  TETRIS_OVER: "tetrisOver"
 };
 
 export function join(name, teamId, playerId) {
@@ -95,6 +106,10 @@ export function view(descriptor) {
 
 export function buzzResult(won) {
   return { v: PROTOCOL_VERSION, t: HOST_MSG.BUZZ_RESULT, won };
+}
+
+export function event(kind, payload) {
+  return { v: PROTOCOL_VERSION, t: HOST_MSG.EVENT, kind, payload };
 }
 
 export function ping() {

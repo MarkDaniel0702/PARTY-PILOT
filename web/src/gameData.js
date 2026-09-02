@@ -3,7 +3,7 @@ import {
   Tv, Music, Image,
   PartyPopper, ListChecks, GitFork, Users, Drama,
   Spade, Layers, Brush,
-  Swords, Gamepad2,
+  Swords, Gamepad2, Blocks,
   Bot, Mic, Smartphone
 } from 'lucide-react';
 
@@ -205,6 +205,17 @@ export const GAME_GROUPS = [
         meta: [
           { icon: Users, label: '2 teams' },
           { icon: Smartphone, label: 'Phones optional', variant: 'auto' }
+        ]
+      },
+      {
+        href: 'tetris.html',
+        icon: Blocks,
+        title: 'Tetris Battle',
+        desc: 'Everyone plays at once on their own phone while every board shows on the big screen. Clear lines to bury your friends in garbage.',
+        accent: '#31d0e0',
+        meta: [
+          { icon: Users, label: '2–4 players' },
+          { icon: Smartphone, label: 'Phones required', variant: 'gm' }
         ]
       }
     ]

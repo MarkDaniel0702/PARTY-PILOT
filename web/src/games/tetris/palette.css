@@ -1,0 +1,25 @@
+:root {
+  --ink: #0e1220;
+  --panel: #182034;
+  --panel-2: #212b44;
+  --paper: #eef2fb;
+  --paper-dim: #94a1bd;
+  --accent: #31d0e0;
+  --accent-2: #e8c31d;
+  --border: rgba(238, 242, 251, 0.13);
+}
+body { background: radial-gradient(ellipse at 50% -10%, #1d2740 0%, var(--ink) 55%), var(--ink); }
+
+:root[data-theme="light"] {
+  --ink: #eaeef7;
+  --panel: #ffffff;
+  --panel-2: #f2f5fb;
+  --paper: #0e1220;
+  --paper-dim: #5a6784;
+  --accent: #0f8fa0;
+  --accent-2: #9a7c00;
+  --border: rgba(14, 18, 32, 0.14);
+}
+:root[data-theme="light"] body {
+  background: radial-gradient(ellipse at 50% -10%, #ffffff 0%, #dfe6f4 55%), var(--ink);
+}

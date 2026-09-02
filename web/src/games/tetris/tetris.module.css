@@ -1,0 +1,124 @@
+.row, .modeNote, .startHint { }
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.9rem 1.1rem;
+  font-size: 0.92rem;
+}
+.modeNote {
+  margin: 0.9rem 0 0;
+  padding: 0.6rem 0.8rem;
+  background: var(--panel-2);
+  border-radius: var(--radius-sm);
+  color: var(--paper-dim);
+  font-size: 0.83rem;
+}
+.startHint { text-align: center; color: var(--paper-dim); font-size: 0.83rem; margin: 0.8rem auto 0; max-width: 48ch; }
+
+/* ---------- board ---------- */
+.board { width: 100%; border-radius: var(--radius-sm); overflow: hidden; line-height: 0; }
+.boardCanvas { display: block; width: 100%; }
+
+/* ---------- host: the TV grid ---------- */
+.matchBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+  font-size: 0.9rem;
+}
+.modeTag { font-family: var(--font-display); color: var(--accent-2); letter-spacing: 0.04em; }
+.clock { font-family: var(--font-display); color: var(--accent); font-variant-numeric: tabular-nums; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr));
+  gap: 0.9rem;
+  align-items: start;
+}
+@media (min-width: 900px) {
+  .grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+}
+
+.pane {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.6rem;
+  position: relative;
+  transition: opacity 0.3s;
+}
+.paneOut { opacity: 0.55; }
+.paneHead {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+  font-size: 0.8rem;
+}
+.paneName { font-weight: 800; }
+.paneScore { color: var(--paper-dim); font-variant-numeric: tabular-nums; }
+.koTag {
+  position: absolute;
+  inset: auto 0 40% 0;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  color: var(--danger);
+  letter-spacing: 0.08em;
+}
+
+.endWrap { max-width: 320px; margin: 1.4rem auto 0; }
+
+/* ---------- phone ---------- */
+.phoneWrap { display: flex; flex-direction: column; gap: 0.5rem; width: 100%; max-width: 340px; align-items: stretch; }
+.phoneStats {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--paper-dim);
+  font-variant-numeric: tabular-nums;
+}
+.incoming { color: var(--danger); font-weight: 800; }
+.phoneBoard { max-width: 260px; margin: 0 auto; }
+.phoneMeta {
+  display: grid;
+  grid-template-columns: auto 1fr auto 1fr;
+  gap: 0.3rem 0.5rem;
+  align-items: center;
+  font-size: 0.75rem;
+}
+.metaLabel { color: var(--paper-dim); text-transform: uppercase; letter-spacing: 0.06em; }
+.metaVal { font-weight: 800; }
+.phoneOver { text-align: center; color: var(--danger); font-weight: 800; }
+
+/* Big, thumb-friendly targets — this is the one screen played on, not read. */
+.pad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  touch-action: none;
+}
+.padBtn {
+  min-height: 62px;
+  border-radius: var(--radius-md);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--paper);
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform 0.08s, background 0.08s;
+}
+.padBtn:active { transform: scale(0.95); background: var(--panel); }
+.padDrop { grid-column: span 2; background: var(--accent); color: #101018; }
