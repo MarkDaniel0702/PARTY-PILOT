@@ -1,0 +1,139 @@
+/* ---------- setup ---------- */
+.seatStrip { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.9rem; justify-content: center; }
+.seatChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.32rem 0.8rem;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.modeNote {
+  margin: 0.9rem 0 0;
+  padding: 0.6rem 0.8rem;
+  background: var(--panel-2);
+  border-radius: var(--radius-sm);
+  color: var(--paper-dim);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+/* ---------- placement (TV) ---------- */
+.placementCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  width: 100%;
+  max-width: 640px;
+  margin: 1.5rem auto;
+}
+.placementCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1.4rem 1rem;
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+}
+.placementReady { border-color: var(--success); }
+.placementName { font-family: var(--font-display); font-size: 1rem; }
+.shipDots { display: flex; gap: 0.4rem; }
+.shipDot {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  background: var(--panel-2);
+  border: 2px solid var(--border);
+}
+.shipDot[data-filled="true"] {
+  background: var(--ship, var(--accent));
+  border-color: var(--ship, var(--accent));
+}
+.placementStatus { color: var(--paper-dim); font-size: 0.85rem; font-weight: 700; }
+.placementReady .placementStatus { color: var(--success); }
+
+/* ---------- battle (TV) ---------- */
+.turnBar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  font-size: 0.95rem;
+  color: var(--paper-dim);
+  max-width: 640px;
+  margin: 0 auto 0.9rem;
+}
+.turnBar strong { color: var(--paper); }
+
+.shotBanner {
+  text-align: center;
+  font-weight: 800;
+  font-size: 1rem;
+  margin: 0 auto 0.9rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  max-width: 640px;
+  animation: bannerIn 0.25s ease;
+}
+.shotHit { background: color-mix(in srgb, var(--danger) 20%, transparent); color: var(--danger); }
+.shotMiss { background: var(--panel-2); color: var(--paper-dim); }
+
+@keyframes bannerIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Breaks out of the shared 1000px column: two full 10x10 boards side by
+   side need more room than the readable-text column allows. */
+.boardsRow {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  padding: 0 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(1rem, 4vw, 2.5rem);
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.boardCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.boardTargeted {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent), var(--shadow-soft);
+}
+
+.boardHead {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+.boardName { font-family: var(--font-display); font-size: 0.95rem; }
+.boardShipsLeft { color: var(--paper-dim); font-size: 0.78rem; }
+.boardScore { font-weight: 800; color: var(--accent-2); }
+
+/* ---------- game over ---------- */
+.winnerEmoji { font-size: 3rem; display: block; text-align: center; }

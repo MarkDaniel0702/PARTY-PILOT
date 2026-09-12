@@ -10,6 +10,8 @@ import { useStrokeBatcher } from "../shared/draw/useStrokeBatcher";
 import { PALETTE, WIDTHS } from "../shared/draw/strokes";
 import { PhoneTetris } from "../games/tetris/PhoneTetris";
 import { AngleDial, PowerMeter } from "../games/dogsvscats/AimControls";
+import { PhonePlacement } from "../games/battleship/PhonePlacement";
+import { PhoneAttack } from "../games/battleship/PhoneAttack";
 import cardStyles from "../shared/cards/cards.module.css";
 import styles from "./controller.module.css";
 
@@ -354,6 +356,10 @@ export default function App() {
           )}
         </div>
       );
+    } else if (view.view === VIEW.PLACEMENT) {
+      body = <PhonePlacement view={view} send={send} />;
+    } else if (view.view === VIEW.BATTLE) {
+      body = <PhoneAttack view={view} send={send} />;
     } else if (view.view === VIEW.TETRIS) {
       // The only view where the phone runs the game itself — see PhoneTetris.
       // Keyed on the seed so a rematch starts a genuinely fresh board.

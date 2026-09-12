@@ -3,7 +3,7 @@ import {
   Tv, Music, Image,
   PartyPopper, ListChecks, GitFork, Users, Drama,
   Spade, Layers, Brush,
-  Swords, Gamepad2, Blocks,
+  Swords, Gamepad2, Blocks, Anchor,
   Bot, Mic, Smartphone
 } from 'lucide-react';
 
@@ -215,6 +215,17 @@ export const GAME_GROUPS = [
         accent: '#31d0e0',
         meta: [
           { icon: Users, label: '2–4 players' },
+          { icon: Smartphone, label: 'Phones required', variant: 'gm' }
+        ]
+      },
+      {
+        href: 'battleship.html',
+        icon: Anchor,
+        title: 'Battleship',
+        desc: "Classic naval combat. Deploy your fleet in private on your phone, then take turns firing at the enemy waters shown up here.",
+        accent: '#2fb5d9',
+        meta: [
+          { icon: Users, label: '2 players' },
           { icon: Smartphone, label: 'Phones required', variant: 'gm' }
         ]
       }

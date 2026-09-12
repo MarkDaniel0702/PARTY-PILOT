@@ -1,7 +1,7 @@
 # 🎮 B-Rotation
 
 <p>
-  <img alt="Games" src="https://img.shields.io/badge/games-16-7c5cff">
+  <img alt="Games" src="https://img.shields.io/badge/games-17-7c5cff">
   <img alt="React" src="https://img.shields.io/badge/React-19-61dafb">
   <img alt="Vite" src="https://img.shields.io/badge/Vite-multi--page-646cff">
   <img alt="Sign-up" src="https://img.shields.io/badge/sign--up-not%20required-2fd67f">
@@ -18,7 +18,7 @@
   <img alt="Guess the Song genres" src="https://img.shields.io/badge/song%20genres-14-ff3d9a">
 </p>
 
-**B-Rotation** is a colourful, browser-based party-game platform. **16 games**, one shared screen, **no dedicated host required** — gather a group around a phone, tablet, or laptop and pick from social deduction, trivia, voting games, and classic party favourites. The app runs turns, timers, randomisation, hidden information, scoring, and results on its own.
+**B-Rotation** is a colourful, browser-based party-game platform. **17 games**, one shared screen, **no dedicated host required** — gather a group around a phone, tablet, or laptop and pick from social deduction, trivia, voting games, and classic party favourites. The app runs turns, timers, randomisation, hidden information, scoring, and results on its own.
 
 > [!TIP]
 > **▶️ Play now:** <https://markdaniel0702.github.io/PARTY-PILOT/> — free, no sign-up, works on any device.
@@ -41,6 +41,7 @@
   - [🎨 Draw & Guess](#-draw--guess)
   - [⚔️ Dogs vs Cats](#️-dogs-vs-cats)
   - [🧱 Tetris Battle](#-tetris-battle)
+  - [🚢 Battleship](#-battleship)
   - [🎲 Other Implemented Games](#-other-implemented-games)
 - [🤖 Automated Game System](#-automated-game-system)
 - [⏱️ Timers](#️-timers)
@@ -60,7 +61,7 @@
 
 ## 🧭 Project Overview
 
-The whole site — the homepage plus all 16 games — is a **single React 19 + Vite multi-page app** living in `web/`. Each game is its own HTML entry (`spy.html`, `quiz.html`, …) that mounts an independent React root, and every game is built from one shared component/hook library in `web/src/shared/`. There is no backend, no database, and no account system.
+The whole site — the homepage plus all 17 games — is a **single React 19 + Vite multi-page app** living in `web/`. Each game is its own HTML entry (`spy.html`, `quiz.html`, …) that mounts an independent React root, and every game is built from one shared component/hook library in `web/src/shared/`. There is no backend, no database, and no account system.
 
 | | |
 |---|---|
@@ -80,7 +81,7 @@ The whole site — the homepage plus all 16 games — is a **single React 19 + V
 |---|---|
 | 🙅 **No host required** | Every game runs itself — turn order, timers, hidden info, and results all happen automatically. |
 | 🎙️ **Game Master optional** | Some games also offer a manual mode where one person controls pacing. |
-| 🎲 **16 games, 5 categories** | Word & Deduction, Trivia & Knowledge, Party & Voting, Card Games, and Arcade. |
+| 🎲 **17 games, 5 categories** | Word & Deduction, Trivia & Knowledge, Party & Voting, Card Games, and Arcade. |
 | ⏱️ **Universal customizable timers** | One shared timer system — a recommended duration you can override with a preset or a custom value (5–600 s), Pause / Resume / Reset controls, and a switch to turn it off entirely. |
 | 🔀 **Randomised content** | Words, questions, prompts, songs, and pictures are drawn at random each round; Quiz Night additionally remembers which questions a slot has shown and avoids repeats. |
 | ⭐ **Bonus events** | Quiz Night boards can include 1–4 surprise bonus tiles with random point swings. |
@@ -114,6 +115,7 @@ The whole site — the homepage plus all 16 games — is a **single React 19 + V
 | 🎨 [Draw & Guess](#-draw--guess) | Card Games | 3–8 | ✅ | — | ✅ |
 | ⚔️ [Dogs vs Cats](#️-dogs-vs-cats) | Arcade | 2 teams | ✅ | — | ✅ |
 | 🧱 [Tetris Battle](#-tetris-battle) | Arcade | 2–4 | ✅ | — | ✅ |
+| 🚢 [Battleship](#-battleship) | Arcade | 2 | ✅ | — | ✅ |
 
 ---
 
@@ -133,7 +135,25 @@ Everyone plays at once, each on their own phone, while **every board appears sid
 - 2–4 players.
 
 > [!NOTE]
-> This is the only game on the site that **needs** phones — there's no shared-screen fallback, because every player needs their own private board and their own controls at the same time.
+> This is one of only two games on the site that **need** phones — there's no shared-screen fallback, because every player needs their own private board and their own controls at the same time. (Battleship, below, is the other.)
+
+---
+
+### 🚢 Battleship
+
+Classic naval combat for two captains. Each player secretly deploys a fleet **on their own phone**; the big screen shows both waters as fog of war, and captains take turns calling shots until one fleet is wiped out.
+
+**The big screen never shows a ship it hasn't earned the right to.** Battleship's whole appeal is hidden information, so the TV only ever draws hits, misses, and a ship's full outline once every one of its cells has been hit (i.e. sunk) — never an intact ship's position, on either side, mid-game. Full fleets are only revealed on the final results screen once the battle is decided.
+
+- **The classic fleet.** Carrier (5), Battleship (4), Cruiser (3), Submarine (3), Destroyer (2) on a 10×10 board — standard A–J / 1–10 coordinates throughout.
+- **Placement is entirely private and forgiving.** Tap a ship, then tap the board to drop it; tap it again to pick it up and move it, rotate in place, or randomize the whole fleet in one tap. Nothing is locked in until you confirm.
+- **Turns alternate strictly** — a hit doesn't earn a bonus shot — so pacing stays predictable and it's always obvious whose turn it is.
+- **Scoring:** 10 points per hit, +50 for sinking a ship, +100 for the winner.
+- **Reconnect-friendly.** A refreshed phone rejoins its seat and picks the current view back up, the same pairing session every other phone-controller game uses.
+- 2 players (exactly — extra paired phones can spectate the big screen).
+
+> [!NOTE]
+> Battleship is the other game on the site that **needs** phones — the whole game is built on each player having a private board the opponent (and the TV) can't see.
 
 ---
 
@@ -731,7 +751,7 @@ The site is deployed on **GitHub Pages** via **GitHub Actions** — free, HTTPS 
 | Publish dir | `web/dist/` |
 | Env vars | None |
 
-**What the workflow does:** installs `web/`'s dependencies, runs the Vite build (outputting the homepage + all 16 games to `web/dist/`), marks it non-Jekyll, then uploads and deploys `web/dist/` with `actions/deploy-pages`.
+**What the workflow does:** installs `web/`'s dependencies, runs the Vite build (outputting the homepage + all 17 games to `web/dist/`), marks it non-Jekyll, then uploads and deploys `web/dist/` with `actions/deploy-pages`.
 
 **Redeploying:**
 

@@ -1,0 +1,177 @@
+/* Phone-side chrome for Battleship's placement and battle screens. The grid
+   cells themselves are styled by boardGrid.module.css — this file only
+   covers the surrounding controls, imported directly by PhonePlacement.jsx
+   and PhoneAttack.jsx (kept out of the site-wide controller.module.css so
+   Battleship stays self-contained and maintainable on its own). */
+
+.placementWrap,
+.attackWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+}
+
+.lead {
+  font-size: clamp(1rem, 4.5vw, 1.15rem);
+  font-weight: 800;
+  margin: 0;
+}
+
+.sub {
+  color: var(--paper-dim);
+  font-size: clamp(0.78rem, 3.4vw, 0.88rem);
+  margin: 0;
+}
+
+/* ---------- ship list ---------- */
+.shipList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
+  width: 100%;
+}
+
+.shipChip {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--radius-sm);
+  background: var(--panel-2);
+  border: 2px solid var(--border);
+  color: var(--paper);
+  font-size: 0.78rem;
+  font-weight: 700;
+  min-height: 40px;
+  transition: border-color 0.15s, transform 0.1s;
+}
+.shipChip:active { transform: scale(0.96); }
+.shipChipOn {
+  border-color: var(--ship, var(--accent));
+  box-shadow: 0 0 0 1px var(--ship, var(--accent)) inset;
+}
+.shipEmoji { font-size: 1rem; line-height: 1; }
+.shipSize {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.2em;
+  padding: 0 0.25em;
+  border-radius: 999px;
+  background: var(--panel);
+  font-size: 0.68rem;
+  color: var(--paper-dim);
+}
+.shipCheck { color: var(--success); }
+
+/* ---------- placement actions ---------- */
+.placementActions {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+}
+.toolBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 44px;
+  padding: 0 0.6rem;
+  border-radius: var(--radius-sm);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--paper);
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+.toolBtn:disabled { opacity: 0.4; }
+
+.confirmBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  min-height: 48px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(160deg, var(--success), color-mix(in srgb, var(--success) 70%, black));
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+  box-shadow: var(--shadow-soft);
+}
+.confirmBtn:disabled {
+  background: var(--panel-2);
+  color: var(--paper-dim);
+  box-shadow: none;
+}
+
+@keyframes shipShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+.shake { animation: shipShake 0.3s ease; }
+
+/* ---------- battle screen ---------- */
+.scoreRow {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  justify-content: center;
+}
+.scoreChip {
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.flashLine {
+  margin: 0;
+  font-weight: 800;
+  font-size: 0.95rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: var(--radius-sm);
+}
+.flashHit { background: color-mix(in srgb, var(--danger) 22%, transparent); color: var(--danger); }
+.flashMiss { background: var(--panel-2); color: var(--paper-dim); }
+
+.tabRow {
+  display: flex;
+  gap: 0.4rem;
+  width: 100%;
+}
+.tabBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 42px;
+  border-radius: var(--radius-sm);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--paper-dim);
+  font-weight: 800;
+  font-size: 0.78rem;
+}
+.tabOn {
+  color: var(--paper);
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 18%, var(--panel-2));
+}
+
+@media (orientation: landscape) and (max-height: 460px) {
+  .placementWrap, .attackWrap { gap: 0.45rem; }
+}

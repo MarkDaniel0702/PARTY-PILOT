@@ -52,7 +52,14 @@ export const VIEW = {
   // Tetris is the one game the phone simulates itself — this view hands it
   // the seed and mode, then the phone runs its own board and streams
   // snapshots back for the TV.
-  TETRIS: "tetris"
+  TETRIS: "tetris",
+  // Battleship. PLACEMENT carries the player's own in-progress fleet only —
+  // never the opponent's. BATTLE carries the player's own board (their ships
+  // + shots received) and their redacted view of the opponent's board (hits/
+  // misses/sunk wrecks only) — the opponent's unsunk ship positions never
+  // enter this message.
+  PLACEMENT: "placement",
+  BATTLE: "battle"
 };
 
 // Action kinds carried by MSG.ACTION.
@@ -69,7 +76,8 @@ export const ACTION = {
   CLEAR: "clear",
   GUESS: "guess",
   // Artillery. AIM streams the live angle/power so the shared screen shows
-  // the arc building; FIRE commits the shot.
+  // the arc building; FIRE commits the shot. Battleship also reuses FIRE
+  // (payload: { row, col }) to commit an attack on a target cell.
   AIM: "aim",
   FIRE: "fire",
   MOVE: "move",
@@ -77,7 +85,12 @@ export const ACTION = {
   // Tetris, phone -> host.
   TETRIS_STATE: "tetrisState",
   TETRIS_GARBAGE: "tetrisGarbage",
-  TETRIS_OVER: "tetrisOver"
+  TETRIS_OVER: "tetrisOver",
+  // Battleship, phone -> host, placement phase only.
+  PLACE_SHIP: "placeShip",
+  REMOVE_SHIP: "removeShip",
+  RANDOM_FLEET: "randomFleet",
+  CONFIRM_FLEET: "confirmFleet"
 };
 
 export function join(name, teamId, playerId) {

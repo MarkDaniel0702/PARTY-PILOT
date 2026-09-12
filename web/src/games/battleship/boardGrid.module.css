@@ -1,0 +1,90 @@
+/* One 11x11 CSS grid: a header row/column of A-J / 1-10 labels around an
+   NxN grid of cells. `--size` (set inline) drives both the template and the
+   cell sizing, so the same component serves the TV's big boards and a
+   phone's compact ones without two implementations. */
+.grid {
+  --cell: clamp(22px, 8vw, 40px);
+  display: grid;
+  grid-template-columns: minmax(16px, 0.6em) repeat(var(--size), var(--cell));
+  grid-auto-rows: var(--cell);
+  gap: 2px;
+  width: max-content;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.corner { grid-column: 1; grid-row: 1; }
+
+.colHead,
+.rowHead {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(0.6rem, 2.4vw, 0.78rem);
+  font-weight: 800;
+  color: var(--paper-dim);
+  user-select: none;
+}
+
+.cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  border-radius: 5px;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 14%, var(--panel)), var(--panel));
+  border: 1px solid var(--border);
+  font-size: clamp(0.7rem, 3vw, 1.1rem);
+  line-height: 1;
+  color: var(--paper);
+  transition: transform 0.12s, background 0.15s, border-color 0.15s;
+}
+
+.cell:disabled { cursor: default; }
+
+/* Clickable cells (an open shot on your turn) get a hover/press affordance;
+   disabled ones (already-shot, or not your turn) never do. */
+.cell:not(:disabled) {
+  cursor: pointer;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 26%, var(--panel)), var(--panel));
+}
+.cell:not(:disabled):hover { border-color: var(--accent); }
+.cell:not(:disabled):active { transform: scale(0.92); }
+
+.water { opacity: 0.9; }
+
+.ship {
+  background: linear-gradient(160deg, color-mix(in srgb, var(--ship, var(--accent-2)) 55%, var(--panel)), var(--panel));
+  border-color: color-mix(in srgb, var(--ship, var(--accent-2)) 60%, var(--border));
+}
+
+.shipActive {
+  box-shadow: 0 0 0 2px var(--ship, var(--accent)) inset;
+}
+
+.miss {
+  background: var(--panel-2);
+  color: var(--paper-dim);
+}
+
+.hit {
+  background: linear-gradient(160deg, color-mix(in srgb, var(--danger) 55%, var(--panel)), var(--panel));
+  border-color: var(--danger);
+  color: #fff;
+}
+
+.sunk {
+  background: linear-gradient(160deg, color-mix(in srgb, var(--danger) 75%, black), #2a1414);
+  border-color: var(--danger);
+  color: #fff;
+}
+
+.justFired {
+  animation: fireFlash 0.6s ease;
+}
+
+@keyframes fireFlash {
+  0% { transform: scale(1.5); box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 60%, transparent); }
+  100% { transform: scale(1); box-shadow: none; }
+}
