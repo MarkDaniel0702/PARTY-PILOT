@@ -1,5 +1,5 @@
 /* Generic card shell shared by every card game. Colour comes from the
-   specific card component (UnoCard, later PlayingCard) via inline style or a
+   specific card component (UnoCard, PlayingCard) via inline style or a
    modifier class, so this file only owns shape, size, and state. */
 
 .frame {

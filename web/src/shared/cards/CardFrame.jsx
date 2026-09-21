@@ -1,9 +1,9 @@
 import styles from "./cards.module.css";
 
 // The generic card shell every card game shares: size, radius, shadow,
-// face-down back, and the selected/disabled/clickable states. UnoCard draws
-// on top of this, and Poker's PlayingCard will too — keeping the physical
-// card metaphor identical across games.
+// face-down back, and the selected/disabled/clickable states. UnoCard and
+// PlayingCard (standard deck — see shared/cards/PlayingCard.jsx) both draw
+// on top of this, keeping the physical card metaphor identical across games.
 export function CardFrame({
   size = "md",
   faceDown = false,

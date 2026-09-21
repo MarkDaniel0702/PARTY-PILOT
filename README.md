@@ -1,7 +1,7 @@
 # 🎮 B-Rotation
 
 <p>
-  <img alt="Games" src="https://img.shields.io/badge/games-17-7c5cff">
+  <img alt="Games" src="https://img.shields.io/badge/games-18-7c5cff">
   <img alt="React" src="https://img.shields.io/badge/React-19-61dafb">
   <img alt="Vite" src="https://img.shields.io/badge/Vite-multi--page-646cff">
   <img alt="Sign-up" src="https://img.shields.io/badge/sign--up-not%20required-2fd67f">
@@ -18,7 +18,7 @@
   <img alt="Guess the Song genres" src="https://img.shields.io/badge/song%20genres-14-ff3d9a">
 </p>
 
-**B-Rotation** is a colourful, browser-based party-game platform. **17 games**, one shared screen, **no dedicated host required** — gather a group around a phone, tablet, or laptop and pick from social deduction, trivia, voting games, and classic party favourites. The app runs turns, timers, randomisation, hidden information, scoring, and results on its own.
+**B-Rotation** is a colourful, browser-based party-game platform. **18 games**, one shared screen, **no dedicated host required** — gather a group around a phone, tablet, or laptop and pick from social deduction, trivia, voting games, and classic party favourites. The app runs turns, timers, randomisation, hidden information, scoring, and results on its own.
 
 > [!TIP]
 > **▶️ Play now:** <https://markdaniel0702.github.io/PARTY-PILOT/> — free, no sign-up, works on any device.
@@ -38,6 +38,7 @@
   - [🎵 Guess the Song](#-guess-the-song)
   - [🖼️ Picture Guess](#️-picture-guess)
   - [🃏 UNO](#-uno)
+  - [🎴 Tong-Its](#-tong-its)
   - [🎨 Draw & Guess](#-draw--guess)
   - [⚔️ Dogs vs Cats](#️-dogs-vs-cats)
   - [🧱 Tetris Battle](#-tetris-battle)
@@ -61,7 +62,7 @@
 
 ## 🧭 Project Overview
 
-The whole site — the homepage plus all 17 games — is a **single React 19 + Vite multi-page app** living in `web/`. Each game is its own HTML entry (`spy.html`, `quiz.html`, …) that mounts an independent React root, and every game is built from one shared component/hook library in `web/src/shared/`. There is no backend, no database, and no account system.
+The whole site — the homepage plus all 18 games — is a **single React 19 + Vite multi-page app** living in `web/`. Each game is its own HTML entry (`spy.html`, `quiz.html`, …) that mounts an independent React root, and every game is built from one shared component/hook library in `web/src/shared/`. There is no backend, no database, and no account system.
 
 | | |
 |---|---|
@@ -81,7 +82,7 @@ The whole site — the homepage plus all 17 games — is a **single React 19 + V
 |---|---|
 | 🙅 **No host required** | Every game runs itself — turn order, timers, hidden info, and results all happen automatically. |
 | 🎙️ **Game Master optional** | Some games also offer a manual mode where one person controls pacing. |
-| 🎲 **17 games, 5 categories** | Word & Deduction, Trivia & Knowledge, Party & Voting, Card Games, and Arcade. |
+| 🎲 **18 games, 5 categories** | Word & Deduction, Trivia & Knowledge, Party & Voting, Card Games, and Arcade. |
 | ⏱️ **Universal customizable timers** | One shared timer system — a recommended duration you can override with a preset or a custom value (5–600 s), Pause / Resume / Reset controls, and a switch to turn it off entirely. |
 | 🔀 **Randomised content** | Words, questions, prompts, songs, and pictures are drawn at random each round; Quiz Night additionally remembers which questions a slot has shown and avoids repeats. |
 | ⭐ **Bonus events** | Quiz Night boards can include 1–4 surprise bonus tiles with random point swings. |
@@ -112,6 +113,7 @@ The whole site — the homepage plus all 17 games — is a **single React 19 + V
 | 👥 [Most Likely To](#-other-implemented-games) | Party & Voting | 3–10 | ✅ | — | — |
 | 🎭 [Charades](#-other-implemented-games) | Party & Voting | 3–10 | ✅ | ✅ | ✅ |
 | 🃏 [UNO](#-uno) | Card Games | 2–8 | ✅ | — | — |
+| 🎴 [Tong-Its](#-tong-its) | Card Games | 2–4 | ✅ | — | ✅ |
 | 🎨 [Draw & Guess](#-draw--guess) | Card Games | 3–8 | ✅ | — | ✅ |
 | ⚔️ [Dogs vs Cats](#️-dogs-vs-cats) | Arcade | 2 teams | ✅ | — | ✅ |
 | 🧱 [Tetris Battle](#-tetris-battle) | Arcade | 2–4 | ✅ | — | ✅ |
@@ -217,6 +219,28 @@ The shared screen always shows the public state — discard pile, active colour,
 
 > [!NOTE]
 > Two deliberate simplifications: there's **no "UNO!" call-out penalty** (the screen just announces when someone is down to one card), and **+2/+4 stacking is off**, matching official rules rather than the common house rule.
+
+---
+
+### 🎴 Tong-Its
+
+The classic Filipino rummy game, dealt and refereed by the app off a standard 52-card deck (no jokers). Build **sets** (3–4 of a rank, one per suit) and **runs** (3+ in a row, one suit), lay them face-up on the table, and empty your hand first.
+
+Like UNO, it plays two ways:
+
+- **📱 With phones** — pair a phone per player and each hand stays private, sent down that player's own WebRTC channel.
+- **🔄 Without phones** — pair nothing and it falls back to the same **pass-the-device** flow: reveal your hand, take your turn, hide, pass on.
+
+The shared screen always shows the public state — the stock and discard piles, every meld laid on the table (whoever it belongs to), and everyone's remaining card count.
+
+- Each turn: draw one card (from the stock or the top of the discard), optionally lay melds, then discard to end your turn.
+- **Sapaw** — the signature Tong-Its move — lets you add a matching card from your hand onto *any* meld already on the table, yours or an opponent's, not just your own.
+- **Tong-Its!** — meld your entire hand in one turn with nothing left to discard, and you win instantly with no discard needed at all. Meld down to your last card and discard it for a normal win instead.
+- If the stock runs dry before anyone goes out, the round ends immediately and whoever is holding the least card value in hand wins the showdown.
+- Player count is **2–4**, with hand sizes that scale down a little at 4 players so the stock still has a healthy reserve to draw from.
+
+> [!NOTE]
+> One simplification: there's no side-betting or per-card payout — B-Rotation plays Tong-Its purely as a race to empty your hand, with the round winner shown on the results screen.
 
 ---
 

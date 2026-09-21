@@ -2,7 +2,7 @@ import {
   Fingerprint, Eye, HelpCircle, Lock, Brain, Grid3x3,
   Tv, Music, Image,
   PartyPopper, ListChecks, GitFork, Users, Drama,
-  Spade, Layers, Brush,
+  Spade, Layers, Brush, Club,
   Swords, Gamepad2, Blocks, Anchor,
   Bot, Mic, Smartphone
 } from 'lucide-react';
@@ -187,6 +187,17 @@ export const GAME_GROUPS = [
         accent: '#2fd1c5',
         meta: [
           { icon: Users, label: '3–8 players' },
+          { icon: Smartphone, label: 'Phones optional', variant: 'auto' }
+        ]
+      },
+      {
+        href: 'tongits.html',
+        icon: Club,
+        title: 'Tong-Its',
+        desc: 'The classic Filipino rummy game. Build sets and runs, piggyback onto melds on the table, and empty your hand first.',
+        accent: '#e8a91d',
+        meta: [
+          { icon: Users, label: '2–4 players' },
           { icon: Smartphone, label: 'Phones optional', variant: 'auto' }
         ]
       }

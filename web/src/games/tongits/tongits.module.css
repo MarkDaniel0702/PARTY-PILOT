@@ -1,0 +1,194 @@
+.modeNote {
+  margin: 0.9rem 0 0;
+  padding: 0.6rem 0.8rem;
+  background: var(--panel-2);
+  border-radius: var(--radius-sm);
+  color: var(--paper-dim);
+  font-size: 0.83rem;
+  line-height: 1.5;
+}
+
+.startHint {
+  text-align: center;
+  color: var(--paper-dim);
+  font-size: 0.83rem;
+  margin: 0.8rem 0 0;
+}
+
+.table {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem;
+  margin-bottom: 1.4rem;
+}
+
+.seatStrip {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.1rem;
+}
+.seatChip {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.7rem;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.seatChipActive {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+.seatName { color: var(--paper); }
+.seatCount {
+  display: grid;
+  place-items: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 0.78rem;
+}
+
+.pileRow {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 2rem;
+  margin-bottom: 1rem;
+}
+.pileSlot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+}
+.pileLabel {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  font-weight: 800;
+}
+.pileCount { font-size: 0.75rem; color: var(--paper-dim); }
+.emptySlot {
+  display: grid;
+  place-items: center;
+  width: clamp(72px, 26vw, 104px);
+  height: calc(clamp(72px, 26vw, 104px) * 1.5);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-md);
+  color: var(--paper-dim);
+  font-size: 0.78rem;
+}
+
+.meldBoard {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.8rem;
+  margin-bottom: 0.8rem;
+  background: var(--panel-2);
+  border-radius: var(--radius-md);
+}
+.meldGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem;
+}
+.meldOwner { font-size: 0.68rem; color: var(--paper-dim); font-weight: 700; }
+.meldCards { display: flex; }
+.meldCards > * { margin-right: -1rem; }
+.meldCards > *:last-child { margin-right: 0; }
+
+.turnBanner {
+  margin: 0;
+  text-align: center;
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+.phoneNote {
+  text-align: center;
+  color: var(--paper-dim);
+  font-size: 0.9rem;
+  margin: 0 0 1.4rem;
+}
+
+.localHand {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem;
+  margin-bottom: 1.4rem;
+  display: flex;
+  justify-content: center;
+}
+
+.endWrap { max-width: 320px; margin: 0 auto; }
+
+.finalList {
+  list-style: none;
+  margin: 0 auto 1.6rem;
+  padding: 0;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.finalRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.6rem 0.9rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+}
+.finalCount { color: var(--paper-dim); font-weight: 500; }
+
+/* The one celebration: a single pop plus an expanding ring, then done —
+   ported from uno.module.css's identical winBurst. */
+.winBurst {
+  position: relative;
+  display: inline-block;
+  animation: winPop 600ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+.winBurst::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-2);
+  transform: translate(-50%, -50%);
+  animation: winRing 620ms ease-out both;
+  pointer-events: none;
+}
+@keyframes winPop {
+  0%   { transform: scale(0.86); opacity: 0; }
+  55%  { transform: scale(1.04); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes winRing {
+  from { width: 10px; height: 10px; opacity: 0.85; }
+  to   { width: 320px; height: 320px; opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .winBurst { animation: none; }
+  .winBurst::before { animation: none; content: none; }
+}

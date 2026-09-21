@@ -3,9 +3,10 @@
 // PROTOCOL_VERSION forces a phone on a stale cached bundle to show a
 // "refresh this page" error instead of silently misbehaving after a deploy.
 // v2 added the card-game views (HAND / CHOICE / WAIT) and the generic ACTION
-// message. A phone still running a cached v1 bundle is rejected with
+// message. v3 added the Tong-Its view and its draw/meld/discard actions. A
+// phone still running a cached older bundle is rejected with
 // "version-mismatch" and told to refresh, rather than silently misbehaving.
-export const PROTOCOL_VERSION = 2;
+export const PROTOCOL_VERSION = 3;
 
 export const MAX_PLAYERS = 8;
 
@@ -59,7 +60,11 @@ export const VIEW = {
   // misses/sunk wrecks only) — the opponent's unsunk ship positions never
   // enter this message.
   PLACEMENT: "placement",
-  BATTLE: "battle"
+  BATTLE: "battle",
+  // Tong-Its. Carries this seat's own hand, the shared table melds (every
+  // seat's, face-up — that part is public by definition), the discard top,
+  // and whose turn/stage it is. Never another seat's hand.
+  TONGITS: "tongits"
 };
 
 // Action kinds carried by MSG.ACTION.
@@ -90,7 +95,13 @@ export const ACTION = {
   PLACE_SHIP: "placeShip",
   REMOVE_SHIP: "removeShip",
   RANDOM_FLEET: "randomFleet",
-  CONFIRM_FLEET: "confirmFleet"
+  CONFIRM_FLEET: "confirmFleet",
+  // Tong-Its, phone -> host.
+  DRAW_STOCK: "drawStock",
+  DRAW_DISCARD: "drawDiscard",
+  LAY_MELD: "layMeld",
+  ADD_TO_MELD: "addToMeld",
+  DISCARD: "discard"
 };
 
 export function join(name, teamId, playerId) {
