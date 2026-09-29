@@ -22,6 +22,7 @@ const TURN_SECONDS = 45;
 const FLIGHT_MS = 1500;
 const FLOAT_MS = 1100;
 const BANNER_MS = 1500;
+const BOOM_MS = 760;
 const MAX_CRATERS = 40;
 
 const FIELD_ITEMS = BATTLEFIELDS.map((b) => ({
@@ -51,6 +52,11 @@ export default function App() {
   const [craters, setCraters] = useState([]);
   const [lastImpact, setLastImpact] = useState(null);
   const [banner, setBanner] = useState(null);
+  // The shot is resolved instantly, but what's on screen must not change
+  // until the shell lands: this holds the pre-shot terrain and characters
+  // (so nobody loses HP, dies or falls before the blast) until detonation.
+  const [hold, setHold] = useState(null);
+  const [matchId, setMatchId] = useState(0);
 
   const session = useHostSession([]);
   const { onMessage, sendTo, players: sessionPlayers } = session;
@@ -58,6 +64,8 @@ export default function App() {
   const actor = match ? activeCharacter(match) : null;
   const team = match ? TEAMS[match.turnTeamIndex] : null;
   const weapon = weaponById(weaponId);
+  const shownChars = hold?.characters ?? match?.characters ?? [];
+  const shownActor = shownChars.find((c) => c.id === actor?.id) ?? actor;
   const busy = !!shot || (match && match.phase !== "aim");
 
   // Handlers read fresh state through a ref so the listener registers once.
@@ -70,6 +78,8 @@ export default function App() {
     if (!m || m.phase !== "aim") return;
 
     const before = new Map(m.characters.map((c) => [c.id, c.hp]));
+    // Terrain is dug in place by fire(), so copy the mask first.
+    const snapshot = { terrain: { ...m.terrain, mask: m.terrain.mask.slice() }, characters: m.characters };
     const { state, shot: s } = fire(m, { weaponId: wid, angle: a, power: p });
 
     // Damage numbers come from diffing HP either side of the resolved shot,
@@ -79,11 +89,11 @@ export default function App() {
     const hits = state.characters
       .map((c) => ({ c, lost: (before.get(c.id) ?? 0) - c.hp }))
       .filter(({ lost }) => lost > 0)
-      .map(({ c, lost }) => ({ id: c.id + "-" + born, x: c.x, y: c.y, amount: lost, born }));
+      .map(({ c, lost }) => ({ id: c.id + "-" + born, charId: c.id, x: c.x, y: c.y, amount: lost, born }));
 
     playSound("incorrect");
     setMatch(state);
-    setTerrainVersion((v) => v + 1);
+    setHold(snapshot);
     setShot(s);
     setShotProgress(0);
     if (hits.length) setFloats((f) => [...f, ...hits]);
@@ -189,6 +199,8 @@ export default function App() {
     const seed = Math.floor(Math.random() * 1e9);
     const m = createMatch({ battlefieldId: fieldId, perTeam, seed });
     setMatch(m);
+    setHold(null);
+    setMatchId((n) => n + 1);
     setTerrainVersion((v) => v + 1);
     setMessage("");
     setFloats([]);
@@ -212,7 +224,9 @@ export default function App() {
         return;
       }
       const w = shot.weapon;
-      setExplosion({ x: shot.impact.x, y: shot.impact.y, radius: w.radius, t: 0 });
+      setHold(null);
+      setTerrainVersion((v) => v + 1);
+      setExplosion({ x: shot.impact.x, y: shot.impact.y, radius: w.radius, weaponId: w.id, t: 0 });
       // The crater scorch and the spent-shot marker are what replace the aim
       // line: you correct off where the last one actually landed.
       if (shot.reason !== "out" && shot.reason !== "expired") {
@@ -227,7 +241,7 @@ export default function App() {
       playSound("timerEnd");
       const boomStart = performance.now();
       const boom = (n) => {
-        const bt = Math.min(1, (n - boomStart) / 420);
+        const bt = Math.min(1, (n - boomStart) / BOOM_MS);
         setExplosion((e) => (e ? { ...e, t: bt } : e));
         if (bt < 1) {
           raf = requestAnimationFrame(boom);
@@ -249,11 +263,12 @@ export default function App() {
   }, [shot]);
 
   useEffect(() => {
-    if (match?.winner && phase === "play") {
+    // Wait for the killing shot to land before calling the match.
+    if (match?.winner && phase === "play" && !shot) {
       playSound("complete");
       setPhase("over");
     }
-  }, [match?.winner, phase]);
+  }, [match?.winner, phase, shot]);
 
   // ---------- keyboard aiming ----------
   // With no trajectory line, fine adjustment matters, and nudging a slider
@@ -307,6 +322,7 @@ export default function App() {
   function handleNewGame() {
     setMatch(null);
     setShot(null);
+    setHold(null);
     setPhase("setup");
   }
 
@@ -358,22 +374,24 @@ export default function App() {
         {match && (
           <>
             <div className={styles.hud}>
-              <TurnCard team={team} actor={actor} />
+              <TurnCard team={team} actor={shownActor} />
               <WindGauge wind={match.wind} />
               <ClockRing seconds={turnLeft} total={TURN_SECONDS} idle={busy} />
             </div>
 
             <div className={styles.stage}>
               <Battlefield
-                terrain={match.terrain}
+                key={matchId}
+                terrain={hold?.terrain ?? match.terrain}
                 terrainVersion={terrainVersion}
                 battlefield={match.battlefield}
-                characters={match.characters}
+                characters={shownChars}
                 activeId={actor?.id}
                 aim={{ angle, power }}
                 shot={shot}
                 shotProgress={shotProgress}
                 explosion={explosion}
+                weaponEmoji={weapon.emoji}
                 wind={match.wind}
                 craters={craters}
                 floats={floats}
@@ -400,10 +418,10 @@ export default function App() {
                     <span className={styles.squadName}>
                       {t.emoji} {t.name}
                     </span>
-                    <span className={styles.squadLeft}>{aliveOf(match, t.id).length} left</span>
+                    <span className={styles.squadLeft}>{shownChars.filter((c) => c.teamId === t.id && c.alive).length} left</span>
                   </div>
                   <div className={styles.squadRow}>
-                    {match.characters
+                    {shownChars
                       .filter((c) => c.teamId === t.id)
                       .map((c) => (
                         <span
