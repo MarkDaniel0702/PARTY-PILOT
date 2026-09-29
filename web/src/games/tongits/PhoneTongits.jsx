@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Layers, RotateCcw } from "lucide-react";
 import { PlayingCard } from "../../shared/cards/PlayingCard";
 import { ACTION, action } from "../../shared/controller/protocol";
-import { meldType, canExtendMeld, rankLabel } from "./engine";
+import { meldType, canExtendMeld, rankLabel, SUIT_LABEL } from "./engine";
 import cardStyles from "../../shared/cards/cards.module.css";
 import styles from "./phoneTongits.module.css";
 
@@ -58,8 +58,11 @@ export function PhoneTongits({ view, send }) {
     setSelected([]);
   }
 
+  // Mirrors the engine: the card just taken from the discard can't go straight back.
+  const blockedDiscard = !!view.justDrawnFromDiscard && selectedCards[0]?.id === view.justDrawnId;
+
   function handleDiscard() {
-    if (selectedCards.length !== 1) return;
+    if (selectedCards.length !== 1 || blockedDiscard) return;
     send(action(ACTION.DISCARD, { cardId: selectedCards[0].id }));
     setSelected([]);
   }
@@ -138,7 +141,7 @@ export function PhoneTongits({ view, send }) {
           <button type="button" className={styles.actionBtn} disabled={!proposedMeldType} onClick={handleLayMeld}>
             Lay {proposedMeldType ? (proposedMeldType === "set" ? "set" : "run") : "meld"}
           </button>
-          <button type="button" className={styles.actionBtn} disabled={selectedCards.length !== 1} onClick={handleDiscard}>
+          <button type="button" className={styles.actionBtn} disabled={selectedCards.length !== 1 || blockedDiscard} onClick={handleDiscard}>
             Discard
           </button>
           {selected.length > 0 && (
@@ -151,8 +154,9 @@ export function PhoneTongits({ view, send }) {
 
       {canAct && selectedCards.length > 0 && (
         <p className={styles.hint}>
-          {selectedCards.map((c) => `${rankLabel(c.rank)}${c.suit}`).join(", ")}
+          {selectedCards.map((c) => `${rankLabel(c.rank)}${SUIT_LABEL[c.suit]}`).join(", ")}
           {proposedMeldType ? ` — valid ${proposedMeldType}` : selectedCards.length >= 3 ? " — not a set or run" : ""}
+          {blockedDiscard ? " — can't discard the card you just took" : ""}
         </p>
       )}
     </div>

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Club, Flag, ArrowRight } from "lucide-react";
+import { Club, Flag, ArrowRight, PartyPopper, Crown, Spade } from "lucide-react";
 import { GameShell } from "../../shared/components/GameShell";
 import { Screen, ScreenTitle, ScreenSub, BigIcon, SetupBlock } from "../../shared/components/Screen";
 import { HowToPlay } from "../../shared/components/HowToPlay";
@@ -143,7 +143,8 @@ export default function App() {
           melds: namedMelds,
           discardTop: topDiscard(game),
           stockCount: game.stock.length,
-          justDrawnId: isMyTurn ? game.drawnCardId : null
+          justDrawnId: isMyTurn ? game.drawnCardId : null,
+          justDrawnFromDiscard: isMyTurn && game.drawnFrom === "discard"
         })
       );
     });
@@ -202,7 +203,8 @@ export default function App() {
           melds: namedMelds,
           discardTop: topDiscard(game),
           stockCount: game.stock.length,
-          justDrawnId: game.drawnCardId
+          justDrawnId: game.drawnCardId,
+          justDrawnFromDiscard: game.drawnFrom === "discard"
         }
       : null;
 
@@ -347,7 +349,7 @@ export default function App() {
 
             {mode === "local" && !handRevealed && !game.winner && (
               <PassCard
-                icon="🃏"
+                icon={<Spade size={48} strokeWidth={2} />}
                 name={turnSeat?.name || ""}
                 hint={<>Nobody else look — your hand is about to show.</>}
                 buttonLabel="Show my hand"
@@ -371,7 +373,7 @@ export default function App() {
       </Screen>
 
       <Screen active={phase === "results"}>
-        <BigIcon>{game?.winType === "tongits" ? "🎉" : "🏁"}</BigIcon>
+        <BigIcon>{game?.winType === "tongits" ? <PartyPopper size={56} /> : <Flag size={56} />}</BigIcon>
         <ScreenTitle>
           <span className={styles.winBurst}>
             {game?.winType ? WIN_HEADLINE[game.winType](winnerName) : `${winnerName} wins!`}
@@ -386,7 +388,7 @@ export default function App() {
                 <li key={s.seatId} className={styles.finalRow}>
                   <span>
                     {s.name}
-                    {s.seatId === game.winner ? " 👑" : ""}
+                    {s.seatId === game.winner && <Crown size={16} aria-label="winner" style={{ marginLeft: 6, verticalAlign: "-0.15em" }} />}
                   </span>
                   <span className={styles.finalCount}>
                     {hand.length} card{hand.length === 1 ? "" : "s"} · {handValue(hand)} pts

@@ -139,6 +139,7 @@ export function createGame(seatIds, { shuffleFn = defaultShuffle } = {}) {
     // straight to melding/discarding — every seat after that must draw first.
     turnStage: "act",
     drawnCardId: null,
+    drawnFrom: null, // "stock" | "discard" — where drawnCardId came from
     winner: null,
     winType: null, // "tongits" | "discard" | "showdown"
     lastEvent: null,
@@ -188,6 +189,7 @@ export function drawStock(state, seatId) {
     hands: { ...state.hands, [seatId]: [...state.hands[seatId], card] },
     turnStage: "act",
     drawnCardId: card.id,
+    drawnFrom: "stock",
     lastEvent: withEvent(state, { kind: "draw", seatId, source: "stock", cardId: card.id })
   };
 }
@@ -203,6 +205,7 @@ export function drawDiscard(state, seatId) {
     hands: { ...state.hands, [seatId]: [...state.hands[seatId], card] },
     turnStage: "act",
     drawnCardId: card.id,
+    drawnFrom: "discard",
     lastEvent: withEvent(state, { kind: "draw", seatId, source: "discard", cardId: card.id })
   };
 }
@@ -280,6 +283,10 @@ export function discard(state, seatId, cardId) {
   const hand = state.hands[seatId];
   const card = hand.find((c) => c.id === cardId);
   if (!card) return state;
+  // Putting the card you just took from the discard straight back would let
+  // a player skip their draw forever and stall the round (the stock never
+  // shrinks), so it's rejected.
+  if (state.drawnFrom === "discard" && state.drawnCardId === cardId) return state;
 
   const nextHand = hand.filter((c) => c.id !== cardId);
   const next = {

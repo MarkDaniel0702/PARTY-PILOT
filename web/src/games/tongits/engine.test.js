@@ -150,6 +150,13 @@ describe("draw phase", () => {
     expect(next.discard).toHaveLength(0);
   });
 
+  it("won't let the card just taken from the discard go straight back", () => {
+    const state = stateWith({ turnStage: "draw", discard: [c("H", 9)], hands: { a: [c("S", 2)], b: [], c: [] } });
+    const drew = drawDiscard(state, "a");
+    expect(discard(drew, "a", "H9")).toBe(drew);
+    expect(discard(drew, "a", "S2")).not.toBe(drew);
+  });
+
   it("no-ops drawing an empty discard pile", () => {
     const state = stateWith({ turnStage: "draw", discard: [] });
     expect(drawDiscard(state, "a")).toBe(state);
