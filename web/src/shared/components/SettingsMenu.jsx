@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { Settings2, Sun, Moon, Volume2, VolumeX, X } from "lucide-react";
 import { useTheme } from "../theme/useTheme";
 import { useSound } from "../audio/useSound";
+import "../audio/music";
 import styles from "./settingsMenu.module.css";
 
 // Global, always-on-screen controls: light/dark theme + sound mute/volume.
