@@ -9,14 +9,18 @@ const MEDALS = ["🥇", "🥈", "🥉"];
 // for the tied case) — winner is matched by object identity against
 // `ranked`, exactly like the original (see TieBreakerScreen.jsx's comment
 // on why entrant objects are never cloned).
-export function ResultsList({ result, unit = "pts", unitSingular, showSwatch = false }) {
+//
+// `chime` is for a game's FINAL scores. A game that shows a ranking after
+// every question (Most Likely To) passes chime={false}, or it would play the
+// victory fanfare each round.
+export function ResultsList({ result, unit = "pts", unitSingular, showSwatch = false, chime = true }) {
   const { ranked, winner, shared, tiebreak } = result;
 
   // Final scores just came up — play the completion fanfare once. Every
   // game that ends on a <ResultsList> gets this for free.
   useEffect(() => {
-    playSound("complete");
-  }, []);
+    if (chime) playSound("complete");
+  }, [chime]);
 
   return (
     <div>

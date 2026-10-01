@@ -51,17 +51,21 @@ export function PhonePlacement({ view, send }) {
     setTimeout(() => setShakeId(null), 350);
   }
 
+  // Returns whether the placement was sent — callers only move on (select the
+  // next ship, commit a new orientation) when it was, so a failed drop leaves
+  // the player exactly where they were to try again.
   function attemptPlacement(shipId, row, col, nextOrientation) {
     const def = shipDef(shipId) || ships.find((s) => s.id === shipId);
-    if (!def) return;
+    if (!def) return false;
     const cells = computeShipCells(row, col, def.size, nextOrientation);
     const fits = cells.every(([r, c]) => isInBounds(r, c));
     const clashes = cells.some(([r, c]) => occupied.has(`${r},${c}`));
     if (!fits || clashes) {
       flash();
-      return;
+      return false;
     }
     send(action(ACTION.PLACE_SHIP, { shipId, row, col, orientation: nextOrientation }));
+    return true;
   }
 
   function handleCellTap(row, col) {
@@ -74,7 +78,7 @@ export function PhonePlacement({ view, send }) {
       return;
     }
     if (!selectedId) return;
-    attemptPlacement(selectedId, row, col, orientation);
+    if (!attemptPlacement(selectedId, row, col, orientation)) return;
     // Optimistically move on to the next unplaced ship so placing the whole
     // fleet is a straight run of taps rather than a select-place-select loop.
     const remaining = ships.filter((s) => s.id !== selectedId && !placedMap.has(s.id));
@@ -94,9 +98,9 @@ export function PhonePlacement({ view, send }) {
     if (!selectedId) return;
     const next = orientation === ORIENTATION.H ? ORIENTATION.V : ORIENTATION.H;
     const cells = placedMap.get(selectedId);
-    if (cells) {
-      attemptPlacement(selectedId, cells[0][0], cells[0][1], next);
-    }
+    // A ship already on the board only changes orientation if it fits that
+    // way; one still in hand just flips what the next tap will drop.
+    if (cells && !attemptPlacement(selectedId, cells[0][0], cells[0][1], next)) return;
     setOrientation(next);
   }
 

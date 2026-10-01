@@ -1,0 +1,162 @@
+/* ---------- setup ---------- */
+.modeNote {
+  margin: 0.9rem 0 0;
+  padding: 0.6rem 0.8rem;
+  background: var(--panel-2);
+  border-radius: var(--radius-sm);
+  color: var(--paper-dim);
+  font-size: 0.85rem;
+  text-align: center;
+}
+.startHint { text-align: center; color: var(--paper-dim); font-size: 0.83rem; margin: 0.8rem auto 0; max-width: 48ch; }
+.rules {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.1rem;
+}
+.ruleRow { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; font-size: 0.92rem; }
+
+/* ---------- table ---------- */
+/* The dice are sized in em, so scaling font-size here enlarges every die on the
+   table for a TV across the room without touching any of the text. */
+.table { display: flex; flex-direction: column; align-items: center; gap: 1rem; font-size: clamp(1rem, 0.55rem + 0.9vw, 1.7rem); }
+
+.roundBar { display: flex; align-items: baseline; gap: 0.9rem; flex-wrap: wrap; justify-content: center; }
+.roundTag { font-family: var(--font-display); font-size: 1.05rem; color: var(--accent); }
+.diceInPlay { color: var(--paper-dim); font-size: 0.85rem; font-weight: 700; }
+
+.seats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.7rem;
+  width: 100%;
+}
+.seat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 8.5rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  border: 2px solid var(--border);
+  transition: border-color 0.25s, box-shadow 0.25s, opacity 0.25s;
+}
+.seatTurn {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent), var(--shadow-soft);
+}
+.seatOut { opacity: 0.45; }
+.seatName {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 11rem;
+  font-weight: 800;
+  font-size: 0.95rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.offlineIcon { color: var(--danger); flex: none; }
+.outTag { display: inline-flex; align-items: center; gap: 0.3rem; color: var(--paper-dim); font-weight: 800; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; min-height: 1.6rem; }
+
+/* ---------- the standing bid ---------- */
+.bidPanel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  max-width: 560px;
+  padding: 1.1rem 1.2rem;
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--accent) 10%, var(--panel));
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  text-align: center;
+}
+.bidBy { color: var(--paper-dim); font-weight: 800; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; }
+.bidBig {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 7vw, 3.6rem);
+}
+.turnLine { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 800; font-size: 1rem; }
+.turnDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 10px 2px var(--accent);
+  animation: dicePulse 1.2s ease-in-out infinite;
+}
+@keyframes dicePulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+@media (prefers-reduced-motion: reduce) { .turnDot { animation: none; } }
+
+.history {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+  max-width: 420px;
+  font-size: 0.85rem;
+  color: var(--paper-dim);
+}
+.history li { display: flex; justify-content: space-between; align-items: center; padding: 0.3rem 0.8rem; border-radius: var(--radius-sm); background: var(--panel); }
+.historyLatest { color: var(--paper); background: var(--panel-2) !important; font-weight: 700; }
+.historyBid { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+.phoneNote { color: var(--paper-dim); font-size: 0.88rem; text-align: center; margin: 0; }
+.localHand { width: 100%; display: flex; justify-content: center; }
+
+/* ---------- reveal ---------- */
+.reveal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  width: 100%;
+  max-width: 760px;
+}
+.revealLead { margin: 0; font-family: var(--font-display); font-size: clamp(1.2rem, 4vw, 1.8rem); text-align: center; }
+.revealBid { margin: 0; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 1.1rem; color: var(--paper-dim); }
+.revealBid strong { color: var(--paper); font-size: 1.4rem; }
+.hands { display: flex; flex-direction: column; gap: 0.55rem; width: 100%; }
+.hand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.7rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  border: 2px solid var(--border);
+}
+.handLoser { border-color: var(--danger); }
+.handName { font-weight: 800; font-size: 1rem; }
+.handDice { display: inline-flex; flex-wrap: wrap; gap: 0.5rem; font-size: 0.85rem; }
+.verdict { margin: 0; padding: 0.8rem 1.1rem; border-radius: var(--radius-md); text-align: center; font-size: 1rem; line-height: 1.5; max-width: 60ch; }
+.verdictGood { background: color-mix(in srgb, var(--success) 16%, var(--panel)); border: 1px solid var(--success); }
+.verdictBluff { background: color-mix(in srgb, var(--danger) 14%, var(--panel)); border: 1px solid var(--danger); }
+.reveal > button { max-width: 360px; }
+
+.endWrap { width: 100%; max-width: 360px; margin-top: 0.4rem; }
+
+@media (max-width: 520px) {
+  /* Seats share a row on a phone-sized screen: shrink their dice (which are
+     sized in em) rather than letting each seat take a full line. */
+  .seat { min-width: 0; flex: 1 1 8.5rem; padding: 0.6rem 0.7rem; font-size: 0.7rem; }
+  .handDice { font-size: 0.7rem; }
+}

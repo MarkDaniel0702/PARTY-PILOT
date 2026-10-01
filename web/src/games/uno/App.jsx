@@ -7,9 +7,10 @@ import { Button, ButtonRow } from "../../shared/components/Button";
 import { Roster } from "../../shared/components/Roster";
 import { PassCard } from "../../shared/components/PassCard";
 import { QRPairing } from "../../shared/components/QRPairing";
+import { OfflineBanner } from "../../shared/components/OfflineBanner";
 import { useRoster } from "../../shared/hooks/useRoster";
 import { useHostSession } from "../../shared/controller/useHostSession";
-import { useSeats, seatsMode } from "../../shared/controller/useSeats";
+import { useSeats, seatsMode, offlineSeats } from "../../shared/controller/useSeats";
 import { VIEW, MSG, ACTION, view as viewMsg } from "../../shared/controller/protocol";
 import { playSound } from "../../shared/audio/sounds";
 import { CardFrame } from "../../shared/cards/CardFrame";
@@ -25,7 +26,8 @@ import {
   playCard,
   chooseColour,
   drawCard,
-  passTurn
+  passTurn,
+  skipTurn
 } from "./engine";
 import cardStyles from "../../shared/cards/cards.module.css";
 import styles from "./uno.module.css";
@@ -60,6 +62,12 @@ export default function App() {
   // Frozen at kickoff so a phone dropping mid-game can't reshuffle the seats
   // out from under an in-progress hand.
   const [activeSeats, setActiveSeats] = useState([]);
+  // Once a hand is dealt, how it is played is fixed by who was seated — NOT by
+  // who happens to be connected right now. If every phone dropped and this
+  // followed the live `mode`, the table would flip to pass-and-play and show
+  // each hand on the shared screen.
+  const playMode = activeSeats.length ? seatsMode(activeSeats) : mode;
+  const offline = offlineSeats(activeSeats, sessionPlayers);
 
   const seatById = useMemo(() => {
     const map = {};
@@ -98,6 +106,8 @@ export default function App() {
         if (next !== game) playSound("timerEndSoft");
       } else if (msg.kind === ACTION.CHOOSE_COLOUR) {
         next = chooseColour(game, seatId, msg.payload?.colour);
+      } else if (msg.kind === ACTION.PASS_TURN) {
+        next = passTurn(game, seatId);
       }
       if (next !== game) setGame(next);
     });
@@ -106,7 +116,7 @@ export default function App() {
   // Push each phone its own view. The HAND view goes to exactly one player,
   // so no other phone's channel ever carries another player's cards.
   useEffect(() => {
-    if (mode !== "phone" || !game || phase !== "play") return;
+    if (playMode !== "phone" || !game || phase !== "play") return;
     activeSeats.forEach((seat) => {
       if (!seat.playerId) return;
       if (game.winner) {
@@ -136,6 +146,9 @@ export default function App() {
             playable,
             canDraw: !game.drawnCardId,
             drawLabel: "Draw a card",
+            // A card drawn on your turn that happens to be legal may be kept
+            // instead of played — same as the pass-the-device screen offers.
+            canPass: !!game.drawnCardId,
             // Lets the phone flip-reveal just the card it was dealt. Taken
             // from lastEvent rather than drawnCardId so it also covers a
             // drawn card that turned out to be unplayable.
@@ -156,7 +169,7 @@ export default function App() {
         })
       );
     });
-  }, [game, phase, mode, activeSeats, seatById, sendTo]);
+  }, [game, phase, playMode, activeSeats, seatById, sendTo]);
 
   // Lobby view while still on the setup screen.
   useEffect(() => {
@@ -208,7 +221,7 @@ export default function App() {
   // ---------- Lifecycle ----------
   useEffect(() => {
     if (game?.winner && phase === "play") {
-      playSound("completion");
+      playSound("complete");
       setPhase("results");
     }
   }, [game?.winner, phase]);
@@ -235,7 +248,7 @@ export default function App() {
 
   const canStart = seats.length >= MIN_PLAYERS;
   const winnerName = game?.winner ? seatById[game.winner]?.name : null;
-  const localTurnPlayable = game && mode === "local" ? getPlayable(game, turnSeatId) : [];
+  const localTurnPlayable = game && playMode === "local" ? getPlayable(game, turnSeatId) : [];
 
   return (
     <GameShell title="UNO" titleIcon={Layers}>
@@ -274,7 +287,11 @@ export default function App() {
         </SetupBlock>
 
         <SetupBlock label="2. Phone controllers">
-          <QRPairing session={session} teams={[]} />
+          <QRPairing
+            session={session}
+            teams={[]}
+            description="Scan a QR code so every hand stays private on its owner's phone."
+          />
         </SetupBlock>
 
         <Button disabled={!canStart} onClick={handleStart}>
@@ -349,13 +366,25 @@ export default function App() {
               </p>
             </div>
 
-            {mode === "phone" && (
+            {playMode === "phone" && (
               <p className={styles.phoneNote}>
                 Everyone plays from their own phone. {turnSeat?.name || "Someone"} is up.
               </p>
             )}
 
-            {mode === "local" && !handRevealed && !game.winner && (
+            {playMode === "phone" && !game.winner && (
+              <OfflineBanner
+                names={offline.map((s) => s.name)}
+                waitingOn={offline.some((s) => s.seatId === turnSeatId) ? turnSeat?.name : null}
+                onSkip={
+                  offline.some((s) => s.seatId === turnSeatId)
+                    ? () => setGame((g) => skipTurn(g, turnSeatId))
+                    : undefined
+                }
+              />
+            )}
+
+            {playMode === "local" && !handRevealed && !game.winner && (
               <PassCard
                 icon="🃏"
                 name={turnSeat?.name || ""}
@@ -365,7 +394,7 @@ export default function App() {
               />
             )}
 
-            {mode === "local" && handRevealed && !game.winner && (
+            {playMode === "local" && handRevealed && !game.winner && (
               <div className={styles.localHand}>
                 {game.pendingWild ? (
                   <>

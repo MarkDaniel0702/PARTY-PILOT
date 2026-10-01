@@ -1,0 +1,92 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  width: 100%;
+  max-width: 440px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.55rem 0.9rem;
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  border: 2px solid var(--snake);
+  box-shadow: 0 0 18px -8px var(--snake);
+}
+.dot {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--snake);
+  box-shadow: 0 0 10px var(--snake);
+}
+.name { flex: 1; min-width: 0; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+.stats { color: var(--paper-dim); font-size: 0.82rem; white-space: nowrap; }
+.stats strong { color: var(--paper); }
+
+.banner {
+  margin: 0;
+  width: 100%;
+  padding: 0.5rem 0.8rem;
+  border-radius: var(--radius-sm);
+  background: var(--panel-2);
+  font-weight: 800;
+  font-size: 0.98rem;
+  text-align: center;
+}
+.good { background: color-mix(in srgb, var(--success) 22%, var(--panel)); color: var(--success); }
+.bad { background: color-mix(in srgb, var(--danger) 16%, var(--panel)); color: var(--danger); }
+
+/* The pad is a square sized by whichever of the width and the height is the
+   smaller, so it can never push the page into scrolling — a scroll mid-game
+   would be a disaster. touch-action:none is what lets a swipe steer instead of
+   scrolling. */
+.pad {
+  --pad: min(88vw, 52vh, 400px);
+  width: var(--pad);
+  height: var(--pad);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--snake) 7%, var(--panel));
+  border: 1px solid color-mix(in srgb, var(--snake) 30%, var(--border));
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition: opacity 0.2s;
+}
+.padIdle { opacity: 0.45; }
+
+.key {
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-md);
+  background: var(--panel-2);
+  border: 2px solid color-mix(in srgb, var(--snake) 45%, var(--border));
+  color: var(--snake);
+  touch-action: none;
+  transition: transform 0.06s, background 0.06s;
+}
+.key:active { transform: scale(0.93); background: color-mix(in srgb, var(--snake) 30%, var(--panel-2)); }
+.up { grid-column: 2; grid-row: 1; }
+.left { grid-column: 1; grid-row: 2; }
+.right { grid-column: 3; grid-row: 2; }
+.down { grid-column: 2; grid-row: 3; }
+.hub {
+  grid-column: 2;
+  grid-row: 2;
+  border-radius: 50%;
+  margin: 18%;
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--snake) 80%, white), var(--snake));
+  box-shadow: 0 0 16px -2px var(--snake);
+}

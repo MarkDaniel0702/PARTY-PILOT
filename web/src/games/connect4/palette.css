@@ -1,0 +1,46 @@
+/* Deep navy room, a bright blue board, and the two classic disc colours. The
+   board and discs keep the same hues in both themes — they are the game —
+   while the page around them flips between a night and a day version. */
+:root {
+  --ink: #070b1e;
+  --panel: #0f1736;
+  --panel-2: #16214a;
+  --paper: #eef1ff;
+  --paper-dim: #8f9ac8;
+  --accent: #5b86ff;
+  --accent-2: #ffd23f;
+  --border: rgba(238, 241, 255, 0.14);
+
+  --board: #2a56e0;
+  --board-edge: #1b3aa8;
+  --p0: #ff4d5e;
+  --p1: #ffd23f;
+}
+body {
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(91, 134, 255, 0.22) 0%, transparent 55%),
+    radial-gradient(ellipse at 100% 110%, rgba(255, 77, 94, 0.1) 0%, transparent 45%),
+    var(--ink);
+}
+
+:root[data-theme="light"] {
+  --ink: #e6ecff;
+  --panel: #ffffff;
+  --panel-2: #eef2ff;
+  --paper: #0b1233;
+  --paper-dim: #56608a;
+  --accent: #2a56e0;
+  --accent-2: #8f6a00;
+  --border: rgba(11, 18, 51, 0.15);
+
+  --board: #2a56e0;
+  --board-edge: #1b3aa8;
+  --p0: #e0283b;
+  --p1: #f2b800;
+}
+:root[data-theme="light"] body {
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(42, 86, 224, 0.14) 0%, transparent 55%),
+    radial-gradient(ellipse at 100% 110%, rgba(224, 40, 59, 0.07) 0%, transparent 45%),
+    var(--ink);
+}

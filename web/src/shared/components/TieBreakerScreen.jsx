@@ -3,6 +3,7 @@ import { Button, ButtonRow } from "./Button";
 import { GameTimer } from "./GameTimer";
 import { useGameTimer } from "../hooks/useGameTimer";
 import { usePersistedUsedIndices } from "../hooks/usePersistedUsedIndices";
+import { useUsedIndices } from "../hooks/useUsedIndices";
 import {
   TIEBREAKER_CHALLENGES,
   TIEBREAKER_TRIVIA,
@@ -214,14 +215,18 @@ function ChallengeBody({ challenge, tied, contentBank, onDone }) {
 // the same { ranked, winner, shared, tiebreak } shape the original passed
 // to onResolved — just merge in the `ranked` you already have.
 export function TieBreakerScreen({ tied, onResolved }) {
-  const challengeBank = usePersistedUsedIndices("tiebreak-challenges");
+  // Which *kind* of challenge came up only has to avoid repeating within this
+  // one tie-break, so it lives in memory. (It used to be persisted under a key
+  // unique to every tie-break, which left two orphaned localStorage entries
+  // behind each time and never reused them.) The question banks, by contrast,
+  // persist on purpose so a question doesn't come back on the next game night.
+  const challengeBank = useUsedIndices();
   const contentBank = usePersistedUsedIndices("tiebreak-content");
-  const sessionKeyRef = useRef(`s${Date.now()}-${Math.floor(Math.random() * 1e6)}`);
 
   const [roundTied, setRoundTied] = useState(tied);
   const [rounds, setRounds] = useState(0);
   const [challenge, setChallenge] = useState(
-    () => challengeBank.pickUnused(sessionKeyRef.current, TIEBREAKER_CHALLENGES).item
+    () => challengeBank.pickUnused(TIEBREAKER_CHALLENGES).item
   );
   const [playing, setPlaying] = useState(false);
 
@@ -232,7 +237,7 @@ export function TieBreakerScreen({ tied, onResolved }) {
       } else {
         setRoundTied(result.stillTied);
         setRounds((r) => r + 1);
-        setChallenge(challengeBank.pickUnused(sessionKeyRef.current, TIEBREAKER_CHALLENGES).item);
+        setChallenge(challengeBank.pickUnused(TIEBREAKER_CHALLENGES).item);
         setPlaying(false);
       }
     },

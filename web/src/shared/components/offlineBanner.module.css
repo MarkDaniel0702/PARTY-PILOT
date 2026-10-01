@@ -1,0 +1,29 @@
+.banner {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  max-width: 640px;
+  margin: 0.9rem auto 0;
+  padding: 0.6rem 0.9rem;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--danger) 12%, var(--panel));
+  border: 1px solid color-mix(in srgb, var(--danger) 45%, transparent);
+  color: var(--paper);
+  font-size: 0.88rem;
+  line-height: 1.4;
+  text-align: center;
+}
+.icon { color: var(--danger); flex-shrink: 0; }
+.text { min-width: 0; }
+.skip {
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  font-weight: 800;
+  font-size: 0.8rem;
+  transition: background 0.15s, color 0.15s;
+}
+.skip:hover { background: var(--danger); color: #fff; }

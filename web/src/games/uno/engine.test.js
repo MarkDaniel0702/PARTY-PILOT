@@ -10,6 +10,7 @@ import {
   chooseColour,
   drawCard,
   passTurn,
+  skipTurn,
   currentSeat,
   topCard,
   publicView
@@ -344,5 +345,51 @@ describe("publicView", () => {
     ]);
     expect(JSON.stringify(view)).not.toContain('"x"');
     expect(JSON.stringify(view)).not.toContain('"y"');
+  });
+});
+
+describe("skipTurn", () => {
+  it("does nothing out of turn or after the game has ended", () => {
+    const state = stateWith({ hands: { a: [spare("a1")], b: [spare("b1")], c: [spare("c1")] } });
+    expect(skipTurn(state, "b")).toBe(state);
+    const over = { ...state, winner: "a" };
+    expect(skipTurn(over, "a")).toBe(over);
+  });
+
+  it("draws a card for the seat and hands the turn on when it isn't playable", () => {
+    const state = stateWith({ hands: { a: [spare("a1")], b: [spare("b1")], c: [spare("c1")] } });
+    const next = skipTurn(state, "a");
+    expect(next.hands.a).toHaveLength(2);
+    expect(currentSeat(next)).toBe("b");
+  });
+
+  it("declines to play a drawn card even when it would have been legal", () => {
+    const playable = card("red", KIND.NUMBER, 9, "draw-top");
+    const state = stateWith({
+      drawPile: [card("green", KIND.NUMBER, 1, "x"), playable],
+      hands: { a: [spare("a1")], b: [spare("b1")], c: [spare("c1")] }
+    });
+    const next = skipTurn(state, "a");
+    expect(next.hands.a.map((c) => c.id)).toContain("draw-top");
+    expect(next.discardPile).toHaveLength(1);
+    expect(currentSeat(next)).toBe("b");
+    expect(next.drawnCardId).toBe(null);
+  });
+
+  it("finishes a half-played wild with the colour the seat holds most of", () => {
+    const wild = card("wild", KIND.WILD, null, "w1");
+    const state = stateWith({
+      hands: {
+        a: [card("blue", KIND.NUMBER, 3, "a1"), card("blue", KIND.NUMBER, 4, "a2"), card("green", KIND.NUMBER, 1, "a3")],
+        b: [spare("b1")],
+        c: [spare("c1")]
+      },
+      discardPile: [card("red", KIND.NUMBER, 5, "top"), wild],
+      pendingWild: { seatId: "a", cardId: "w1", kind: KIND.WILD }
+    });
+    const next = skipTurn(state, "a");
+    expect(next.activeColour).toBe("blue");
+    expect(next.pendingWild).toBe(null);
+    expect(currentSeat(next)).toBe("b");
   });
 });

@@ -355,7 +355,15 @@
 }
 
 .phoneBoardRow { display: flex; gap: 0.5rem; align-items: flex-start; justify-content: center; }
-.phoneBoard { width: min(64vw, 260px); }
+/* The well is twice as tall as it is wide, so on a short phone it — not the
+   pad — is what has to give: 350px is everything else on the screen (header,
+   stats, the 3-row pad and the gaps), and what's left over is the well's
+   height. Without this a 375x667 phone pushes the pad below the fold, which
+   in a game played by thumb means scrolling mid-drop. */
+.phoneBoard {
+  width: min(64vw, 260px, max(120px, calc((100vh - 350px) / 2)));
+  width: min(64vw, 260px, max(120px, calc((100dvh - 350px) / 2)));
+}
 .phoneRail {
   display: flex;
   flex-direction: column;
@@ -431,4 +439,13 @@
 }
 :global(:root[data-theme="light"]) .padDrop {
   color: #08121f;
+}
+
+/* Shown next to a name while that player's phone is off the network. */
+.offlineTag {
+  display: inline-grid;
+  place-items: center;
+  color: var(--danger);
+  animation: tbThrob 0.9s ease-in-out infinite;
+  flex: none;
 }

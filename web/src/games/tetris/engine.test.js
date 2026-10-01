@@ -410,3 +410,23 @@ describe("a full deterministic game", () => {
     expect(run(9)).toEqual(run(9));
   });
 });
+
+describe("shared piece sequence", () => {
+  it("is unaffected by garbage landing on one player's board", () => {
+    // Same seed, but one player eats garbage after every piece. Their pieces
+    // must still match the untouched player's, because garbage holes come from
+    // a separate rng stream rather than the one that shuffles the bag.
+    let clean = createGame({ seed: 42, mode: "battle" });
+    let hit = createGame({ seed: 42, mode: "battle" });
+    const cleanPieces = [];
+    const hitPieces = [];
+    for (let i = 0; i < 30; i++) {
+      cleanPieces.push(clean.piece.type);
+      hitPieces.push(hit.piece.type);
+      // Reset the stack each round so neither player can top out mid-test.
+      clean = hardDrop({ ...clean, board: emptyBoard() });
+      hit = hardDrop(queueGarbage({ ...hit, board: emptyBoard() }, 2));
+    }
+    expect(hitPieces).toEqual(cleanPieces);
+  });
+});

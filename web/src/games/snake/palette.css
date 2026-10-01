@@ -1,0 +1,36 @@
+/* Arcade night: near-black navy, with an acid-green accent. The arena itself is
+   painted by the canvas in the same dark tones in both themes (neon snakes
+   need a dark field), so the page around it is pitched to match. */
+:root {
+  --ink: #060912;
+  --panel: #0e1424;
+  --panel-2: #161e36;
+  --paper: #eaf2ff;
+  --paper-dim: #8a98bb;
+  --accent: #3dff9a;
+  --accent-2: #ffe14a;
+  --border: rgba(234, 242, 255, 0.13);
+}
+body {
+  background:
+    radial-gradient(ellipse at 50% -15%, rgba(61, 255, 154, 0.16) 0%, transparent 55%),
+    radial-gradient(ellipse at 100% 110%, rgba(255, 225, 74, 0.08) 0%, transparent 45%),
+    var(--ink);
+}
+
+:root[data-theme="light"] {
+  --ink: #e7f1ec;
+  --panel: #ffffff;
+  --panel-2: #eef6f1;
+  --paper: #0b1a12;
+  --paper-dim: #4f6a5c;
+  --accent: #0c8a4b;
+  --accent-2: #8a6a00;
+  --border: rgba(11, 26, 18, 0.15);
+}
+:root[data-theme="light"] body {
+  background:
+    radial-gradient(ellipse at 50% -15%, rgba(12, 138, 75, 0.13) 0%, transparent 55%),
+    radial-gradient(ellipse at 100% 110%, rgba(138, 106, 0, 0.07) 0%, transparent 45%),
+    var(--ink);
+}

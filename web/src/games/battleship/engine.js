@@ -74,11 +74,14 @@ function createPlayer(playerId, name) {
 }
 
 // `players`: [{ playerId, name }, { playerId, name }] — exactly two seats.
-export function createMatch(players) {
+// `firstTurn` is the seat that fires first once both fleets are down; rematches
+// hand it to the other captain so going first isn't permanently one player's.
+export function createMatch(players, firstTurn = 0) {
   return {
     phase: "placement", // placement | battle | over
     players: players.map((p) => createPlayer(p.playerId, p.name)),
-    turnIndex: 0,
+    firstTurn,
+    turnIndex: firstTurn,
     winnerIndex: null,
     lastShot: null // { by, row, col, result, shipId, sunk } — for TV/phone feedback
   };

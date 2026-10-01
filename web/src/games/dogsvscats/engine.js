@@ -1,4 +1,4 @@
-import { buildBattlefield, destroy, findSpawns, settle, isOutOfBounds, makeRng } from "./terrain";
+import { buildBattlefield, destroy, findSpawns, settle, isOutOfBounds, isSolid, makeRng } from "./terrain";
 import { simulateShot, launchVelocity, blastDamage, distance, rollWind } from "./physics";
 import { weaponById } from "./weapons";
 
@@ -130,8 +130,9 @@ export function fire(state, { weaponId, angle, power }) {
       if (!c.alive || c.id === shooter.id) return c;
       if (distance(c.x, c.y, shooter.x, shooter.y) > weapon.range) return c;
       const hp = Math.max(0, c.hp - weapon.damage);
-      // Knock them back and up, which often does more than the hit itself.
-      return { ...c, hp, alive: hp > 0, x: c.x + facing * weapon.knockback, y: c.y - 4 };
+      // Knock them back and up, which often does more than the hit itself —
+      // but a wall stops them; they are never shoved inside the rock.
+      return { ...c, hp, alive: hp > 0, x: shoveX(state.terrain, c.x, c.y - 4, facing, weapon.knockback), y: c.y - 4 };
     });
     characters = applyGravityToAll(state.terrain, characters);
     const next = {
@@ -164,6 +165,19 @@ export function fire(state, { weaponId, angle, power }) {
     phase: "resolve"
   };
   return { state: withWinner(next), shot: { ...shot, weapon } };
+}
+
+// How far along x a body at height y can be pushed before the ground stops
+// it. Leaving the sides of the map is allowed — that's how you ring someone
+// out — only solid ground blocks.
+function shoveX(terrain, x, y, dir, distance) {
+  let cur = x;
+  for (let i = 0; i < distance; i++) {
+    const next = cur + dir;
+    if (next >= 0 && next < terrain.width && isSolid(terrain, next, y)) break;
+    cur = next;
+  }
+  return cur;
 }
 
 function withWinner(state) {
@@ -205,20 +219,16 @@ export function moveActive(state, direction) {
   const targetX = actor.x + direction * MOVE_STEP;
   if (targetX < 2 || targetX > state.terrain.width - 2) return state;
 
-  // Try to stand at the new column: allow a small step up or a drop.
-  let bestY = null;
-  for (let dy = -MAX_CLIMB; dy <= MAX_CLIMB; dy++) {
-    const probe = settle(state.terrain, targetX, actor.y + dy);
-    if (!probe.lost && Math.abs(probe.y - actor.y) <= MAX_CLIMB) {
-      bestY = probe.y;
-      break;
-    }
-  }
-  if (bestY == null) {
-    const drop = settle(state.terrain, targetX, actor.y);
-    if (drop.lost) return state;
-    bestY = drop.y;
-  }
+  // Stand at the new column: step up a small ledge or walk off into a drop.
+  // Probing from MAX_CLIMB above the current height is what limits climbing —
+  // if even that is solid, the ground ahead is a wall, not a step. (Probing
+  // *every* height from there down used to accept a point already inside the
+  // wall as "resting", which let characters walk straight up cliffs.)
+  const startY = actor.y - MAX_CLIMB;
+  if (isSolid(state.terrain, targetX, startY)) return state;
+  const landing = settle(state.terrain, targetX, startY);
+  if (landing.lost) return state;
+  const bestY = landing.y;
 
   return {
     ...state,

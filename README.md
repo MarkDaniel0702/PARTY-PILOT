@@ -1,7 +1,7 @@
 # 🎮 B-Rotation
 
 <p>
-  <img alt="Games" src="https://img.shields.io/badge/games-18-7c5cff">
+  <img alt="Games" src="https://img.shields.io/badge/games-21-7c5cff">
   <img alt="React" src="https://img.shields.io/badge/React-19-61dafb">
   <img alt="Vite" src="https://img.shields.io/badge/Vite-multi--page-646cff">
   <img alt="Sign-up" src="https://img.shields.io/badge/sign--up-not%20required-2fd67f">
@@ -18,7 +18,7 @@
   <img alt="Guess the Song genres" src="https://img.shields.io/badge/song%20genres-14-ff3d9a">
 </p>
 
-**B-Rotation** is a colourful, browser-based party-game platform. **18 games**, one shared screen, **no dedicated host required** — gather a group around a phone, tablet, or laptop and pick from social deduction, trivia, voting games, and classic party favourites. The app runs turns, timers, randomisation, hidden information, scoring, and results on its own.
+**B-Rotation** is a colourful, browser-based party-game platform. **21 games**, one shared screen, **no dedicated host required** — gather a group around a phone, tablet, or laptop and pick from social deduction, trivia, voting games, and classic party favourites. The app runs turns, timers, randomisation, hidden information, scoring, and results on its own.
 
 > [!TIP]
 > **▶️ Play now:** <https://markdaniel0702.github.io/PARTY-PILOT/> — free, no sign-up, works on any device.
@@ -41,6 +41,9 @@
   - [🎴 Tong-Its](#-tong-its)
   - [🎨 Draw & Guess](#-draw--guess)
   - [⚔️ Dogs vs Cats](#️-dogs-vs-cats)
+  - [🐍 Snake Battle](#-snake-battle)
+  - [🔴 Connect Four](#-connect-four)
+  - [🎲 Liar's Dice](#-liars-dice)
   - [🧱 Tetris Battle](#-tetris-battle)
   - [🚢 Battleship](#-battleship)
   - [🎲 Other Implemented Games](#-other-implemented-games)
@@ -62,7 +65,7 @@
 
 ## 🧭 Project Overview
 
-The whole site — the homepage plus all 18 games — is a **single React 19 + Vite multi-page app** living in `web/`. Each game is its own HTML entry (`spy.html`, `quiz.html`, …) that mounts an independent React root, and every game is built from one shared component/hook library in `web/src/shared/`. There is no backend, no database, and no account system.
+The whole site — the homepage plus all 21 games — is a **single React 19 + Vite multi-page app** living in `web/`. Each game is its own HTML entry (`spy.html`, `quiz.html`, …) that mounts an independent React root, and every game is built from one shared component/hook library in `web/src/shared/`. There is no backend, no database, and no account system.
 
 | | |
 |---|---|
@@ -82,7 +85,7 @@ The whole site — the homepage plus all 18 games — is a **single React 19 + V
 |---|---|
 | 🙅 **No host required** | Every game runs itself — turn order, timers, hidden info, and results all happen automatically. |
 | 🎙️ **Game Master optional** | Some games also offer a manual mode where one person controls pacing. |
-| 🎲 **18 games, 5 categories** | Word & Deduction, Trivia & Knowledge, Party & Voting, Card Games, and Arcade. |
+| 🎲 **21 games, 5 categories** | Word & Deduction, Trivia & Knowledge, Party & Voting, Cards & Dice, and Arcade. |
 | ⏱️ **Universal customizable timers** | One shared timer system — a recommended duration you can override with a preset or a custom value (5–600 s), Pause / Resume / Reset controls, and a switch to turn it off entirely. |
 | 🔀 **Randomised content** | Words, questions, prompts, songs, and pictures are drawn at random each round; Quiz Night additionally remembers which questions a slot has shown and avoids repeats. |
 | ⭐ **Bonus events** | Quiz Night boards can include 1–4 surprise bonus tiles with random point swings. |
@@ -91,7 +94,7 @@ The whole site — the homepage plus all 18 games — is a **single React 19 + V
 | 🔊 **Sound effects** | Timer start / warning / buzzer cues plus event sounds (correct, incorrect, steal, bonus, completion), with a global mute and volume control. |
 | 🌗 **Light / dark mode** | A site-wide theme toggle that follows your system preference by default and remembers your choice. |
 | 📱 **Fully responsive** | Works on a laptop, tablet, or phone passed around a table. |
-| 🎮 **Optional phone controllers** | Quiz Night, Guess the Song, and Picture Guess can pair players' phones over WebRTC (scan a QR code) so they can buzz in directly — entirely optional, and every game still plays exactly the same without it. |
+| 🎮 **Phone controllers** | Players pair their phones over WebRTC (scan a QR code). In the quiz-style games they buzz in; in the card, dice, drawing and arcade games the phone is a private hand, a sketch pad, a gamepad or a whole game board. Almost always optional — and a phone that drops out redials on its own and picks its screen straight back up. |
 | 🔒 **Private by design** | No accounts, no server, no database. Pairing a phone briefly touches PeerJS's public broker to connect the two devices — no other game data ever leaves your browser. |
 
 ---
@@ -112,12 +115,69 @@ The whole site — the homepage plus all 18 games — is a **single React 19 + V
 | 🤷 [Would You Rather?](#-other-implemented-games) | Party & Voting | 2–10 | ✅ | — | — |
 | 👥 [Most Likely To](#-other-implemented-games) | Party & Voting | 3–10 | ✅ | — | — |
 | 🎭 [Charades](#-other-implemented-games) | Party & Voting | 3–10 | ✅ | ✅ | ✅ |
-| 🃏 [UNO](#-uno) | Card Games | 2–8 | ✅ | — | — |
-| 🎴 [Tong-Its](#-tong-its) | Card Games | 2–4 | ✅ | — | ✅ |
-| 🎨 [Draw & Guess](#-draw--guess) | Card Games | 3–8 | ✅ | — | ✅ |
+| 🃏 [UNO](#-uno) | Cards & Dice | 2–8 | ✅ | — | — |
+| 🎴 [Tong-Its](#-tong-its) | Cards & Dice | 2–4 | ✅ | — | ✅ |
+| 🎲 [Liar's Dice](#-liars-dice) | Cards & Dice | 2–6 | ✅ | — | ✅ |
+| 🎨 [Draw & Guess](#-draw--guess) | Cards & Dice | 3–8 | ✅ | — | ✅ |
 | ⚔️ [Dogs vs Cats](#️-dogs-vs-cats) | Arcade | 2 teams | ✅ | — | ✅ |
 | 🧱 [Tetris Battle](#-tetris-battle) | Arcade | 2–4 | ✅ | — | ✅ |
 | 🚢 [Battleship](#-battleship) | Arcade | 2 | ✅ | — | ✅ |
+| 🐍 [Snake Battle](#-snake-battle) | Arcade | 1–8 | ✅ | — | ✅ |
+| 🔴 [Connect Four](#-connect-four) | Arcade | 2 | ✅ | — | ✅ |
+
+---
+
+### 🐍 Snake Battle
+
+Everyone steers their **own snake in one arena, all at once**. Eat to grow, crash your friends into walls and each other, and be the last snake moving. The shared screen is the arena; every phone is a steering pad.
+
+- **The phone is a pad, not a screen.** Swipe anywhere on it or tap the big arrow keys — turns fire on touch-*down*, so steering never waits for a finger to lift. The host runs the whole simulation, so there's nothing to cheat and nothing to sync.
+- **Or use the keyboard.** Add one or two players on the host's own keyboard (`W A S D` and the arrow keys) — a handy way to play with fewer phones, or to try it solo.
+- **Two modes.** *Survival* — last snake alive wins, the game speeds up as it goes, and the arena slowly closes in so it always ends. *Timed* — most points when the clock runs out (1, 1½ or 2 minutes); a crashed snake respawns after a moment, so nobody sits out.
+- **Solid walls or wrap-around**, and three speeds (*Chill*, *Normal*, *Fast*).
+- **Rules that feel fair.** Quick turn sequences ("up, then left") are queued rather than dropped; a snake may follow its own tail but not bite itself; running into someone's **body** crashes *you* and earns *them* a kill bonus; two heads meeting crash both.
+- **Every crash feeds the board.** A dead snake's body turns into food, and golden food is worth triple.
+- **Spawns are spaced round the arena and aimed along it**, with room to run, so nobody loses in the opening second.
+- 1–8 players (one player is a solo practice run).
+
+> [!NOTE]
+> Needs at least one paired phone or keyboard player. Offline phones' snakes simply keep going until they crash — the match never waits for a dead connection.
+
+---
+
+### 🔴 Connect Four
+
+The classic two-player drop-discs game. Line up **four in a row** — across, down or diagonally — before your rival does.
+
+It plays two ways, like UNO:
+
+- **📱 With phones** — pair two phones and each player drops from their own: a miniature of the board with tappable columns on your turn. The big screen just shows the board (extra phones watch).
+- **🔄 Without phones** — play right on the shared screen: tap a column, or press `1`–`7`.
+
+- **Series play.** Single game, best of 3 or best of 5. The starting player swaps every game, and rematches swap it again.
+- **A real drop.** Discs fall behind the board's face, bounce, and show through the holes on the way down; the winning line pulses. Player two's discs carry a faint ring, so the colours never have to carry the whole difference.
+- **Optional turn timer.** If it runs out a disc is dropped for you (centre columns preferred).
+- **Between games**, both phones tap *Ready* and the next game starts on its own — or use the host button.
+- If a player's phone drops, a banner says so and offers to play a move for them; the phone picks the board straight back up when it returns.
+
+---
+
+### 🎲 Liar's Dice
+
+The bluffing classic. Everyone rolls their dice in secret, then takes turns **bidding on how many dice of one face are on the whole table** — yours *and* everyone else's. Think the last bid is a lie? Call it.
+
+Like UNO, it plays two ways:
+
+- **📱 With phones** — each phone shows only its owner's dice, with a quantity stepper, a face picker and a big **Liar!** button. The host never sends anyone else's dice to your phone.
+- **🔄 Without phones** — pass the device: "Show my dice", bid or challenge, hide, pass on.
+
+- **Bids only go up:** more dice, or the same number of a higher face ("three 4s" beats "three 3s"; "four 2s" beats both).
+- **A challenge reveals every die.** If the bid was true the *challenger* loses a die; if it was a bluff the *bidder* does. Whoever loses a die opens the next round.
+- **Ones are wild** (they count towards any face) except when the bid is on ones. Switch it off in the house rules, and pick 3–6 starting dice each.
+- **Reveal screen** lays every hand out, with matching dice outlined in green and wilds in gold, then says exactly why the bid was good or a bluff.
+- Lose your last die and you're out; the last player holding dice wins. Results show how many rounds each player lasted.
+- If someone's phone vanishes mid-game the host can remove them so the table keeps moving.
+- 2–6 players.
 
 ---
 
@@ -128,12 +188,13 @@ Everyone plays at once, each on their own phone, while **every board appears sid
 **This is the one game where the phone runs the game itself.** Every other game keeps the rules on the shared screen and treats phones as controllers. Here your board is simulated *on your phone*, because that's the only way input can feel instant — your eyes are on the phone, so nothing has to cross the network before you see your piece move. The host receives board snapshots purely to draw the TV, where a little delay costs nothing because nobody plays off it.
 
 - **Modern rules:** SRS rotation with wall kicks (so T-spins work), a 7-bag randomiser, hold piece, ghost piece, lock delay, and a next-piece queue.
-- **Everyone gets the same pieces.** One shared seed per match, so a loss is never down to a worse bag.
+- **Everyone gets the same pieces.** One shared seed per match, so a loss is never down to a worse bag — garbage holes draw from their own stream, so even a board that's being attacked keeps getting exactly the same pieces as everyone else.
 - **Two modes.** *Battle* — clearing 2+ lines at once sends garbage to everyone else, and the last board standing wins. *Line Race* — no garbage, most lines before the clock runs out.
 - **Garbage cancels.** A clear of your own wipes out incoming garbage before it lands, so a well-timed Tetris can save you.
 - **Auto-repeat runs on the phone**, so a held direction stays smooth even if the network hiccups.
 - **The big screen is an arena.** Boards are sized off the screen's *height* so two to four wells fill a TV, each player owns a seat colour, and every pane carries its own hold/next previews, level and line count.
 - **You can see the fight.** Line clears burst as `SINGLE / DOUBLE / TRIPLE / TETRIS!`, garbage flies across the screen as a tracer from attacker to victim, incoming garbage climbs a warning bar beside the well, the top of a well glows red as the stack nears the ceiling, and a knockout gets a stamped placement.
+- **A network blip doesn't cost you your board.** A phone that drops shows "Reconnecting…" over its running well and picks up where it left off. One that stays silent for ten seconds (tab closed, phone gone) is knocked out so the match can still finish, and a Line Race ends early if every board has topped out.
 - 2–4 players.
 
 > [!NOTE]
@@ -151,7 +212,7 @@ Classic naval combat for two captains. Each player secretly deploys a fleet **on
 - **Placement is entirely private and forgiving.** Tap a ship, then tap the board to drop it; tap it again to pick it up and move it, rotate in place, or randomize the whole fleet in one tap. Nothing is locked in until you confirm.
 - **Turns alternate strictly** — a hit doesn't earn a bonus shot — so pacing stays predictable and it's always obvious whose turn it is.
 - **Scoring:** 10 points per hit, +50 for sinking a ship, +100 for the winner.
-- **Reconnect-friendly.** A refreshed phone rejoins its seat and picks the current view back up, the same pairing session every other phone-controller game uses.
+- **Reconnect-friendly.** A refreshed phone rejoins its seat and picks the current view back up, the same pairing session every other phone-controller game uses. The captain who lost the last battle fires second in the rematch.
 - 2 players (exactly — extra paired phones can spectate the big screen).
 
 > [!NOTE]
@@ -174,6 +235,7 @@ Turn-based artillery. Two teams alternate turns; on yours you walk a little, pic
 - **Live battlefields.** Clouds drift at the speed of the wind, a parallax skyline sits behind the ground, characters breathe, shots leave a burning trail, and blasts throw debris and shake the screen. All of it stands down under `prefers-reduced-motion`.
 - **A HUD you can read across a room** — turn card with the shooter's health, a wind gauge, a countdown ring, both squads with per-character health, and weapon tiles carrying their own damage and blast stats.
 - On the shared screen you can aim from the keyboard: `←/→` angle, `↑/↓` power, `A/D` walk, `Space` fire (hold Shift for bigger steps).
+- Characters can step up a small ledge but not walk up a cliff, and a paw whack never shoves anyone into the rock.
 - 1–4 characters per team, and a 45-second turn clock.
 
 > [!NOTE]
@@ -277,6 +339,7 @@ A Jeopardy-style trivia board with **27 themes** and a 100–500 point system. P
 - If the question timer runs out with no answer (or a team taps **No answer — open steal**), a **10-second steal window** opens for **every team except the one whose turn it was**.
 - The group taps **"[Team] got it!"** for the first team to answer correctly (they take the points) or **"[Team] missed"** for each team that fails. If everyone misses or the steal timer expires, the question is a **time-out** with no points awarded.
 - **Turn order is unaffected by a steal.** The next turn always goes to the team *after the one whose turn it originally was*, regardless of who stole the points.
+- **Buzzing in pauses the clock.** With phones paired, the 10-second window is for buzzing in, not for answering: the moment a team buzzes the steal timer holds while they answer, and resumes for the remaining teams if they miss.
 
 #### Randomized question pools
 
@@ -581,7 +644,7 @@ npm run preview     # serves web/dist/ locally, exactly as deployed
 | `npm run dev` | Vite dev server with hot module reload |
 | `npm run build` | Builds every page into `web/dist/` |
 | `npm run preview` | Serves the built `web/dist/` locally |
-| `npm run test` | Runs the [Vitest](https://vitest.dev) unit tests for the pure game engines (currently UNO's rules) |
+| `npm run test` | Runs the [Vitest](https://vitest.dev) unit tests for the pure game engines (UNO, Tong-Its, Tetris, Battleship, Dogs vs Cats, Draw & Guess matching, Snake, Connect Four and Liar's Dice) |
 
 > [!NOTE]
 > No accounts or backend are required. An internet connection is only needed for Google Fonts (first load), Picture Guess's Wikipedia photo lookups, and Guess the Song's YouTube clips — all of which degrade gracefully if unavailable.
@@ -594,11 +657,9 @@ npm run preview     # serves web/dist/ locally, exactly as deployed
 PARTY-PILOT/
 ├── web/                              The entire site — one Vite multi-page app
 │   ├── index.html                    Homepage entry
-│   ├── spy.html  quiz.html  whoami.html  password.html
-│   ├── categories.html  wordgrid.html  guessthesong.html
-│   ├── pictureguess.html  twotruths.html  wouldurather.html
-│   ├── mostlikely.html  charades.html
-│   │                                 One HTML entry per game; each mounts its own React root
+│   ├── spy.html  quiz.html  uno.html  snake.html  connect4.html  liarsdice.html  …
+│   │                                 One HTML entry per game (21 of them); each mounts its own React root
+│   ├── controller.html               The page a paired phone opens (renders whatever view the host pushes)
 │   ├── vite.config.js                Auto-discovers every top-level *.html as a build entry
 │   ├── package.json
 │   └── src/
@@ -612,7 +673,11 @@ PARTY-PILOT/
 │       │   ├── components/           Screen, GameShell, SettingsMenu, Button, Roster,
 │       │   │                         TeamSetup, TimerSetup, GameTimer, PassCard, RevealCard,
 │       │   │                         GroupedPicker, Voting, ResultsList, TieBreakerScreen,
-│       │   │                         Scoreboard, StatementCard, CompletionChime (+ .module.css)
+│       │   │                         Scoreboard, StatementCard, CompletionChime, QRPairing,
+│       │   │                         OfflineBanner (+ .module.css)
+│       │   ├── controller/           The phone layer: protocol.js (message contract),
+│       │   │                         useHostSession.js (main screen), useControllerClient.js
+│       │   │                         (phone, auto-reconnecting), useSeats.js
 │       │   ├── hooks/                useCountdown, useGameTimer, useRoster, useTeams,
 │       │   │                         useTimerSetup, useUsedIndices, usePersistedUsedIndices
 │       │   └── utils/                random.js, resolveStanding.js
@@ -621,6 +686,9 @@ PARTY-PILOT/
 │               ├── App.jsx           The game's screens and logic
 │               ├── main.jsx          React entry point for that page
 │               ├── data.js           That game's themes / questions / content
+│               ├── engine.js         Pure rules (no React) + engine.test.js — card, dice,
+│               │                     board and arcade games keep their rules here
+│               ├── Phone*.jsx        The game's screen on a paired phone (optional)
 │               ├── palette.css       That game's colour-token overrides (light + dark)
 │               └── <game>.module.css Styling bespoke to that one game (optional)
 ├── .github/workflows/deploy.yml      Builds web/ and deploys web/dist/ to GitHub Pages
@@ -660,6 +728,18 @@ Every game is its own `web/src/games/<game>/` folder plus one `web/<game>.html` 
 
 > [!IMPORTANT]
 > Keep every game host-optional: let the app manage turns/timers/randomisation, and only add a Game Master toggle if a timer would otherwise force pacing on the group.
+
+### A game that uses phones
+
+Card, dice, board and arcade games put their rules in a pure `engine.js` (no React, no timers, no network — every action returns a new state, and an invalid one returns the *same* object so the host can tell it did nothing) with an `engine.test.js` next to it. `uno/`, `connect4/`, `liarsdice/` and `snake/` are good models. To give a game a phone screen:
+
+1. Add a `VIEW.<GAME>` (what the phone renders) and any `ACTION.<KIND>`s (what it sends back) to `web/src/shared/controller/protocol.js`, and **bump `PROTOCOL_VERSION`** — a phone running a cached older bundle is then told to refresh instead of silently misbehaving.
+2. Write a `Phone<Game>.jsx` that renders one view descriptor and calls `send(action(ACTION.X, payload))`. It never runs rules; the host re-validates everything.
+3. In the game's `App.jsx`, use `useHostSession` + `useSeats` and push each phone its own view with `sendTo`. Anything private (a hand, your dice) goes only to that seat's phone.
+4. Add a branch for the new view in `web/src/controller/App.jsx`.
+5. Keep play fixed to *who was seated* when the game started (`seatsMode(activeSeats)`), not who is connected right now, and show `<OfflineBanner>` plus a way past a seat that isn't coming back.
+
+Reconnection comes free: the host replays each phone's latest view when it rejoins, and the phone redials on its own.
 
 ### New content for an existing game
 
@@ -775,7 +855,7 @@ The site is deployed on **GitHub Pages** via **GitHub Actions** — free, HTTPS 
 | Publish dir | `web/dist/` |
 | Env vars | None |
 
-**What the workflow does:** installs `web/`'s dependencies, runs the Vite build (outputting the homepage + all 17 games to `web/dist/`), marks it non-Jekyll, then uploads and deploys `web/dist/` with `actions/deploy-pages`.
+**What the workflow does:** installs `web/`'s dependencies, runs the Vite build (outputting the homepage + all 21 games to `web/dist/`), marks it non-Jekyll, then uploads and deploys `web/dist/` with `actions/deploy-pages`.
 
 **Redeploying:**
 
@@ -833,7 +913,13 @@ The choice is stored in `localStorage`. Private/incognito windows and browsers s
 <details>
 <summary><strong>My phone won't connect to a QR pairing session</strong></summary>
 
-A few things to check, in order: the phone needs to be on the same Wi-Fi as the main screen (mobile data won't reach a device sitting on a home network); some corporate or public Wi-Fi networks block the peer-to-peer connection outright; and the pairing card's **Retry** button gets a fresh code if the first one failed to register. If phones still won't connect, every game plays exactly the same without them — tap **Play without phones** and use the on-screen buttons instead.
+A few things to check, in order: the phone needs to be on the same Wi-Fi as the main screen (mobile data won't reach a device sitting on a home network); some corporate or public Wi-Fi networks block the peer-to-peer connection outright; and the pairing card's **Retry** button gets a fresh code if the first one failed to register. If phones still won't connect, every game plays exactly the same without them — tap **Play without phones** and use the on-screen buttons instead (the games that need phones — Tetris Battle and Battleship — say so on their setup screen).
+</details>
+
+<details>
+<summary><strong>A phone shows "Reconnecting…" or the host says someone lost connection</strong></summary>
+
+That's the link between the phone and the main screen dropping — a sleeping phone, a Wi-Fi hiccup, switching apps. The phone keeps its current screen (even a running Tetris board), redials by itself with a short back-off, and tries again the instant the page is visible. The host remembers each phone's latest screen and replays it on rejoin, so nothing needs to be restarted. A seat that never returns is handled per game: UNO and Tong-Its let the host skip that turn, Liar's Dice lets the host remove the player, Connect Four plays a move for them, Tetris Battle knocks the board out after ten silent seconds, and a Snake Battle snake just keeps going until it crashes. If the phone page itself was *refreshed*, it rejoins the same seat automatically.
 </details>
 
 <details>

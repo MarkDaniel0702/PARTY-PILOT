@@ -5,6 +5,7 @@ import { Screen, ScreenTitle, ScreenSub, SetupBlock } from "../../shared/compone
 import { HowToPlay } from "../../shared/components/HowToPlay";
 import { Button, ButtonRow } from "../../shared/components/Button";
 import { QRPairing } from "../../shared/components/QRPairing";
+import { OfflineBanner } from "../../shared/components/OfflineBanner";
 import { ResultsList } from "../../shared/components/ResultsList";
 import { useHostSession } from "../../shared/controller/useHostSession";
 import { VIEW, MSG, ACTION, view as viewMsg } from "../../shared/controller/protocol";
@@ -46,6 +47,11 @@ export default function App() {
   const screen = !match ? "setup" : match.phase; // setup | placement | battle | over
   const connected = sessionPlayers.filter((p) => p.connected);
   const canStart = connected.length >= 2;
+  // Captains in the running match whose phone has dropped. Their view comes
+  // straight back when they rejoin, so this only has to say who's missing.
+  const offlineCaptains = match
+    ? match.players.filter((p) => !connected.some((c) => c.playerId === p.playerId)).map((p) => p.name)
+    : [];
 
   const ref = useRef();
   ref.current = { match };
@@ -205,7 +211,13 @@ export default function App() {
 
   function handleRematch() {
     if (!match) return;
-    setMatch(createMatch(match.players.map((p) => ({ playerId: p.playerId, name: p.name }))));
+    // The other captain fires first this time.
+    setMatch(
+      createMatch(
+        match.players.map((p) => ({ playerId: p.playerId, name: p.name })),
+        opponentIndexOf(match.firstTurn ?? 0)
+      )
+    );
     setImpact(null);
     setBanner(null);
     lastShotKeyRef.current = null;
@@ -283,7 +295,11 @@ export default function App() {
         />
 
         <SetupBlock label="Phone controllers" wide>
-          <QRPairing session={session} teams={[]} />
+          <QRPairing
+            session={session}
+            teams={[]}
+            description="Each captain scans a QR code to deploy and fire from their own phone."
+          />
           {connected.length > 0 && (
             <div className={styles.seatStrip}>
               {connected.slice(0, 2).map((p) => (
@@ -314,6 +330,7 @@ export default function App() {
           <>
             <ScreenTitle>Deploying fleets…</ScreenTitle>
             <ScreenSub>Both captains are placing ships privately on their phones.</ScreenSub>
+            <OfflineBanner names={offlineCaptains} />
             <div className={styles.placementCards}>
               {match.players.map((p, i) => (
                 <div key={p.playerId} className={`${styles.placementCard} ${p.ready ? styles.placementReady : ""}`.trim()}>
@@ -354,6 +371,8 @@ export default function App() {
                 <strong>{match.players[defenderIdx].name}</strong>'s waters
               </span>
             </div>
+
+            <OfflineBanner names={offlineCaptains} />
 
             {banner && (
               <p key={banner.key} className={`${styles.shotBanner} ${banner.kind === "hit" ? styles.shotHit : styles.shotMiss}`.trim()}>

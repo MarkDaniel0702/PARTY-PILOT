@@ -260,12 +260,21 @@ export default function App() {
   // itself is registered once and reads fresh state through this ref
   // instead of resubscribing on every state change.
   const buzzStateRef = useRef();
-  buzzStateRef.current = { questionPhase, teams, timedOutIndex, activeTeamIndex, missedTeams, buzzedTeam, sessionPlayers };
+  buzzStateRef.current = {
+    questionPhase,
+    teams,
+    timedOutIndex,
+    activeTeamIndex,
+    missedTeams,
+    buzzedTeam,
+    sessionPlayers,
+    pauseSteal: stealTimer.pause
+  };
 
   useEffect(() => {
     return onMessage((msg) => {
       if (msg.type !== "buzz") return;
-      const { questionPhase, teams, timedOutIndex, activeTeamIndex, missedTeams, buzzedTeam, sessionPlayers } =
+      const { questionPhase, teams, timedOutIndex, activeTeamIndex, missedTeams, buzzedTeam, sessionPlayers, pauseSteal } =
         buzzStateRef.current;
       if (questionPhase !== "steal" || buzzedTeam || buzzLockRef.current) return;
       const player = sessionPlayers.find((p) => p.playerId === msg.playerId);
@@ -283,6 +292,10 @@ export default function App() {
       // the spoken answer.
       setBuzzedTeam(team);
       setBuzzedPlayerId(msg.playerId);
+      // The steal clock is for buzzing in, not for answering — hold it while
+      // the team that buzzed gives their answer, or a late buzz leaves them a
+      // second or two to speak before the window slams shut on them.
+      pauseSteal();
     });
   }, [onMessage, sendTo]);
 
@@ -337,8 +350,15 @@ export default function App() {
   function resolvePhoneSteal(won) {
     if (!buzzedTeam) return;
     if (buzzedPlayerId) sendTo(buzzedPlayerId, buzzResult(won));
-    if (won) resolveQuestion("stolen", buzzedTeam);
-    else handleMiss(buzzedTeam);
+    if (won) {
+      resolveQuestion("stolen", buzzedTeam);
+    } else {
+      handleMiss(buzzedTeam);
+      // They missed: the remaining teams get the rest of the window. (If that
+      // was the last eligible team the question is already resolved and the
+      // timer stopped, so this resume is a no-op.)
+      stealTimer.resume();
+    }
     setBuzzedTeam(null);
     setBuzzedPlayerId(null);
     buzzLockRef.current = false;

@@ -3,10 +3,11 @@
 // PROTOCOL_VERSION forces a phone on a stale cached bundle to show a
 // "refresh this page" error instead of silently misbehaving after a deploy.
 // v2 added the card-game views (HAND / CHOICE / WAIT) and the generic ACTION
-// message. v3 added the Tong-Its view and its draw/meld/discard actions. A
+// message. v3 added the Tong-Its view and its draw/meld/discard actions. v4
+// added the Snake, Connect Four and Liar's Dice views and their actions. A
 // phone still running a cached older bundle is rejected with
 // "version-mismatch" and told to refresh, rather than silently misbehaving.
-export const PROTOCOL_VERSION = 3;
+export const PROTOCOL_VERSION = 4;
 
 export const MAX_PLAYERS = 8;
 
@@ -64,7 +65,16 @@ export const VIEW = {
   // Tong-Its. Carries this seat's own hand, the shared table melds (every
   // seat's, face-up — that part is public by definition), the discard top,
   // and whose turn/stage it is. Never another seat's hand.
-  TONGITS: "tongits"
+  TONGITS: "tongits",
+  // Snake Battle: a steering pad. The host runs the whole simulation; the
+  // phone only reports which way its snake should turn.
+  SNAKE: "snake",
+  // Connect Four: the column picker plus a miniature of the board.
+  CONNECT4: "connect4",
+  // Liar's Dice. Carries this seat's own dice (and only theirs), the current
+  // bid, and the bidding controls on their turn. Opponents' dice only ever
+  // appear in the reveal after a challenge, which is public by definition.
+  DICE: "dice"
 };
 
 // Action kinds carried by MSG.ACTION.
@@ -72,6 +82,9 @@ export const ACTION = {
   PLAY_CARD: "playCard",
   DRAW_CARD: "drawCard",
   CHOOSE_COLOUR: "chooseColour",
+  // UNO: decline to play the card you just drew (it was legal, but you'd
+  // rather keep it) and end the turn.
+  PASS_TURN: "passTurn",
   // Drawing. Points are batched by the sender rather than sent per pointer
   // event — see shared/draw/useStrokeBatcher.js.
   STROKE_START: "strokeStart",
@@ -101,7 +114,16 @@ export const ACTION = {
   DRAW_DISCARD: "drawDiscard",
   LAY_MELD: "layMeld",
   ADD_TO_MELD: "addToMeld",
-  DISCARD: "discard"
+  DISCARD: "discard",
+  // Snake Battle, phone -> host: payload { dir: "up" | "down" | "left" | "right" }.
+  TURN: "turn",
+  // Connect Four, phone -> host: payload { col }.
+  DROP_DISC: "dropDisc",
+  // Liar's Dice, phone -> host. BID payload { quantity, face }; READY means
+  // "I've seen the reveal, deal the next round".
+  BID: "bid",
+  CALL_LIAR: "callLiar",
+  READY: "ready"
 };
 
 export function join(name, teamId, playerId) {

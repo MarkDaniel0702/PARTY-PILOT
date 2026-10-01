@@ -38,3 +38,12 @@ export function useSeats({ sessionPlayers = [], rosterNames = [] }) {
 export function seatsMode(seats) {
   return seats.length && seats[0].source === "phone" ? "phone" : "local";
 }
+
+// Seats whose phone has dropped off the network. A game freezes its seat list
+// at kickoff (so a dropped phone can't reshuffle hands mid-round), which means
+// that list can't say who is still online — this can.
+export function offlineSeats(activeSeats, sessionPlayers) {
+  return activeSeats.filter(
+    (s) => s.source === "phone" && !sessionPlayers.some((p) => p.playerId === s.playerId && p.connected)
+  );
+}

@@ -62,6 +62,11 @@ export function createGame({ seed = 1, mode = "battle" } = {}) {
   const [first, ...rest] = bag;
   return {
     rng,
+    // Garbage holes get their own stream. If they drew from `rng` too, every
+    // line of garbage a player received would shift their piece bag out of
+    // step with everyone else's, and "same pieces for all" would only hold
+    // until the first attack landed.
+    garbageRng: makeRng((seed ^ 0x9e3779b9) >>> 0),
     mode,
     board: emptyBoard(),
     piece: spawnPiece(first),
@@ -154,7 +159,7 @@ function clearLines(board) {
 // sentence.
 export function addGarbage(state, rows, holeColumn = null) {
   if (rows <= 0 || state.over) return state;
-  const hole = holeColumn ?? Math.floor(state.rng() * COLS);
+  const hole = holeColumn ?? Math.floor(state.garbageRng() * COLS);
   // Rows pushed past the ceiling are a loss, not free disposal — without
   // this check the blocks would simply be sliced away and the player would
   // survive a burial that should have ended them.

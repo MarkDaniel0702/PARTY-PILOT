@@ -44,6 +44,10 @@ function GameGroup({ label, icon: Icon, games }) {
   );
 }
 
+// Counted from the list itself so the headline can never drift out of date
+// when a game is added.
+const GAME_COUNT = GAME_GROUPS.reduce((n, group) => n + group.games.length, 0);
+
 export default function App() {
   return (
     <main className="home">
@@ -54,8 +58,8 @@ export default function App() {
           <span className="line line-2">ROTATION</span>
         </h1>
         <p className="home-tagline">
-          12 party games. One shared screen. The app runs turns, customizable timers, and scoring
-          — nobody has to sit out and host.
+          {GAME_COUNT} party games. One shared screen. The app runs turns, customizable timers, and
+          scoring — nobody has to sit out and host.
         </p>
       </header>
 

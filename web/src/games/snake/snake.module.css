@@ -1,0 +1,168 @@
+/* Snake Battle. The play screen is an arena, not a page: it breaks out of the
+   shared 1000px column and sizes the field off the viewport height so the whole
+   board is visible on a TV without scrolling. Every seat owns a `--seat`
+   colour that follows it everywhere — the snake, its name, its scoreboard row. */
+
+/* ---------- setup ---------- */
+.kbRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+.kbRow > div { min-width: min(100%, 220px); flex: 1; max-width: 280px; }
+.kbLabel { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 800; font-size: 0.9rem; }
+
+.seatStrip { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.9rem; justify-content: center; }
+.seatChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.32rem 0.8rem;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid color-mix(in srgb, var(--seat) 55%, transparent);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.seatHint { font-style: normal; font-weight: 600; color: var(--paper-dim); font-size: 0.74rem; }
+.seatDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--seat, var(--accent));
+  box-shadow: 0 0 8px -1px var(--seat, var(--accent));
+  flex: none;
+}
+.modeNote {
+  margin: 0.9rem 0 0;
+  padding: 0.6rem 0.8rem;
+  background: var(--panel-2);
+  border-radius: var(--radius-sm);
+  color: var(--paper-dim);
+  font-size: 0.85rem;
+  text-align: center;
+}
+.startHint { text-align: center; color: var(--paper-dim); font-size: 0.83rem; margin: 0.8rem auto 0; max-width: 48ch; }
+
+/* ---------- the arena ---------- */
+.arena {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  padding: 0 1rem;
+}
+
+.matchBar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: 1400px;
+  margin: 0 auto 0.8rem;
+  font-size: 0.9rem;
+}
+.modeTag { font-family: var(--font-display); color: var(--accent-2); letter-spacing: 0.04em; font-size: 0.9rem; }
+.clock {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-display);
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  margin-right: auto;
+}
+.matchBar .endBtn { width: auto; padding: 0.4rem 0.9rem; font-size: 0.72rem; }
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 15rem;
+  gap: 1rem;
+  align-items: start;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+@media (max-width: 900px) {
+  .layout { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* The field is as wide as the space and the viewport height allow (the arena is
+   32 x 20, so width = height x 1.6), minus the bar above it. */
+.field {
+  position: relative;
+  justify-self: center;
+  width: min(100%, calc((100vh - 170px) * 1.6));
+  min-width: 260px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 2px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  box-shadow: 0 0 40px -18px var(--accent), var(--shadow-soft);
+  background: #0a1020;
+}
+.canvasWrap { width: 100%; line-height: 0; }
+.canvas { display: block; width: 100%; }
+
+.countdown {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  background: rgba(6, 9, 18, 0.55);
+  color: #fff;
+  pointer-events: none;
+}
+.countNum {
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 14vw, 9rem);
+  line-height: 1;
+  color: var(--accent);
+  text-shadow: 0 0 30px var(--accent);
+  animation: snCount 0.8s ease-out both;
+}
+.countHint { font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.9rem; opacity: 0.85; }
+@keyframes snCount {
+  0% { transform: scale(1.6); opacity: 0; }
+  35% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.85; }
+}
+@media (prefers-reduced-motion: reduce) { .countNum { animation: none; } }
+
+/* ---------- scoreboard ---------- */
+.scores {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.7rem;
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  border: 1px solid var(--border);
+}
+@media (max-width: 900px) {
+  .scores { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+}
+.scoreRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--seat) 10%, var(--panel-2));
+  border-left: 3px solid var(--seat);
+  font-size: 0.85rem;
+  transition: opacity 0.3s;
+}
+.scoreDead { opacity: 0.5; }
+.scoreName { flex: 1; min-width: 0; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.scoreLen { color: var(--paper-dim); font-variant-numeric: tabular-nums; min-width: 1.6ch; text-align: right; }
+.scoreVal { font-family: var(--font-display); font-variant-numeric: tabular-nums; min-width: 3.2ch; text-align: right; }
+.status { display: inline-flex; align-items: center; gap: 0.2rem; color: var(--paper-dim); font-size: 0.75rem; font-weight: 800; }
+.offlineIcon { color: var(--danger); flex: none; }
+.legend { display: flex; justify-content: space-between; color: var(--paper-dim); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.1rem 0.4rem 0; }

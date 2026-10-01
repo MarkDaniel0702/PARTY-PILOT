@@ -37,7 +37,7 @@ jobs:
         run: npm run build
 
       # web/ is a multi-page Vite app — one entry per game, plus the
-      # homepage. All 12 games are React now, so web/dist is the entire site.
+      # homepage. Every game is React, so web/dist is the entire site.
       - name: Mark as non-Jekyll site
         run: touch web/dist/.nojekyll
 

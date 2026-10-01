@@ -274,3 +274,26 @@ export function passTurn(state, seatId) {
     lastEvent: withEvent(state, { kind: "pass", seatId })
   };
 }
+
+function dominantColour(hand) {
+  const counts = {};
+  hand.forEach((c) => {
+    if (COLOURS.includes(c.colour)) counts[c.colour] = (counts[c.colour] || 0) + 1;
+  });
+  return COLOURS.slice().sort((a, b) => (counts[b] || 0) - (counts[a] || 0))[0];
+}
+
+// Plays a turn on behalf of a seat that can't (a phone that dropped and isn't
+// coming back), so one lost connection can't freeze the whole table. It never
+// helps that seat: a half-played wild is finished with the colour they hold
+// most of, otherwise they draw a card and decline to play it.
+export function skipTurn(state, seatId) {
+  if (state.winner || currentSeat(state) !== seatId) return state;
+  if (state.pendingWild) {
+    if (state.pendingWild.seatId !== seatId) return state;
+    return chooseColour(state, seatId, dominantColour(state.hands[seatId]));
+  }
+  let next = state.drawnCardId ? state : drawCard(state, seatId);
+  if (next.drawnCardId && currentSeat(next) === seatId) next = passTurn(next, seatId);
+  return next;
+}

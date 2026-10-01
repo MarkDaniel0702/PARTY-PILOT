@@ -16,7 +16,8 @@ import {
   drawDiscard,
   layMeld,
   addToMeld,
-  discard
+  discard,
+  skipTurn
 } from "./engine";
 
 const noShuffle = (arr) => arr.slice();
@@ -259,5 +260,55 @@ describe("view helpers", () => {
     const state = stateWith({ hands: { a: [c("S", 1)], b: [], c: [] }, discard: [c("H", 2)] });
     expect(handFor(state, "a").map((card) => card.id)).toEqual(["S1"]);
     expect(topDiscard(state).id).toBe("H2");
+  });
+});
+
+describe("dealer rotation", () => {
+  it("lets any seat deal and play first", () => {
+    const state = createGame(["a", "b", "c"], { shuffleFn: noShuffle, dealer: 1 });
+    expect(currentSeat(state)).toBe("b");
+    expect(state.hands.b).toHaveLength(state.hands.a.length + 1);
+    expect(state.hands.c).toHaveLength(state.hands.a.length);
+  });
+
+  it("wraps an out-of-range dealer index around the table", () => {
+    expect(currentSeat(createGame(["a", "b", "c"], { shuffleFn: noShuffle, dealer: 4 }))).toBe("b");
+    expect(currentSeat(createGame(["a", "b"], { shuffleFn: noShuffle, dealer: -1 }))).toBe("b");
+  });
+});
+
+describe("skipTurn", () => {
+  it("does nothing out of turn", () => {
+    const state = stateWith({ hands: { a: [c("S", 1)], b: [c("H", 2)], c: [c("D", 3)] } });
+    expect(skipTurn(state, "b")).toBe(state);
+  });
+
+  it("draws from the stock, discards the highest-value card and passes the turn", () => {
+    const state = stateWith({
+      turnStage: "draw",
+      stock: [c("C", 1, "s1"), c("C", 2, "s2")],
+      hands: { a: [c("S", 3, "low"), c("H", 13, "king")], b: [c("H", 2, "b1")], c: [c("D", 3, "c1")] }
+    });
+    const next = skipTurn(state, "a");
+    expect(next.discard.map((x) => x.id)).toEqual(["king"]);
+    expect(next.hands.a).toHaveLength(2);
+    expect(currentSeat(next)).toBe("b");
+    expect(next.turnStage).toBe("draw");
+  });
+
+  it("never throws the card back that was just taken from the discard", () => {
+    const state = stateWith({
+      turnStage: "act",
+      drawnCardId: "k",
+      drawnFrom: "discard",
+      hands: { a: [c("S", 13, "k"), c("H", 5, "five")], b: [c("H", 2, "b1")], c: [c("D", 3, "c1")] }
+    });
+    const next = skipTurn(state, "a");
+    expect(next.discard.map((x) => x.id)).toEqual(["five"]);
+  });
+
+  it("leaves the state alone when the stock is empty", () => {
+    const state = stateWith({ turnStage: "draw", stock: [], hands: { a: [c("S", 3)], b: [], c: [] } });
+    expect(skipTurn(state, "a")).toBe(state);
   });
 });

@@ -313,10 +313,18 @@ export function destroy(terrain, cx, cy, radius) {
   return removed;
 }
 
+// Furthest a buried point is lifted to reach open air, in mask pixels.
+const MAX_UNBURY = 48;
+
 // Drop a point until it rests on solid ground. Returns the resting y and how
 // far it fell, so callers can apply fall damage.
 export function settle(terrain, x, y, maxFall = terrain.height) {
   let cur = Math.floor(y);
+  // A point buried in solid ground (shoved into a hillside, say) first rises
+  // to the open air above. Without this the "is there ground below me?" test
+  // below sees solid rock immediately, calls it resting, and the character
+  // stays embedded until the terrain around them happens to be blown away.
+  for (let lift = 0; lift < MAX_UNBURY && cur > 0 && isSolid(terrain, x, cur); lift++) cur--;
   let fell = 0;
   while (fell < maxFall) {
     const below = cur + 1;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Smartphone, RotateCcw, Wifi, WifiOff, Plus } from "lucide-react";
+import { Smartphone, RotateCcw, Wifi, WifiOff, Plus, X } from "lucide-react";
 import { Button } from "./Button";
 import styles from "./qrPairing.module.css";
 
@@ -14,7 +14,11 @@ import styles from "./qrPairing.module.css";
 // so closing the session in this effect's cleanup would disconnect every
 // paired phone the instant the host leaves setup and starts the game. The
 // session is only ever closed by an explicit "Play without phones" tap.
-export function QRPairing({ session, teams = [] }) {
+//
+// `description` is the one-line pitch on the collapsed card — the default
+// speaks to the buzzer games, so a game where the phone does something else
+// (steer, deploy a fleet, hold private cards) passes its own.
+export function QRPairing({ session, teams = [], description = "Players scan a QR code to buzz in from their own phone." }) {
   // The session outlives this component (see note above), so a remount —
   // e.g. "New Quiz" bouncing back through the setup screen — should show
   // whatever's already running instead of defaulting back to collapsed.
@@ -63,9 +67,7 @@ export function QRPairing({ session, teams = [] }) {
           <span className={styles.toggleTitle}>
             Add phone controllers <span className={styles.optional}>(optional)</span>
           </span>
-          <span className={styles.toggleSub}>
-            Players scan a QR code to buzz in from their own phone.
-          </span>
+          <span className={styles.toggleSub}>{description}</span>
         </span>
         <Plus size={18} strokeWidth={2.5} className={styles.togglePlus} aria-hidden="true" />
       </button>
@@ -103,6 +105,17 @@ export function QRPairing({ session, teams = [] }) {
                   <WifiOff size={14} strokeWidth={2.5} className={styles.offline} />
                 )}
                 <span className={styles.playerName}>{p.name}</span>
+                {!p.connected && (
+                  <button
+                    type="button"
+                    className={styles.removeBtn}
+                    aria-label={`Remove ${p.name}`}
+                    title="Remove this player"
+                    onClick={() => session.removePlayer(p.playerId)}
+                  >
+                    <X size={13} strokeWidth={2.5} />
+                  </button>
+                )}
                 {teams.length > 1 && (
                   <select
                     className={styles.teamSelect}

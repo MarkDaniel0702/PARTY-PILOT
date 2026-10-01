@@ -116,14 +116,17 @@ export function topDiscard(state) {
   return state.discard.length ? state.discard[state.discard.length - 1] : null;
 }
 
-export function createGame(seatIds, { shuffleFn = defaultShuffle } = {}) {
+// `dealer` is the seat index that deals and plays first; rematches pass the
+// next index along so the first-move advantage rotates around the table.
+export function createGame(seatIds, { shuffleFn = defaultShuffle, dealer = 0 } = {}) {
   const baseHand = HAND_SIZE_BY_COUNT[seatIds.length] || 12;
+  const dealerIndex = ((dealer % seatIds.length) + seatIds.length) % seatIds.length;
   const pile = shuffleFn(createDeck());
   const hands = {};
   seatIds.forEach((id, i) => {
-    // Seat 0 deals and plays first, so they get the traditional extra card
-    // instead of a separate opening draw.
-    const size = i === 0 ? baseHand + 1 : baseHand;
+    // The dealer plays first, so they get the traditional extra card instead
+    // of a separate opening draw.
+    const size = i === dealerIndex ? baseHand + 1 : baseHand;
     hands[id] = pile.splice(pile.length - size, size);
   });
 
@@ -134,7 +137,7 @@ export function createGame(seatIds, { shuffleFn = defaultShuffle } = {}) {
     melds: [],
     meldSeq: 0,
     seatOrder: seatIds.slice(),
-    turnIndex: 0,
+    turnIndex: dealerIndex,
     // The dealer already holds their extra card, so round one skips
     // straight to melding/discarding — every seat after that must draw first.
     turnStage: "act",
@@ -315,4 +318,24 @@ export function publicView(state) {
     winType: state.winType,
     counts: state.seatOrder.map((id) => ({ seatId: id, count: state.hands[id].length }))
   };
+}
+
+// Plays a turn on behalf of a seat that can't (a phone that dropped and isn't
+// coming back) so one lost connection can't freeze the table. It never helps
+// that seat: they draw from the stock (never the discard pile) and throw away
+// their highest-value card.
+export function skipTurn(state, seatId) {
+  if (state.winner || currentSeat(state) !== seatId) return state;
+  let next = state;
+  if (next.turnStage === "draw") {
+    next = drawStock(next, seatId);
+    if (next === state) return state; // stock empty: the round is already over
+  }
+  if (next.turnStage !== "act") return next;
+  const eligible = next.hands[seatId].filter(
+    (card) => !(next.drawnFrom === "discard" && next.drawnCardId === card.id)
+  );
+  if (eligible.length === 0) return next;
+  const worst = eligible.slice().sort((a, b) => cardValue(b) - cardValue(a))[0];
+  return discard(next, seatId, worst.id);
 }

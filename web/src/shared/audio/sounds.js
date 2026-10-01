@@ -27,6 +27,13 @@ export const SOUND_NAMES = [
   "steal",
   "bonus",
   "complete",
+  // Short effects for the arcade / board games.
+  "drop",
+  "tick",
+  "go",
+  "eat",
+  "crash",
+  "roll",
 ];
 
 // ---------------------------------------------------------------------------
@@ -212,6 +219,32 @@ const RECIPES = {
   },
   complete(dest) {
     arpeggio(dest, [523.25, 659.25, 783.99, 1046.5], { type: "triangle", step: 0.11, dur: 0.22, gain: 0.26 });
+  },
+  // A disc or piece landing: a short low thump.
+  drop(dest) {
+    tone(dest, { type: "sine", freq: 190, freqEnd: 70, dur: 0.14, gain: 0.34 });
+  },
+  // Countdown beat, and its higher "go" partner.
+  tick(dest) {
+    tone(dest, { type: "square", freq: 660, dur: 0.07, gain: 0.16 });
+  },
+  go(dest) {
+    tone(dest, { type: "square", freq: 990, dur: 0.18, gain: 0.2 });
+  },
+  // Snake eating: a quick rising blip, quiet enough to survive being played
+  // by eight snakes at once.
+  eat(dest) {
+    tone(dest, { type: "triangle", freq: 520, freqEnd: 900, dur: 0.07, gain: 0.12 });
+  },
+  crash(dest) {
+    tone(dest, { type: "sawtooth", freq: 260, freqEnd: 60, dur: 0.28, gain: 0.26 });
+    tone(dest, { type: "square", freq: 90, freqEnd: 40, dur: 0.22, gain: 0.18, at: 0.04 });
+  },
+  // Dice rattling in a cup: a burst of short, uneven clicks.
+  roll(dest) {
+    [0, 0.06, 0.1, 0.17, 0.21, 0.29, 0.34].forEach((at, i) => {
+      tone(dest, { type: "square", freq: 170 + ((i * 53) % 90), dur: 0.035, gain: 0.14, at });
+    });
   },
 };
 

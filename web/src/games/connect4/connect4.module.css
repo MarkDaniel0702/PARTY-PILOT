@@ -1,0 +1,260 @@
+/* ---------- setup ---------- */
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.9rem 1.1rem;
+  font-size: 0.92rem;
+}
+.namesGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; margin-top: 0.4rem; }
+@media (max-width: 480px) { .namesGrid { grid-template-columns: 1fr; } }
+.nameField { display: flex; align-items: center; gap: 0.6rem; }
+.nameInput {
+  flex: 1;
+  min-width: 0;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.7rem 0.9rem;
+  color: var(--paper);
+  font-size: 1rem; /* >= 16px so iOS doesn't zoom on focus */
+}
+.nameInput:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.disc0, .disc1 {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  flex: none;
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.22), 0 0 10px -2px currentColor;
+}
+.disc0 { background: var(--p0, #ff4d5e); color: var(--p0, #ff4d5e); }
+.disc1 { background: var(--p1, #ffd23f); color: var(--p1, #ffd23f); }
+
+.modeNote {
+  margin: 0.9rem 0 0;
+  padding: 0.6rem 0.8rem;
+  background: var(--panel-2);
+  border-radius: var(--radius-sm);
+  color: var(--paper-dim);
+  font-size: 0.85rem;
+  text-align: center;
+}
+.seatStrip { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.9rem; justify-content: center; }
+.seatChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.32rem 0.8rem;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* ---------- series bar ---------- */
+.seriesBar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0.8rem;
+  max-width: 760px;
+  margin: 0 auto 1rem;
+}
+.side {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+  padding: 0.55rem 0.8rem;
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  border: 2px solid var(--border);
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+}
+.sideRight { flex-direction: row-reverse; text-align: right; }
+.sideActive {
+  border-color: var(--chip);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--chip) 25%, transparent), var(--shadow-soft);
+}
+.chipDisc {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--chip);
+  box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.22);
+  flex: none;
+}
+.sideText { display: flex; flex-direction: column; min-width: 0; }
+.sideName { font-weight: 800; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sideSub { font-size: 0.72rem; color: var(--paper-dim); }
+.pips { display: inline-flex; gap: 4px; }
+.sideRight .pips { justify-content: flex-end; }
+.pip {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--chip);
+  background: transparent;
+}
+.pipOn { background: var(--chip); }
+.midInfo { text-align: center; font-size: 0.78rem; color: var(--paper-dim); line-height: 1.35; }
+.midInfo strong { display: block; color: var(--accent-2); font-family: var(--font-display); font-size: 0.9rem; }
+@media (max-width: 560px) {
+  .seriesBar { grid-template-columns: 1fr 1fr; }
+  .midInfo { grid-column: 1 / -1; grid-row: 1; }
+}
+
+/* ---------- the board ---------- */
+.stage { display: flex; flex-direction: column; align-items: center; gap: 0.9rem; }
+
+/* Sized by the smaller of the width and the height available, so on a TV the
+   whole board is visible without scrolling and on a phone it fills the width.
+   The 380px is the header, series bar and turn banner stacked above it. */
+.boardWrap { width: max(280px, min(100%, calc((100vh - 380px) * 7 / 6), 900px)); max-width: 100%; }
+
+.board {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 7 / 6;
+  border-radius: 16px;
+  overflow: hidden;
+  /* What you see through the holes: always dark, in both themes. */
+  background: #0a1030;
+  box-shadow: 0 0 0 6px var(--board-edge, #1b3aa8), var(--shadow-soft);
+  user-select: none;
+  -webkit-user-select: none;
+}
+.discs {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+}
+.slot { position: relative; display: block; }
+.disc {
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+}
+.p0 {
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--p0, #ff4d5e) 70%, white), var(--p0, #ff4d5e) 55%, color-mix(in srgb, var(--p0, #ff4d5e) 70%, black));
+  color: var(--p0, #ff4d5e);
+}
+/* A faint inner ring tells the second player's discs apart without relying on
+   hue alone. */
+.p1 {
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--p1, #ffd23f) 70%, white), var(--p1, #ffd23f) 55%, color-mix(in srgb, var(--p1, #ffd23f) 70%, black));
+  color: var(--p1, #ffd23f);
+}
+.p1::after {
+  content: "";
+  position: absolute;
+  inset: 24%;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0.18);
+}
+
+.drop {
+  --from: calc(-125% * (var(--row, 0) + 1));
+  animation: c4drop calc(0.2s + var(--row, 0) * 0.06s) both;
+}
+@keyframes c4drop {
+  0% { transform: translateY(var(--from)); animation-timing-function: cubic-bezier(0.5, 0, 1, 0.6); }
+  70% { transform: translateY(0); animation-timing-function: ease-out; }
+  84% { transform: translateY(-7%); animation-timing-function: ease-in; }
+  100% { transform: translateY(0); }
+}
+
+.win { animation: c4win 0.8s ease-in-out infinite alternate; z-index: 1; }
+@keyframes c4win {
+  from { box-shadow: 0 0 0 0 currentColor; transform: scale(1); }
+  to { box-shadow: 0 0 0 4px #fff, 0 0 18px 6px currentColor; transform: scale(1.06); }
+}
+
+/* The blue face with a round hole at every cell. One element and a repeating
+   gradient instead of 42 children. */
+.face {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle closest-side at 50% 50%, transparent 0 80%, rgba(0, 0, 0, 0.35) 83%, var(--board, #2a56e0) 88%)
+    0 0 / calc(100% / 7) calc(100% / 6);
+}
+
+.columns {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  z-index: 3;
+}
+.column {
+  position: relative;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.column:disabled { cursor: default; }
+.column:not(:disabled):hover,
+.column:not(:disabled):focus-visible { background: rgba(255, 255, 255, 0.1); outline: none; }
+/* A ghost disc at the top of the hovered column shows where it will go. */
+.column:not(:disabled):hover::before {
+  content: "";
+  position: absolute;
+  top: 3%;
+  left: 14%;
+  right: 14%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--ghost);
+  opacity: 0.55;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drop, .win { animation: none; }
+}
+
+/* ---------- turn / result banner ---------- */
+.turnPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 2px solid var(--chip, var(--border));
+  font-weight: 800;
+  font-size: 1rem;
+}
+.turnPill .chipDisc { width: 18px; height: 18px; }
+.turnDim { color: var(--paper-dim); font-weight: 700; font-size: 0.82rem; }
+.banner {
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 3vw, 1.5rem);
+  padding: 0.7rem 1.2rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--chip, var(--accent)) 16%, var(--panel));
+  border: 2px solid var(--chip, var(--accent));
+  animation: bannerIn 0.3s ease both;
+}
+@keyframes bannerIn {
+  from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.timerRow { display: flex; justify-content: center; }
+.actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0.8rem; width: 100%; max-width: 560px; }
+.keys { color: var(--paper-dim); font-size: 0.78rem; text-align: center; margin: 0; }
+/* No keyboard on a touch-only device, so don't mention one. */
+@media (hover: none) and (pointer: coarse) { .kbHint { display: none; } }
+
+.winnerEmoji { font-size: 3rem; display: block; text-align: center; }
+.startHint { text-align: center; color: var(--paper-dim); font-size: 0.83rem; margin: 0.8rem auto 0; max-width: 48ch; }

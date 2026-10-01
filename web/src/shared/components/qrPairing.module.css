@@ -91,7 +91,18 @@
 }
 .online { color: var(--success); flex-shrink: 0; }
 .offline { color: var(--paper-dim); flex-shrink: 0; }
-.playerName { flex: 1; font-weight: 700; }
+.playerName { flex: 1; font-weight: 700; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.removeBtn {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: var(--paper-dim);
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.removeBtn:hover { color: var(--danger); border-color: var(--danger); }
 .teamSelect {
   background: var(--panel);
   color: var(--paper);

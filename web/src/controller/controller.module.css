@@ -299,3 +299,37 @@
   line-height: 1.5;
   color: var(--paper-dim);
 }
+
+/* Shown over the live screen while the link to the main screen is redialled —
+   the view underneath stays put so a running game isn't lost. */
+.reconnecting {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--danger) 14%, var(--panel));
+  border: 1px solid color-mix(in srgb, var(--danger) 45%, transparent);
+  color: var(--danger);
+  font-size: 0.82rem;
+  font-weight: 800;
+  animation: reconnectPulse 1.2s ease-in-out infinite;
+}
+@keyframes reconnectPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reconnecting { animation: none; }
+}
+
+/* A guess one letter off: told to that guesser alone, so it needs to read as
+   encouragement rather than as an error. */
+.closeLead { color: var(--accent-2); animation: closeNudge 0.4s ease; }
+@keyframes closeNudge {
+  0% { transform: scale(0.94); }
+  60% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) { .closeLead { animation: none; } }

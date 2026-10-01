@@ -1,0 +1,35 @@
+/* A smoky, felt-green back room: lamplit amber accents over deep green, with
+   the dice themselves staying warm ivory in both themes. */
+:root {
+  --ink: #07140f;
+  --panel: #0f2219;
+  --panel-2: #163225;
+  --paper: #f3f1e6;
+  --paper-dim: #9bb5a5;
+  --accent: #f0b429;
+  --accent-2: #ffd978;
+  --border: rgba(243, 241, 230, 0.14);
+}
+body {
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(240, 180, 41, 0.17) 0%, transparent 55%),
+    radial-gradient(ellipse at 0% 110%, rgba(40, 150, 90, 0.16) 0%, transparent 50%),
+    var(--ink);
+}
+
+:root[data-theme="light"] {
+  --ink: #e9f2ea;
+  --panel: #ffffff;
+  --panel-2: #eaf3ec;
+  --paper: #10241a;
+  --paper-dim: #52695b;
+  --accent: #b87c00;
+  --accent-2: #8a5d00;
+  --border: rgba(16, 36, 26, 0.15);
+}
+:root[data-theme="light"] body {
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(184, 124, 0, 0.12) 0%, transparent 55%),
+    radial-gradient(ellipse at 0% 110%, rgba(40, 150, 90, 0.12) 0%, transparent 50%),
+    var(--ink);
+}

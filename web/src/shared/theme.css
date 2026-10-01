@@ -97,6 +97,13 @@ a { color: inherit; }
 button { font-family: inherit; border: none; cursor: pointer; background: none; padding: 0; }
 input { font-family: inherit; }
 
+/* Touch: without this, two quick taps on the same control (BUZZ, a Tetris
+   pad key, a column in Connect Four) are read by mobile browsers as a
+   double-tap-to-zoom, which swallows the second tap and zooms the page.
+   `manipulation` keeps taps and scrolling but drops that gesture. */
+button, a, summary, label, input, select, textarea { touch-action: manipulation; }
+button { -webkit-tap-highlight-color: transparent; }
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }

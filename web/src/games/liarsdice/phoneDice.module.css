@@ -1,0 +1,140 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.85rem;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+}
+
+.round { margin: 0; color: var(--paper-dim); font-size: 0.8rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+.lead { margin: 0; font-size: 1.1rem; font-weight: 800; text-wrap: balance; }
+.sub { margin: 0; color: var(--paper-dim); font-size: 0.92rem; display: flex; align-items: center; justify-content: center; gap: 0.45rem; flex-wrap: wrap; }
+.hint { margin: 0; color: var(--paper-dim); font-size: 0.75rem; }
+.label { color: var(--paper-dim); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- your dice ---------- */
+.mine {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  align-items: center;
+  padding: 0.8rem 0.6rem 1rem;
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+  border: 1px solid var(--border);
+}
+.myDice { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; font-size: 1rem; }
+
+/* ---------- the standing bid ---------- */
+.bidCard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  padding: 0.7rem 1rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--accent) 12%, var(--panel));
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  min-height: 3.4rem;
+}
+.bidText { display: inline-flex; align-items: center; gap: 0.45rem; font-family: var(--font-display); font-size: 1.5rem; }
+
+/* ---------- bidding controls ---------- */
+.controls { display: flex; flex-direction: column; gap: 0.75rem; }
+.qtyRow { display: flex; align-items: center; justify-content: center; gap: 1.2rem; }
+.step {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--panel-2);
+  border: 2px solid var(--border);
+  color: var(--paper);
+}
+.step:active:not(:disabled) { transform: scale(0.92); }
+.step:disabled { opacity: 0.35; }
+.qty { min-width: 2.2ch; font-family: var(--font-display); font-size: 2.4rem; font-variant-numeric: tabular-nums; }
+
+.faces { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.4rem; }
+.faceBtn {
+  display: grid;
+  place-items: center;
+  padding: 0.35rem 0;
+  min-height: 52px;
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  border: 2px solid var(--border);
+  font-size: 0.8rem; /* die size is em-based: keeps six of them inside 390px */
+  transition: border-color 0.15s, transform 0.1s, background 0.15s;
+}
+.faceBtn:active:not(:disabled) { transform: scale(0.94); }
+.faceBtn:disabled { opacity: 0.3; }
+.faceOn { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 18%, var(--panel)); }
+
+.primary {
+  padding: 0.95rem 1.2rem;
+  min-height: 52px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(120deg, var(--accent), color-mix(in srgb, var(--accent) 60%, white));
+  color: #0d0620;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  box-shadow: var(--shadow-soft);
+}
+.primary:active:not(:disabled) { transform: scale(0.98); }
+.primary:disabled { opacity: 0.4; box-shadow: none; }
+
+.liar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.2rem;
+  min-height: 52px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--danger) 14%, var(--panel));
+  border: 2px solid var(--danger);
+  color: var(--danger);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+}
+.liar:active { transform: scale(0.98); background: var(--danger); color: #fff; }
+
+/* ---------- history ---------- */
+.history {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.82rem;
+  color: var(--paper-dim);
+}
+.history li { display: flex; justify-content: space-between; align-items: center; padding: 0.25rem 0.7rem; border-radius: var(--radius-sm); background: var(--panel); }
+.history .latest { color: var(--paper); background: var(--panel-2); font-weight: 700; }
+.histBid { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.85rem; }
+
+/* ---------- reveal ---------- */
+.hands { display: flex; flex-direction: column; gap: 0.4rem; }
+.hand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  border: 1px solid var(--border);
+}
+.handMine { border-color: var(--accent); }
+.handName { font-weight: 800; font-size: 0.85rem; text-align: left; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.handDice { display: inline-flex; flex-wrap: wrap; gap: 0.3rem; justify-content: flex-end; font-size: 1rem; }
+.verdict { margin: 0; padding: 0.7rem 0.9rem; border-radius: var(--radius-md); font-weight: 800; font-size: 0.95rem; }
+.good { background: color-mix(in srgb, var(--success) 16%, var(--panel)); color: var(--paper); }
+.bluff { background: color-mix(in srgb, var(--danger) 14%, var(--panel)); color: var(--paper); }

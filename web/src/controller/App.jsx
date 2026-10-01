@@ -13,6 +13,9 @@ import { AngleDial, PowerMeter } from "../games/dogsvscats/AimControls";
 import { PhonePlacement } from "../games/battleship/PhonePlacement";
 import { PhoneAttack } from "../games/battleship/PhoneAttack";
 import { PhoneTongits } from "../games/tongits/PhoneTongits";
+import { PhoneConnectFour } from "../games/connect4/PhoneConnectFour";
+import { PhoneDice } from "../games/liarsdice/PhoneDice";
+import { PhoneSnake } from "../games/snake/PhoneSnake";
 import cardStyles from "../shared/cards/cards.module.css";
 import styles from "./controller.module.css";
 
@@ -66,6 +69,10 @@ export default function App() {
 
   function handleDrawCard() {
     send(action(ACTION.DRAW_CARD, {}));
+  }
+
+  function handlePassTurn() {
+    send(action(ACTION.PASS_TURN, {}));
   }
 
   function handleChoice(optionId) {
@@ -154,6 +161,7 @@ export default function App() {
     return () => clearTimeout(t);
   }, [lastBuzzResult]);
 
+  const live = status === "connected" || status === "reconnecting";
   let body;
 
   if (status === "no-code") {
@@ -201,7 +209,10 @@ export default function App() {
         <Button type="submit" disabled={!name.trim()}>Join session {code}</Button>
       </form>
     );
-  } else if (status === "connected") {
+  } else if (live) {
+    // "reconnecting" deliberately falls through to the same view as "connected":
+    // tearing the screen down on every Wi-Fi blip would throw away a Tetris
+    // board that is running right here on the phone.
     if (!view || view.view === VIEW.LOBBY) {
       body = (
         <div className={styles.waiting}>
@@ -251,6 +262,11 @@ export default function App() {
           {view.canDraw && (
             <Button variant="secondary" onClick={handleDrawCard}>
               {view.drawLabel || "Draw a card"}
+            </Button>
+          )}
+          {view.canPass && (
+            <Button variant="secondary" onClick={handlePassTurn}>
+              Keep it &amp; pass
             </Button>
           )}
         </div>
@@ -327,7 +343,7 @@ export default function App() {
     } else if (view.view === VIEW.GUESS) {
       body = (
         <div className={styles.form}>
-          <p className={styles.lead}>{view.title || "What is it?"}</p>
+          <p className={`${styles.lead} ${view.close ? styles.closeLead : ""}`.trim()}>{view.title || "What is it?"}</p>
           {view.hint && <p className={styles.hintWord}>{view.hint}</p>}
           {!view.locked && (
             <form className={styles.guessForm} onSubmit={handleGuess}>
@@ -363,6 +379,12 @@ export default function App() {
       body = <PhoneAttack view={view} send={send} />;
     } else if (view.view === VIEW.TONGITS) {
       body = <PhoneTongits view={view} send={send} />;
+    } else if (view.view === VIEW.CONNECT4) {
+      body = <PhoneConnectFour view={view} send={send} />;
+    } else if (view.view === VIEW.DICE) {
+      body = <PhoneDice view={view} send={send} />;
+    } else if (view.view === VIEW.SNAKE) {
+      body = <PhoneSnake view={view} send={send} />;
     } else if (view.view === VIEW.TETRIS) {
       // The only view where the phone runs the game itself — see PhoneTetris.
       // Keyed on the seed so a rematch starts a genuinely fresh board.
@@ -478,6 +500,11 @@ export default function App() {
       </header>
       <div className={styles.content}>
         <div className={styles.contentInner}>
+          {status === "reconnecting" && (
+            <p className={styles.reconnecting} role="status">
+              <WifiOff size={15} strokeWidth={2.5} aria-hidden="true" /> Reconnecting…
+            </p>
+          )}
           {flash === "won" && <p className={styles.won}>You got it!</p>}
           {flash === "lost" && <p className={styles.lost}>Missed it!</p>}
           {body}

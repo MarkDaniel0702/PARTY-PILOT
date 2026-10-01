@@ -7,9 +7,10 @@ import { Button, ButtonRow } from "../../shared/components/Button";
 import { Roster } from "../../shared/components/Roster";
 import { PassCard } from "../../shared/components/PassCard";
 import { QRPairing } from "../../shared/components/QRPairing";
+import { OfflineBanner } from "../../shared/components/OfflineBanner";
 import { useRoster } from "../../shared/hooks/useRoster";
 import { useHostSession } from "../../shared/controller/useHostSession";
-import { useSeats, seatsMode } from "../../shared/controller/useSeats";
+import { useSeats, seatsMode, offlineSeats } from "../../shared/controller/useSeats";
 import { VIEW, MSG, ACTION, view as viewMsg } from "../../shared/controller/protocol";
 import { playSound } from "../../shared/audio/sounds";
 import { PlayingCard } from "../../shared/cards/PlayingCard";
@@ -25,7 +26,8 @@ import {
   drawDiscard,
   layMeld,
   addToMeld,
-  discard
+  discard,
+  skipTurn
 } from "./engine";
 import styles from "./tongits.module.css";
 
@@ -67,6 +69,14 @@ export default function App() {
   // Frozen at kickoff so a phone dropping mid-round can't reshuffle the
   // seats out from under an in-progress hand.
   const [activeSeats, setActiveSeats] = useState([]);
+  // Once cards are dealt, how the round is played is fixed by who was seated,
+  // not by who happens to be connected right now — otherwise every phone
+  // dropping at once would flip the table to pass-and-play and show each
+  // hand on the shared screen.
+  const playMode = activeSeats.length ? seatsMode(activeSeats) : mode;
+  const offline = offlineSeats(activeSeats, sessionPlayers);
+  // Which seat deals (and so moves first). Rotates on every rematch.
+  const dealerRef = useRef(0);
 
   const seatById = useMemo(() => {
     const map = {};
@@ -119,7 +129,7 @@ export default function App() {
 
   // Push each phone its own view.
   useEffect(() => {
-    if (mode !== "phone" || !game || phase !== "play") return;
+    if (playMode !== "phone" || !game || phase !== "play") return;
     activeSeats.forEach((seat) => {
       if (!seat.playerId) return;
       if (game.winner) {
@@ -148,7 +158,14 @@ export default function App() {
         })
       );
     });
-  }, [game, phase, mode, activeSeats, seatById, namedMelds, sendTo]);
+    // Phones beyond the table's capacity just watch, rather than staring at a
+    // stale "waiting for the host to deal" screen for the whole game.
+    sessionPlayers.forEach((p) => {
+      if (p.connected && !activeSeats.some((s) => s.playerId === p.playerId)) {
+        sendTo(p.playerId, viewMsg({ view: VIEW.LOBBY, title: "Spectating", subtitle: "This table is full — watch the big screen." }));
+      }
+    });
+  }, [game, phase, playMode, activeSeats, seatById, namedMelds, sessionPlayers, sendTo]);
 
   // Lobby view while still on the setup screen.
   useEffect(() => {
@@ -218,14 +235,16 @@ export default function App() {
 
   function handleStart() {
     const dealt = seats.slice(0, MAX_PLAYERS);
+    dealerRef.current = 0;
     setActiveSeats(dealt);
-    setGame(createGame(dealt.map((s) => s.seatId)));
+    setGame(createGame(dealt.map((s) => s.seatId), { dealer: dealerRef.current }));
     setHandRevealed(false);
     setPhase("play");
   }
 
   function handlePlayAgain() {
-    setGame(createGame(activeSeats.map((s) => s.seatId)));
+    dealerRef.current += 1;
+    setGame(createGame(activeSeats.map((s) => s.seatId), { dealer: dealerRef.current }));
     setHandRevealed(false);
     setPhase("play");
   }
@@ -277,7 +296,11 @@ export default function App() {
         </SetupBlock>
 
         <SetupBlock label="2. Phone controllers">
-          <QRPairing session={session} teams={[]} />
+          <QRPairing
+            session={session}
+            teams={[]}
+            description="Scan a QR code so every hand stays private on its owner's phone."
+          />
         </SetupBlock>
 
         <Button disabled={!canStart} onClick={handleStart}>
@@ -341,13 +364,25 @@ export default function App() {
               <p className={styles.turnBanner}>{turnSeat?.name || "—"}'s turn</p>
             </div>
 
-            {mode === "phone" && (
+            {playMode === "phone" && (
               <p className={styles.phoneNote}>
                 Everyone plays from their own phone. {turnSeat?.name || "Someone"} is up.
               </p>
             )}
 
-            {mode === "local" && !handRevealed && !game.winner && (
+            {playMode === "phone" && !game.winner && (
+              <OfflineBanner
+                names={offline.map((s) => s.name)}
+                waitingOn={offline.some((s) => s.seatId === turnSeatId) ? turnSeat?.name : null}
+                onSkip={
+                  offline.some((s) => s.seatId === turnSeatId)
+                    ? () => setGame((g) => skipTurn(g, turnSeatId))
+                    : undefined
+                }
+              />
+            )}
+
+            {playMode === "local" && !handRevealed && !game.winner && (
               <PassCard
                 icon={<Spade size={48} strokeWidth={2} />}
                 name={turnSeat?.name || ""}
@@ -357,7 +392,7 @@ export default function App() {
               />
             )}
 
-            {mode === "local" && handRevealed && !game.winner && localView && (
+            {playMode === "local" && handRevealed && !game.winner && localView && (
               <div className={styles.localHand}>
                 <PhoneTongits view={localView} send={localSend} />
               </div>

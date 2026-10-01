@@ -168,7 +168,7 @@ export default function App() {
         {phase === "results" && (
           <>
             <PromptHeading text={currentPrompt} />
-            <ResultsList result={{ ranked, winner, shared: false, tiebreak: null }} unit="votes" unitSingular="vote" />
+            <ResultsList result={{ ranked, winner, shared: false, tiebreak: null }} unit="votes" unitSingular="vote" chime={false} />
             <Button onClick={handleNextOrSkip}>Next Question →</Button>
           </>
         )}

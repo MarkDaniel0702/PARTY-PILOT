@@ -2,8 +2,8 @@ import {
   Fingerprint, Eye, HelpCircle, Lock, Brain, Grid3x3,
   Tv, Music, Image,
   PartyPopper, ListChecks, GitFork, Users, Drama,
-  Spade, Layers, Brush, Club,
-  Swords, Gamepad2, Blocks, Anchor,
+  Spade, Layers, Brush, Club, Dices,
+  Swords, Gamepad2, Blocks, Anchor, CircleDot, Worm,
   Bot, Mic, Smartphone
 } from 'lucide-react';
 
@@ -165,7 +165,7 @@ export const GAME_GROUPS = [
     ]
   },
   {
-    label: 'Card Games',
+    label: 'Cards & Dice',
     icon: Spade,
     games: [
       {
@@ -198,6 +198,17 @@ export const GAME_GROUPS = [
         accent: '#e8a91d',
         meta: [
           { icon: Users, label: '2–4 players' },
+          { icon: Smartphone, label: 'Phones optional', variant: 'auto' }
+        ]
+      },
+      {
+        href: 'liarsdice.html',
+        icon: Dices,
+        title: "Liar's Dice",
+        desc: 'Roll in secret, bid on every die on the table, and call out the bluff. Last player holding dice wins.',
+        accent: '#f0b429',
+        meta: [
+          { icon: Users, label: '2–6 players' },
           { icon: Smartphone, label: 'Phones optional', variant: 'auto' }
         ]
       }
@@ -238,6 +249,28 @@ export const GAME_GROUPS = [
         meta: [
           { icon: Users, label: '2 players' },
           { icon: Smartphone, label: 'Phones required', variant: 'gm' }
+        ]
+      },
+      {
+        href: 'snake.html',
+        icon: Worm,
+        title: 'Snake Battle',
+        desc: 'Everyone steers their own snake in one arena at once. Eat, grow, and trap your friends against a wall. Steer from your phone or the keyboard.',
+        accent: '#3dff9a',
+        meta: [
+          { icon: Users, label: '1–8 players' },
+          { icon: Smartphone, label: 'Phones or keyboard', variant: 'auto' }
+        ]
+      },
+      {
+        href: 'connect4.html',
+        icon: CircleDot,
+        title: 'Connect Four',
+        desc: 'Drop discs, block your rival, and line up four first. Play on the shared screen or from two phones, best-of series included.',
+        accent: '#5b86ff',
+        meta: [
+          { icon: Users, label: '2 players' },
+          { icon: Smartphone, label: 'Phones optional', variant: 'auto' }
         ]
       }
     ]

@@ -276,3 +276,22 @@ describe("board coordinate helpers", () => {
     expect(SHIP_DEFS.reduce((sum, s) => sum + s.size, 0)).toBe(17);
   });
 });
+
+describe("createMatch first turn", () => {
+  const seats = [
+    { playerId: "p1", name: "Ann" },
+    { playerId: "p2", name: "Bo" }
+  ];
+
+  it("lets player 0 fire first by default", () => {
+    const m = createMatch(seats);
+    expect(m.turnIndex).toBe(0);
+    expect(m.firstTurn).toBe(0);
+  });
+
+  it("starts the battle on the requested seat", () => {
+    const m = createMatch(seats, 1);
+    expect(m.turnIndex).toBe(1);
+    expect(m.firstTurn).toBe(1);
+  });
+});

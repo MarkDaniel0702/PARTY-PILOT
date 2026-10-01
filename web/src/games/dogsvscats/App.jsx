@@ -70,7 +70,7 @@ export default function App() {
 
   // Handlers read fresh state through a ref so the listener registers once.
   const ref = useRef();
-  ref.current = { match, phase, weaponId, angle, power, busy, team };
+  ref.current = { match, phase, weaponId, angle, power, busy, team, sessionPlayers };
 
   const doFire = useCallback((a, p, wid) => {
     const st = ref.current;
@@ -105,6 +105,11 @@ export default function App() {
       if (msg.type !== MSG.ACTION) return;
       const st = ref.current;
       if (st.phase !== "play" || st.busy) return;
+      // Only the phones on the team whose turn it is may steer — the other
+      // team's phones are shown "watch the screen", but a stale or modified
+      // controller must not be able to take the shot out of their hands.
+      const seat = st.sessionPlayers.findIndex((sp) => sp.playerId === msg.playerId);
+      if (seat === -1 || seat % 2 !== st.match.turnTeamIndex) return;
       const p = msg.payload || {};
       if (msg.kind === ACTION.AIM) {
         if (typeof p.angle === "number") setAngle(p.angle);
@@ -160,17 +165,22 @@ export default function App() {
   // ---------- turn timer ----------
   useEffect(() => {
     if (phase !== "play" || busy || !match || match.phase === "over") return undefined;
-    setTurnLeft(TURN_SECONDS);
+    // The countdown lives in a local, not in a state updater: running the
+    // end-of-turn side effects inside `setTurnLeft((t) => ...)` made them fire
+    // twice wherever React double-invokes updaters (StrictMode in dev), which
+    // skipped a whole extra turn.
+    let left = TURN_SECONDS;
+    setTurnLeft(left);
     const id = setInterval(() => {
-      setTurnLeft((t) => {
-        if (t <= 1) {
-          clearInterval(id);
-          setMessage("Out of time!");
-          setMatch((m) => (m ? endTurn(m) : m));
-          return TURN_SECONDS;
-        }
-        return t - 1;
-      });
+      left -= 1;
+      if (left <= 0) {
+        clearInterval(id);
+        setTurnLeft(TURN_SECONDS);
+        setMessage("Out of time!");
+        setMatch((m) => (m ? endTurn(m) : m));
+        return;
+      }
+      setTurnLeft(left);
     }, 1000);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -200,6 +210,11 @@ export default function App() {
     const m = createMatch({ battlefieldId: fieldId, perTeam, seed });
     setMatch(m);
     setHold(null);
+    // A blast or shot left mid-animation by "End battle" must not reappear,
+    // frozen, on the next battlefield.
+    setShot(null);
+    setShotProgress(0);
+    setExplosion(null);
     setMatchId((n) => n + 1);
     setTerrainVersion((v) => v + 1);
     setMessage("");
@@ -322,6 +337,8 @@ export default function App() {
   function handleNewGame() {
     setMatch(null);
     setShot(null);
+    setShotProgress(0);
+    setExplosion(null);
     setHold(null);
     setPhase("setup");
   }
@@ -362,7 +379,11 @@ export default function App() {
         </SetupBlock>
 
         <SetupBlock label="3. Phone controllers">
-          <QRPairing session={session} teams={[]} />
+          <QRPairing
+            session={session}
+            teams={[]}
+            description="Scan a QR code to aim, walk and fire from your phone."
+          />
         </SetupBlock>
 
         <Button onClick={handleStart}>

@@ -391,3 +391,71 @@ describe("weapons", () => {
     expect(lobber.windFactor).toBeGreaterThan(bazooka.windFactor);
   });
 });
+
+// Terrain with a sheer wall rising from the flat ground — the wall is far taller
+// than MAX_CLIMB, so it must stop a walking character, not be climbed.
+function wallTerrain({ groundY = 250, wallX = 320, wallW = 30, wallTop = 180 } = {}) {
+  const t = flatTerrain(groundY);
+  for (let y = wallTop; y < groundY; y++) {
+    for (let x = wallX; x < wallX + wallW; x++) t.mask[y * t.width + x] = 1;
+  }
+  return t;
+}
+
+describe("walking into a wall", () => {
+  const setup = (terrain, x) => {
+    const m = createMatch({ battlefieldId: "hills", perTeam: 1, seed: 8 });
+    return {
+      ...m,
+      terrain,
+      characters: m.characters.map((c, i) => (i === 0 ? { ...c, x, y: 249 } : { ...c, x: 40, y: 249 }))
+    };
+  };
+
+  it("refuses a step up that is taller than a character can climb", () => {
+    const m = setup(wallTerrain(), 316);
+    let cur = m;
+    for (let i = 0; i < 6; i++) cur = moveActive(cur, 1);
+    const me = activeCharacter(cur);
+    // Stuck at the foot of the wall, still standing on the floor.
+    expect(me.x).toBeLessThan(320);
+    expect(me.y).toBe(249);
+  });
+
+  it("still climbs a small ledge", () => {
+    const t = wallTerrain({ wallTop: 245 }); // a 5px step
+    const m = setup(t, 316);
+    let cur = m;
+    for (let i = 0; i < 4; i++) cur = moveActive(cur, 1);
+    const me = activeCharacter(cur);
+    expect(me.x).toBeGreaterThanOrEqual(320);
+    expect(isSolid(t, me.x, me.y)).toBe(false);
+    expect(isSolid(t, me.x, me.y + 1)).toBe(true);
+  });
+});
+
+describe("a character buried in the ground", () => {
+  it("settle() lifts a point buried in solid ground up onto the surface", () => {
+    const t = flatTerrain(250);
+    const r = settle(t, 300, 262); // 12px under the surface
+    expect(r.y).toBe(249);
+    expect(r.lost).toBe(false);
+    expect(isSolid(t, 300, r.y)).toBe(false);
+  });
+
+  it("a paw whack never shoves its victim into a wall", () => {
+    const t = wallTerrain({ wallX: 330, wallW: 40, wallTop: 200 });
+    const m = createMatch({ battlefieldId: "hills", perTeam: 1, seed: 8 });
+    const shooter = activeCharacter(m);
+    const setupState = {
+      ...m,
+      terrain: t,
+      characters: m.characters.map((c) =>
+        c.id === shooter.id ? { ...c, x: 316, y: 249 } : { ...c, x: 326, y: 249 }
+      )
+    };
+    const { state } = fire(setupState, { weaponId: "whack", angle: 0, power: 0 });
+    const victim = state.characters.find((c) => c.id !== shooter.id);
+    expect(isSolid(t, victim.x, victim.y)).toBe(false);
+  });
+});

@@ -14,13 +14,14 @@ import { TurnBanner } from "../../shared/components/RevealCard";
 import { ResultsList } from "../../shared/components/ResultsList";
 import { TieBreakerScreen } from "../../shared/components/TieBreakerScreen";
 import { QRPairing } from "../../shared/components/QRPairing";
+import { OfflineBanner } from "../../shared/components/OfflineBanner";
 import { useRoster } from "../../shared/hooks/useRoster";
 import { useTimerSetup } from "../../shared/hooks/useTimerSetup";
 import { useGameTimer } from "../../shared/hooks/useGameTimer";
 import { useUsedIndices } from "../../shared/hooks/useUsedIndices";
 import { resolveStanding } from "../../shared/utils/resolveStanding";
 import { useHostSession } from "../../shared/controller/useHostSession";
-import { useSeats, seatsMode } from "../../shared/controller/useSeats";
+import { useSeats, seatsMode, offlineSeats } from "../../shared/controller/useSeats";
 import { VIEW, MSG, ACTION, view as viewMsg } from "../../shared/controller/protocol";
 import { StrokeCanvas } from "../../shared/draw/StrokeCanvas";
 import { PALETTE, WIDTHS, createStroke, appendPoint, appendPoints } from "../../shared/draw/strokes";
@@ -74,6 +75,12 @@ export default function App() {
   const mode = seatsMode(seats);
 
   const [activeSeats, setActiveSeats] = useState([]);
+  // Fixed by who was seated when the game started, not by who is connected
+  // right now — otherwise every phone dropping at once would flip the table
+  // to pass-and-play, putting the secret word and a drawing pad on the
+  // shared screen.
+  const playMode = activeSeats.length ? seatsMode(activeSeats) : mode;
+  const offline = offlineSeats(activeSeats, sessionPlayers);
   const [scores, setScores] = useState({});
   const [roundIndex, setRoundIndex] = useState(0);
   const [turnIndex, setTurnIndex] = useState(0);
@@ -81,6 +88,9 @@ export default function App() {
   const [board, setBoard] = useState(EMPTY_BOARD);
   const [feed, setFeed] = useState([]);
   const [correctIds, setCorrectIds] = useState([]);
+  // Seats whose latest guess was one letter off. Told only to that guesser —
+  // see the GUESS view below — and cleared on their next guess.
+  const [closeIds, setCloseIds] = useState([]);
   const [lastResult, setLastResult] = useState("");
   const [colour, setColour] = useState(PALETTE[0]);
   const [width, setWidth] = useState(WIDTHS[1]);
@@ -166,7 +176,7 @@ export default function App() {
   // drawer; GUESS carries the masked word, so the answer never reaches anyone
   // who is meant to be guessing it.
   useEffect(() => {
-    if (mode !== "phone" || sessionPlayers.length === 0) return;
+    if (playMode !== "phone" || sessionPlayers.length === 0) return;
 
     if (phase === "setup") {
       sessionPlayers.forEach((p) => {
@@ -202,16 +212,21 @@ export default function App() {
           seat.playerId,
           viewMsg({
             view: VIEW.GUESS,
-            title: correctIds.includes(seat.seatId) ? "You got it!" : "What is it?",
+            title: correctIds.includes(seat.seatId)
+              ? "You got it!"
+              : closeIds.includes(seat.seatId)
+              ? "So close — try again!"
+              : "What is it?",
             hint: masked,
             locked: correctIds.includes(seat.seatId),
+            close: closeIds.includes(seat.seatId),
             feed: feed.slice(-6)
           })
         );
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode, phase, activeSeats, drawer, currentWord, masked, feed, correctIds, sessionPlayers, sendTo]);
+  }, [playMode, phase, activeSeats, drawer, currentWord, masked, feed, correctIds, closeIds, sessionPlayers, sendTo]);
 
   // ---------- turn flow ----------
   function wordPool() {
@@ -224,6 +239,7 @@ export default function App() {
     setBoard(EMPTY_BOARD);
     setFeed([]);
     setCorrectIds([]);
+    setCloseIds([]);
     setTurnIndex(idx);
     setRoundIndex(roundArg);
     // With phones the drawer reads the word privately on their own screen, so
@@ -260,6 +276,8 @@ export default function App() {
     if (verdict === RESULT.IGNORED) return;
 
     const name = st.seatById[seatId]?.name || "Player";
+    // Any new guess retires the previous "so close".
+    setCloseIds((prev) => (prev.includes(seatId) ? prev.filter((id) => id !== seatId) : prev));
 
     if (verdict === RESULT.CORRECT) {
       playSound("correct");
@@ -270,23 +288,11 @@ export default function App() {
       return;
     }
 
-    // A near miss is told only to the guesser — the shared feed shows it as an
-    // ordinary wrong guess, or the whole room learns they're one letter away.
-    if (verdict === RESULT.CLOSE) {
-      const seat = st.seatById[seatId];
-      if (seat?.playerId) {
-        sendTo(
-          seat.playerId,
-          viewMsg({
-            view: VIEW.GUESS,
-            title: "So close!",
-            hint: maskWord(st.currentWord, hintCount(st.currentWord, 1 - st.remainingFraction)),
-            close: true,
-            feed: []
-          })
-        );
-      }
-    }
+    // A near miss is told only to the guesser (through closeIds, which the
+    // view effect folds into that seat's own GUESS view) — the shared feed
+    // shows it as an ordinary wrong guess, or the whole room learns they're
+    // one letter away.
+    if (verdict === RESULT.CLOSE) setCloseIds((prev) => [...prev, seatId]);
     setFeed((prev) => [...prev, feedEntry(name, text, RESULT.WRONG)]);
   }
 
@@ -440,7 +446,11 @@ export default function App() {
         </SetupBlock>
 
         <SetupBlock label="4. Phone controllers">
-          <QRPairing session={session} teams={[]} />
+          <QRPairing
+            session={session}
+            teams={[]}
+            description="Scan a QR code to sketch and type guesses from your own phone."
+          />
         </SetupBlock>
 
         <SetupBlock label="5. Rounds">
@@ -492,6 +502,15 @@ export default function App() {
           <span className={styles.drawerName}>✏️ {drawer?.name} is drawing</span>
         </div>
 
+        {playMode === "phone" && (
+          <OfflineBanner
+            names={offline.map((s) => s.name)}
+            waitingOn={offline.some((s) => s.seatId === drawer?.seatId) ? drawer?.name : null}
+            onSkip={offline.some((s) => s.seatId === drawer?.seatId) ? () => endTurn(null) : undefined}
+            skipLabel="Skip this drawing"
+          />
+        )}
+
         {timerSetup.enabled && <GameTimer timer={gameTimer} />}
 
         <p className={styles.maskedWord} aria-label="word so far">
@@ -504,12 +523,12 @@ export default function App() {
 
         {/* Local mode shows the word to whoever is holding the device — they
             already revealed it deliberately via the pass card. */}
-        {mode === "local" && <p className={styles.localWord}>Your word: <strong>{currentWord}</strong></p>}
+        {playMode === "local" && <p className={styles.localWord}>Your word: <strong>{currentWord}</strong></p>}
 
         <StrokeCanvas
           strokes={board.strokes}
           liveStroke={board.live}
-          interactive={mode === "local"}
+          interactive={playMode === "local"}
           colour={colour}
           width={width}
           onStrokeStart={localStart}
@@ -518,7 +537,7 @@ export default function App() {
           label={`${drawer?.name || "Someone"}'s drawing`}
         />
 
-        {mode === "local" && (
+        {playMode === "local" && (
           <div className={styles.tools}>
             <div className={styles.swatches}>
               {PALETTE.map((c) => (
@@ -560,7 +579,7 @@ export default function App() {
           </div>
         )}
 
-        {mode === "phone" ? (
+        {playMode === "phone" ? (
           <div className={styles.feed}>
             {feed.length === 0 && <p className={styles.feedEmpty}>Guesses will appear here…</p>}
             {feed.slice(-8).map((f, i) => (

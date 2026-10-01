@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Grid3x3, Flag, ArrowRight } from "lucide-react";
+import { Grid3x3, Flag, ArrowRight, WifiOff } from "lucide-react";
 import { GameShell } from "../../shared/components/GameShell";
 import { Screen, ScreenTitle, ScreenSub, BigIcon, SetupBlock } from "../../shared/components/Screen";
 import { HowToPlay } from "../../shared/components/HowToPlay";
@@ -23,6 +23,12 @@ const MAX_PLAYERS = 4;
 const SEAT_COLOURS = ["#31d0e0", "#e8c31d", "#e8434f", "#7ee06a"];
 
 const TRACER_MS = 850;
+// A phone streams its board ~12 times a second even when nobody is touching
+// it, so silence this long means it is gone (dropped, asleep, refreshed — a
+// refreshed phone has lost its board and can't resume it). Without this a
+// single dead phone would hold the whole match open until someone noticed
+// and pressed End match.
+const FORFEIT_MS = 10000;
 const CLEAR_LABELS = { 1: "SINGLE", 2: "DOUBLE", 3: "TRIPLE", 4: "TETRIS!" };
 
 const MODE_ITEMS = [
@@ -48,11 +54,13 @@ export default function App() {
   const arenaRef = useRef(null);
   const paneRefs = useRef({});
   const seenRef = useRef({});
+  const lastSeenRef = useRef({}); // playerId -> when its last snapshot arrived
 
   const session = useHostSession([]);
   const { onMessage, sendTo, players: sessionPlayers } = session;
 
   const connected = sessionPlayers.filter((p) => p.connected);
+  const offlineIds = new Set(sessionPlayers.filter((p) => !p.connected).map((p) => p.playerId));
   const canStart = connected.length >= MIN_PLAYERS;
 
   const ref = useRef();
@@ -107,7 +115,10 @@ export default function App() {
       const id = msg.playerId;
 
       if (msg.kind === ACTION.TETRIS_STATE) {
-        setBoards((b) => (b[id] ? { ...b, [id]: { ...b[id], ...msg.payload } } : b));
+        lastSeenRef.current[id] = Date.now();
+        // A board that is already out stays out: a forfeited phone that dials
+        // back in must not bring its board back to life on the TV.
+        setBoards((b) => (b[id] && !b[id].over ? { ...b, [id]: { ...b[id], ...msg.payload } } : b));
         return;
       }
 
@@ -149,11 +160,18 @@ export default function App() {
     setHits({});
     setBursts({});
     seenRef.current = {};
+    lastSeenRef.current = Object.fromEntries(players.map((p) => [p.playerId, Date.now()]));
     setClock(mode === "race" ? raceSeconds * 60 : 0);
     setPhase("play");
     players.forEach((p, i) => {
       sendTo(p.playerId, viewMsg({ view: VIEW.TETRIS, seed: s, mode, colour: SEAT_COLOURS[i % SEAT_COLOURS.length] }));
     });
+    // A fifth phone has no board — tell it so instead of leaving it on the lobby.
+    sessionPlayers
+      .filter((p) => p.connected && !players.some((q) => q.playerId === p.playerId))
+      .forEach((p) =>
+        sendTo(p.playerId, viewMsg({ view: VIEW.LOBBY, title: "Spectating", subtitle: "All four boards are taken — watch the big screen." }))
+      );
   }, [sessionPlayers, mode, raceSeconds, sendTo]);
 
   // Lobby view while setting up.
@@ -177,6 +195,24 @@ export default function App() {
     }, 1000);
     return () => clearInterval(id);
   }, [phase, mode]);
+
+  // Knock out any board whose phone has gone quiet (see FORFEIT_MS).
+  useEffect(() => {
+    if (phase !== "play") return undefined;
+    const id = setInterval(() => {
+      const st = ref.current;
+      const now = Date.now();
+      st.order.forEach((pid) => {
+        if (st.boards[pid]?.over) return;
+        if (now - (lastSeenRef.current[pid] ?? now) < FORFEIT_MS) return;
+        lastSeenRef.current[pid] = now;
+        setBoards((b) => (b[pid] && !b[pid].over ? { ...b, [pid]: { ...b[pid], over: true, forfeit: true } } : b));
+        setKnockouts((k) => (k.includes(pid) ? k : [...k, pid]));
+        sendTo(pid, viewMsg({ view: VIEW.WAIT, title: "Knocked out", subtitle: "Your connection dropped for too long." }));
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [phase, sendTo]);
 
   // Line clears and level-ups, spotted by diffing successive snapshots. The
   // engine clears lines the instant a piece locks, so without `clearId` in
@@ -208,9 +244,10 @@ export default function App() {
   useEffect(() => {
     if (phase !== "play" || order.length === 0) return;
     const alive = order.filter((id) => !boards[id]?.over);
-    const finished = mode === "race" ? clock <= 0 : alive.length <= 1;
+    // A race also ends the moment nobody is left to race. The fanfare isn't
+    // played here: the results screen's ResultsList plays it on mount.
+    const finished = mode === "race" ? clock <= 0 || alive.length === 0 : alive.length <= 1;
     if (!finished) return;
-    playSound("complete");
     order.forEach((id) => sendTo(id, eventMsg("end", {})));
     order.forEach((id) =>
       sendTo(id, viewMsg({ view: VIEW.WAIT, title: "Match over", subtitle: "Check the big screen." }))
@@ -283,7 +320,11 @@ export default function App() {
         )}
 
         <SetupBlock label={mode === "race" ? "3. Players" : "2. Players"}>
-          <QRPairing session={session} teams={[]} />
+          <QRPairing
+            session={session}
+            teams={[]}
+            description="Everyone scans a QR code — your phone is your board and your controls."
+          />
           {connected.length > 0 && (
             <div className={styles.seatStrip}>
               {connected.slice(0, MAX_PLAYERS).map((p, i) => (
@@ -346,6 +387,11 @@ export default function App() {
                   <div className={styles.paneHead}>
                     <span className={styles.seatDot} />
                     <span className={styles.paneName}>{b.name}</span>
+                    {offlineIds.has(id) && !b.over && (
+                      <span className={styles.offlineTag} title="Reconnecting">
+                        <WifiOff size={12} strokeWidth={2.5} aria-hidden="true" />
+                      </span>
+                    )}
                     {id === leaderId && order.length > 1 && (
                       <span className={styles.crown} title="Most lines">👑</span>
                     )}
@@ -396,7 +442,7 @@ export default function App() {
                       )}
                       {b.over && (
                         <span className={styles.koStamp}>
-                          Knocked out
+                          {b.forfeit ? "Disconnected" : "Knocked out"}
                           <em>#{place}</em>
                         </span>
                       )}
