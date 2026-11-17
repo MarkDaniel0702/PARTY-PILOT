@@ -116,7 +116,7 @@ The whole site — the homepage plus all 21 games — is a **single React 19 + V
 | 👥 [Most Likely To](#-other-implemented-games) | Party & Voting | 3–10 | ✅ | — | — |
 | 🎭 [Charades](#-other-implemented-games) | Party & Voting | 3–10 | ✅ | ✅ | ✅ |
 | 🃏 [UNO](#-uno) | Cards & Dice | 2–8 | ✅ | — | — |
-| 🎴 [Tong-Its](#-tong-its) | Cards & Dice | 2–4 | ✅ | — | ✅ |
+| 🎴 [Tong-Its](#-tong-its) | Cards & Dice | 2–3 | ✅ | — | ✅ |
 | 🎲 [Liar's Dice](#-liars-dice) | Cards & Dice | 2–6 | ✅ | — | ✅ |
 | 🎨 [Draw & Guess](#-draw--guess) | Cards & Dice | 3–8 | ✅ | — | ✅ |
 | ⚔️ [Dogs vs Cats](#️-dogs-vs-cats) | Arcade | 2 teams | ✅ | — | ✅ |
@@ -295,14 +295,18 @@ Like UNO, it plays two ways:
 
 The shared screen always shows the public state — the stock and discard piles, every meld laid on the table (whoever it belongs to), and everyone's remaining card count.
 
-- Each turn: draw one card (from the stock or the top of the discard), optionally lay melds, then discard to end your turn.
-- **Sapaw** — the signature Tong-Its move — lets you add a matching card from your hand onto *any* meld already on the table, yours or an opponent's, not just your own.
-- **Tong-Its!** — meld your entire hand in one turn with nothing left to discard, and you win instantly with no discard needed at all. Meld down to your last card and discard it for a normal win instead.
-- If the stock runs dry before anyone goes out, the round ends immediately and whoever is holding the least card value in hand wins the showdown.
-- Player count is **2–4**, with hand sizes that scale down a little at 4 players so the stock still has a healthy reserve to draw from.
+- **Deal:** 12 cards each, 13 for the dealer, who opens by discarding. The round's winner deals the next one.
+- **Your turn:** draw from the stock, **or** take the top discard — but only if you can lay a set/run with it immediately (2+ cards from your hand) or add it onto a meld on the table. Then lay melds, sapaw, and discard one card.
+- **Sapaw** — add a matching card onto *any* meld on the table. Sapaw'ing a meld locks its owner out of calling Draw until their next turn.
+- **Tong-Its!** — get rid of every card (melds, sapaw, or discarding your last) and win instantly.
+- **Draw** — with a meld of your own out, call Draw instead of drawing. Opponents **Fold** or **Challenge** (no exposed meld and no "Secret" four-of-a-kind = auto-fold). Lowest hand value wins; ties go to the challenger.
+- **Burned (sunog)** — never laying a meld means you can't challenge and automatically lose when the stock runs out.
+- **Stock out** — the round ends; burned players lose, lowest hand wins, ties go to whoever drew the last stock card (then the next seat).
+- **Chips** — payouts follow the classic playtongits.com table (ante 10 chips): Tong-Its 4 from each loser, stock-out 4, Draw fold 2 / fight 5, +2 if burned, +2 per Ace/King, Secret or Escalera (5+ run) in the winner's cards. Balances carry across rounds.
+- Player count is **2–3** (the standard 3-player game, or a 2-player variant).
 
 > [!NOTE]
-> One simplification: there's no side-betting or per-card payout — B-Rotation plays Tong-Its purely as a race to empty your hand, with the round winner shown on the results screen.
+> Not implemented: "Spread" (an all-melds opening hand) and the jackpot/"two hits" pot. House payout tables vary; this is one documented set.
 
 ---
 

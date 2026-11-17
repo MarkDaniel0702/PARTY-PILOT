@@ -5,19 +5,45 @@ import { shuffle as defaultShuffle } from "../../shared/utils/random";
 // one, and an invalid action returns the *same* state object by reference so
 // callers can detect a no-op with `next === state`.
 //
-// Tong-Its is a Filipino rummy: build sets (3-4 of a rank, one per suit) and
-// runs (3+ consecutive cards, one suit) from your hand, lay them face-up on
-// the table, and empty your hand first. Two ways to win a round:
-//   - "Tongits!" — you meld your entire hand with nothing left to discard.
-//     This is the big one: an instant win with a bonus.
-//   - A normal go-out — you meld everything but one card, then discard it.
-// If the stock runs dry before either happens, the round ends on the spot
-// and whoever is holding the least card value in their hand wins instead.
+// Rules implemented (Filipino Tong-Its, per tongits.org / playtongits.com):
+//   * 2-3 players, 52 cards. Everyone gets 12, the dealer 13 and opens by
+//     discarding (no draw on the dealer's first turn).
+//   * Your turn: draw from the stock, OR take the top discard — but only if
+//     you immediately lay a meld that uses it (a new set/run with 2+ cards
+//     from your hand, or "sapaw" onto a meld already on the table).
+//   * Then you may lay melds and sapaw, and you finish by discarding one card.
+//   * Sets are 3-4 of a rank (distinct suits); runs are 3+ in a row, one
+//     suit, Ace low only (no K-A-2 wrap).
+//   * TONGITS: your hand reaches zero cards (everything melded / sapaw'd, or
+//     the last card discarded) — instant win.
+//   * DRAW: instead of drawing you may call Draw if you have an exposed meld
+//     and no one has sapaw'd your melds (nor you your own) since your last
+//     turn. Opponents with an exposed meld (or a concealed "Secret" four of
+//     a kind) choose Fold or Challenge; the rest are auto-folded. Lowest
+//     hand value wins; a tie goes to the challenger.
+//   * STOCK OUT: when the stock is empty at the end of a turn the round
+//     ends. Burned players (no exposed meld, no Secret) lose; lowest hand
+//     value among the rest wins, ties to whoever drew the last stock card,
+//     else the next tied seat after them.
+//   * Payouts follow playtongits.com's table (ante = 10 chips, 20% = 2).
+//
+// Not implemented: "Spread" (an all-melds opening hand), jackpot/two-hits.
 
 export const SUITS = ["S", "H", "D", "C"];
 export const SUIT_LABEL = { S: "♠", H: "♥", D: "♦", C: "♣" };
 // Ace is always low (rank 1) — Tong-Its runs never wrap K-A-2.
 export const RANK_LABEL = { 1: "A", 11: "J", 12: "Q", 13: "K" };
+
+export const ANTE = 10; // chips; every payout below is a share of this
+const PCT = ANTE / 100;
+export const PAY = {
+  tongits: 40 * PCT, // winner by Tong-Its, from each loser
+  stockOut: 40 * PCT, // winner by lowest points when the stock runs out
+  drawFold: 20 * PCT, // loser who folded to a Draw
+  drawFight: 50 * PCT, // loser who challenged (or the caller who was beaten)
+  burned: 20 * PCT, // extra a burned loser pays on top
+  bonus: 20 * PCT // per Ace/King, Secret, Escalera in the winner's cards
+};
 
 export function rankLabel(rank) {
   return RANK_LABEL[rank] || String(rank);
@@ -38,10 +64,7 @@ export function createDeck() {
   return deck;
 }
 
-// A non-dealer's starting hand size, by player count — the dealer always
-// gets one extra (see createGame). Kept modest at 4 players purely so the
-// stock still has a healthy reserve left to draw from all round.
-const HAND_SIZE_BY_COUNT = { 2: 12, 3: 12, 4: 10 };
+const HAND_SIZE = 12; // the dealer gets one extra
 
 export function isSet(cards) {
   if (cards.length < 3 || cards.length > 4) return false;
@@ -116,18 +139,56 @@ export function topDiscard(state) {
   return state.discard.length ? state.discard[state.discard.length - 1] : null;
 }
 
-// `dealer` is the seat index that deals and plays first; rematches pass the
-// next index along so the first-move advantage rotates around the table.
+// The seat that must act right now: the next responder while a Draw is
+// pending, otherwise whoever's turn it is.
+export function actorSeat(state) {
+  if (state.turnStage === "respond" && state.drawCall) {
+    return state.drawCall.queue[state.drawCall.responses.length] ?? null;
+  }
+  return currentSeat(state);
+}
+
+// A seat has an exposed meld if it laid one itself — sapaw'ing onto someone
+// else's meld doesn't count.
+export function hasExposedMeld(state, seatId) {
+  return state.melds.some((m) => m.ownerSeatId === seatId);
+}
+
+// "Secret": four of a kind still concealed in the hand.
+export function hasSecret(hand) {
+  const counts = {};
+  for (const c of hand) counts[c.rank] = (counts[c.rank] || 0) + 1;
+  return Object.values(counts).some((n) => n === 4);
+}
+
+// Burned ("sunog"): nothing exposed and no Secret to fall back on.
+export function isBurned(state, seatId) {
+  return !hasExposedMeld(state, seatId) && !hasSecret(state.hands[seatId]);
+}
+
+export function canCallDraw(state, seatId) {
+  return (
+    !state.winner &&
+    currentSeat(state) === seatId &&
+    state.turnStage === "draw" &&
+    hasExposedMeld(state, seatId) &&
+    !state.drawBlocked[seatId]
+  );
+}
+
+// `dealer` is the seat index that deals and plays first; the winner of a
+// round deals the next one (the app passes their index along).
 export function createGame(seatIds, { shuffleFn = defaultShuffle, dealer = 0 } = {}) {
-  const baseHand = HAND_SIZE_BY_COUNT[seatIds.length] || 12;
   const dealerIndex = ((dealer % seatIds.length) + seatIds.length) % seatIds.length;
   const pile = shuffleFn(createDeck());
   const hands = {};
   seatIds.forEach((id, i) => {
-    // The dealer plays first, so they get the traditional extra card instead
-    // of a separate opening draw.
-    const size = i === dealerIndex ? baseHand + 1 : baseHand;
+    const size = i === dealerIndex ? HAND_SIZE + 1 : HAND_SIZE;
     hands[id] = pile.splice(pile.length - size, size);
+  });
+  const drawBlocked = {};
+  seatIds.forEach((id) => {
+    drawBlocked[id] = false;
   });
 
   return {
@@ -140,11 +201,15 @@ export function createGame(seatIds, { shuffleFn = defaultShuffle, dealer = 0 } =
     turnIndex: dealerIndex,
     // The dealer already holds their extra card, so round one skips
     // straight to melding/discarding — every seat after that must draw first.
-    turnStage: "act",
+    turnStage: "act", // "draw" | "act" | "respond"
     drawnCardId: null,
-    drawnFrom: null, // "stock" | "discard" — where drawnCardId came from
+    drawnFrom: null, // "stock" | "discard"
+    lastStockDrawer: null,
+    drawBlocked, // seat -> true while Draw may not be called
+    drawCall: null, // { callerId, queue, responses: [{seatId, challenge}], autoFolded }
     winner: null,
-    winType: null, // "tongits" | "discard" | "showdown"
+    winType: null, // "tongits" | "draw" | "showdown"
+    result: null, // settlement, set when the round ends
     lastEvent: null,
     shuffleFn
   };
@@ -154,17 +219,78 @@ function withEvent(state, event) {
   return { ...event, seq: (state.lastEvent ? state.lastEvent.seq : 0) + 1 };
 }
 
-function resolveShowdown(state) {
-  const standings = state.seatOrder
-    .map((id) => ({ seatId: id, value: handValue(state.hands[id]), count: state.hands[id].length }))
-    .sort((a, b) => a.value - b.value || a.count - b.count);
-  const winnerSeatId = standings[0].seatId;
+// ---------- Payouts ----------
+
+function winnerBonuses(state, winnerId) {
+  const own = state.melds.filter((m) => m.ownerSeatId === winnerId);
+  const cards = [...own.flatMap((m) => m.cards), ...state.hands[winnerId]];
+  const aceKing = cards.filter((c) => c.rank === 1 || c.rank === 13).length;
+  const secret = own.some((m) => m.type === "set" && m.cards.length === 4) || hasSecret(state.hands[winnerId]);
+  const escalera = own.some((m) => m.type === "run" && m.cards.length >= 5);
+  return { aceKing, secret, escalera };
+}
+
+// Builds the chip settlement. `base(seatId)` is what each loser owes before
+// the burned surcharge and the winner's bonuses.
+function settle(state, winnerId, base) {
+  const bonuses = winnerBonuses(state, winnerId);
+  const bonusChips = (bonuses.aceKing + (bonuses.secret ? 1 : 0) + (bonuses.escalera ? 1 : 0)) * PAY.bonus;
+  const payments = {};
+  const lines = [];
+  let total = 0;
+  state.seatOrder.forEach((id) => {
+    payments[id] = 0;
+  });
+  state.seatOrder.forEach((id) => {
+    if (id === winnerId) return;
+    const burned = isBurned(state, id);
+    const amount = base(id) + (burned ? PAY.burned : 0) + bonusChips;
+    payments[id] = -amount;
+    total += amount;
+    lines.push({ seatId: id, amount, burned });
+  });
+  payments[winnerId] = total;
+  return { winnerId, payments, lines, bonuses, bonusChips };
+}
+
+function finish(state, winnerId, winType, base, extra = {}) {
+  const result = { ...settle(state, winnerId, base), ...extra };
   return {
     ...state,
-    winner: winnerSeatId,
-    winType: "showdown",
-    lastEvent: withEvent(state, { kind: "win", seatId: winnerSeatId, winType: "showdown" })
+    winner: winnerId,
+    winType,
+    turnStage: "done",
+    drawCall: null,
+    result,
+    lastEvent: withEvent(state, { kind: "win", seatId: winnerId, winType })
   };
+}
+
+function winTongits(state, seatId) {
+  return finish(state, seatId, "tongits", () => PAY.tongits);
+}
+
+// Stock ran out: burned players lose outright, then lowest hand value wins;
+// ties go to whoever drew the last stock card, else the next tied seat after
+// them in turn order.
+function resolveShowdown(state) {
+  const eligible = state.seatOrder.filter((id) => !isBurned(state, id));
+  const pool = eligible.length ? eligible : state.seatOrder;
+  const best = Math.min(...pool.map((id) => handValue(state.hands[id])));
+  const tied = pool.filter((id) => handValue(state.hands[id]) === best);
+  let winnerId = tied[0];
+  if (tied.length > 1) {
+    const n = state.seatOrder.length;
+    const from = Math.max(0, state.seatOrder.indexOf(state.lastStockDrawer));
+    for (let step = 0; step < n; step++) {
+      const id = state.seatOrder[(from + step) % n];
+      if (tied.includes(id)) {
+        winnerId = id;
+        break;
+      }
+    }
+  }
+  return finish(state, winnerId, "showdown", () => PAY.stockOut);
 }
 
 function advanceTurn(state, event) {
@@ -174,11 +300,21 @@ function advanceTurn(state, event) {
     turnIndex: (state.turnIndex + 1) % n,
     turnStage: "draw",
     drawnCardId: null,
+    drawnFrom: null,
     lastEvent: event
   };
-  // Nothing left to draw for the next seat — the round ends right here
-  // rather than letting play stall out. Lowest hand value wins.
+  // Nothing left to draw for the next seat — the round ends right here.
   return next.stock.length === 0 ? resolveShowdown(next) : next;
+}
+
+// ---------- Drawing ----------
+
+function takeTurn(state, seatId, patch) {
+  return {
+    ...state,
+    ...patch,
+    drawBlocked: { ...state.drawBlocked, [seatId]: false }
+  };
 }
 
 export function drawStock(state, seatId) {
@@ -186,30 +322,66 @@ export function drawStock(state, seatId) {
   if (currentSeat(state) !== seatId || state.turnStage !== "draw") return state;
   if (state.stock.length === 0) return state;
   const card = state.stock[state.stock.length - 1];
-  return {
-    ...state,
+  return takeTurn(state, seatId, {
     stock: state.stock.slice(0, -1),
     hands: { ...state.hands, [seatId]: [...state.hands[seatId], card] },
     turnStage: "act",
     drawnCardId: card.id,
     drawnFrom: "stock",
+    lastStockDrawer: seatId,
     lastEvent: withEvent(state, { kind: "draw", seatId, source: "stock", cardId: card.id })
-  };
+  });
 }
 
-export function drawDiscard(state, seatId) {
+// Take the top discard — only legal if it completes a meld you lay at once.
+// Pass `cardIds` (2+ cards from your hand forming a set/run with the discard),
+// or `meldId` to sapaw it straight onto a meld already on the table.
+export function drawDiscard(state, seatId, { cardIds = [], meldId = null } = {}) {
   if (state.winner) return state;
   if (currentSeat(state) !== seatId || state.turnStage !== "draw") return state;
-  if (state.discard.length === 0) return state;
-  const card = state.discard[state.discard.length - 1];
+  const top = topDiscard(state);
+  if (!top) return state;
+  const hand = state.hands[seatId];
+
+  let melds = state.melds;
+  let meldSeq = state.meldSeq;
+  let nextHand = hand;
+  let blocked = state.drawBlocked;
+  let event;
+
+  if (meldId) {
+    const idx = state.melds.findIndex((m) => m.id === meldId);
+    if (idx === -1 || !canExtendMeld(state.melds[idx], top)) return state;
+    const meld = state.melds[idx];
+    melds = state.melds.slice();
+    melds[idx] = { ...meld, cards: orderMeldCards(meld.type, [...meld.cards, top]) };
+    blocked = { ...blocked, [meld.ownerSeatId]: true };
+    event = { kind: "sapaw", seatId, meldId, cardId: top.id, fromDiscard: true };
+  } else {
+    if (cardIds.length < 2) return state;
+    const cards = cardIds.map((id) => hand.find((c) => c.id === id)).filter(Boolean);
+    if (cards.length !== cardIds.length || new Set(cardIds).size !== cardIds.length) return state;
+    const type = meldType([...cards, top]);
+    if (!type) return state;
+    const idSet = new Set(cardIds);
+    nextHand = hand.filter((c) => !idSet.has(c.id));
+    const meld = { id: `m${meldSeq}`, ownerSeatId: seatId, type, cards: orderMeldCards(type, [...cards, top]) };
+    melds = [...state.melds, meld];
+    meldSeq += 1;
+    event = { kind: "meld", seatId, meldId: meld.id, meldType: type, cardIds: [...cardIds, top.id], fromDiscard: true };
+  }
+
   return {
     ...state,
     discard: state.discard.slice(0, -1),
-    hands: { ...state.hands, [seatId]: [...state.hands[seatId], card] },
+    hands: { ...state.hands, [seatId]: nextHand },
+    melds,
+    meldSeq,
+    drawBlocked: { ...blocked, [seatId]: false },
     turnStage: "act",
-    drawnCardId: card.id,
+    drawnCardId: top.id,
     drawnFrom: "discard",
-    lastEvent: withEvent(state, { kind: "draw", seatId, source: "discard", cardId: card.id })
+    lastEvent: withEvent(state, event)
   };
 }
 
@@ -222,7 +394,7 @@ export function layMeld(state, seatId, cardIds) {
 
   const hand = state.hands[seatId];
   const cards = cardIds.map((id) => hand.find((c) => c.id === id)).filter(Boolean);
-  if (cards.length !== cardIds.length) return state;
+  if (cards.length !== cardIds.length || new Set(cardIds).size !== cardIds.length) return state;
 
   const type = meldType(cards);
   if (!type) return state;
@@ -237,15 +409,13 @@ export function layMeld(state, seatId, cardIds) {
     meldSeq: state.meldSeq + 1,
     lastEvent: withEvent(state, { kind: "meld", seatId, meldId: meld.id, meldType: type, cardIds })
   };
-
-  if (nextHand.length === 0) {
-    return { ...next, winner: seatId, winType: "tongits", lastEvent: withEvent(state, { kind: "win", seatId, winType: "tongits" }) };
-  }
-  return next;
+  return nextHand.length === 0 ? winTongits(next, seatId) : next;
 }
 
 // Adds one card from the hand onto an already-laid meld (any seat's) —
-// "sapaw". A no-op if the meld can't take that card right now.
+// "sapaw". A no-op if the meld can't take that card right now. Sapaw'ing a
+// meld (yours or an opponent's) locks its owner out of calling Draw until
+// their next turn's draw.
 export function addToMeld(state, seatId, meldId, cardId) {
   if (state.winner) return state;
   if (currentSeat(state) !== seatId || state.turnStage !== "act") return state;
@@ -267,18 +437,13 @@ export function addToMeld(state, seatId, meldId, cardId) {
     ...state,
     hands: { ...state.hands, [seatId]: nextHand },
     melds,
+    drawBlocked: { ...state.drawBlocked, [meld.ownerSeatId]: true },
     lastEvent: withEvent(state, { kind: "sapaw", seatId, meldId, cardId })
   };
-
-  if (nextHand.length === 0) {
-    return { ...next, winner: seatId, winType: "tongits", lastEvent: withEvent(state, { kind: "win", seatId, winType: "tongits" }) };
-  }
-  return next;
+  return nextHand.length === 0 ? winTongits(next, seatId) : next;
 }
 
-// Discards to end the turn. Emptying the hand this way (melded everything
-// but this last card) is a normal go-out win — the bigger "Tongits!" bonus
-// only happens via layMeld/addToMeld above, when no discard was needed at all.
+// Discards to end the turn. Throwing away your last card is Tong-Its too.
 export function discard(state, seatId, cardId) {
   if (state.winner) return state;
   if (currentSeat(state) !== seatId || state.turnStage !== "act") return state;
@@ -286,10 +451,6 @@ export function discard(state, seatId, cardId) {
   const hand = state.hands[seatId];
   const card = hand.find((c) => c.id === cardId);
   if (!card) return state;
-  // Putting the card you just took from the discard straight back would let
-  // a player skip their draw forever and stall the round (the stock never
-  // shrinks), so it's rejected.
-  if (state.drawnFrom === "discard" && state.drawnCardId === cardId) return state;
 
   const nextHand = hand.filter((c) => c.id !== cardId);
   const next = {
@@ -298,11 +459,67 @@ export function discard(state, seatId, cardId) {
     discard: [...state.discard, card],
     drawnCardId: null
   };
-
-  if (nextHand.length === 0) {
-    return { ...next, winner: seatId, winType: "discard", lastEvent: withEvent(state, { kind: "win", seatId, winType: "discard" }) };
-  }
+  if (nextHand.length === 0) return winTongits(next, seatId);
   return advanceTurn(next, withEvent(state, { kind: "discard", seatId, cardId }));
+}
+
+// ---------- Draw ----------
+
+// Call Draw instead of drawing. Opponents answer in turn order; anyone with
+// nothing exposed and no Secret is folded automatically.
+export function callDraw(state, seatId) {
+  if (!canCallDraw(state, seatId)) return state;
+  const n = state.seatOrder.length;
+  const order = [];
+  for (let step = 1; step < n; step++) order.push(state.seatOrder[(state.turnIndex + step) % n]);
+  const queue = order.filter((id) => hasExposedMeld(state, id) || hasSecret(state.hands[id]));
+  const next = {
+    ...state,
+    turnStage: "respond",
+    drawCall: { callerId: seatId, queue, responses: [], order },
+    lastEvent: withEvent(state, { kind: "draw-call", seatId })
+  };
+  return queue.length === 0 ? resolveDraw(next) : next;
+}
+
+export function respondDraw(state, seatId, challenge) {
+  if (state.winner || state.turnStage !== "respond") return state;
+  if (actorSeat(state) !== seatId) return state;
+  const drawCall = {
+    ...state.drawCall,
+    responses: [...state.drawCall.responses, { seatId, challenge: !!challenge }]
+  };
+  const next = {
+    ...state,
+    drawCall,
+    lastEvent: withEvent(state, { kind: challenge ? "challenge" : "fold", seatId })
+  };
+  return drawCall.responses.length >= drawCall.queue.length ? resolveDraw(next) : next;
+}
+
+function resolveDraw(state) {
+  const { callerId, responses, order } = state.drawCall;
+  const challengers = responses.filter((r) => r.challenge).map((r) => r.seatId);
+  const values = {};
+  [callerId, ...challengers].forEach((id) => {
+    values[id] = handValue(state.hands[id]);
+  });
+  let winnerId = callerId;
+  if (challengers.length) {
+    const best = Math.min(...Object.values(values));
+    const tied = [callerId, ...challengers].filter((id) => values[id] === best);
+    // A tie never favours the caller; between tied challengers the one
+    // seated first to the caller's right (next in turn order) wins.
+    winnerId = order.find((id) => tied.includes(id)) ?? callerId;
+  }
+  const challengerSet = new Set(challengers);
+  return finish(
+    state,
+    winnerId,
+    "draw",
+    (id) => (challengerSet.has(id) || id === callerId ? PAY.drawFight : PAY.drawFold),
+    { callerId, challengers, values }
+  );
 }
 
 // Everything safe to show on the shared screen or send to every phone —
@@ -313,29 +530,28 @@ export function publicView(state) {
     discardTop: topDiscard(state),
     melds: state.melds,
     currentSeatId: currentSeat(state),
+    actorSeatId: actorSeat(state),
     turnStage: state.turnStage,
     winner: state.winner,
     winType: state.winType,
+    drawCall: state.drawCall,
     counts: state.seatOrder.map((id) => ({ seatId: id, count: state.hands[id].length }))
   };
 }
 
-// Plays a turn on behalf of a seat that can't (a phone that dropped and isn't
+// Plays on behalf of a seat that can't (a phone that dropped and isn't
 // coming back) so one lost connection can't freeze the table. It never helps
-// that seat: they draw from the stock (never the discard pile) and throw away
-// their highest-value card.
+// that seat: a pending Draw is folded, otherwise they draw from the stock and
+// throw away their highest-value card.
 export function skipTurn(state, seatId) {
-  if (state.winner || currentSeat(state) !== seatId) return state;
+  if (state.winner || actorSeat(state) !== seatId) return state;
+  if (state.turnStage === "respond") return respondDraw(state, seatId, false);
   let next = state;
   if (next.turnStage === "draw") {
     next = drawStock(next, seatId);
     if (next === state) return state; // stock empty: the round is already over
   }
   if (next.turnStage !== "act") return next;
-  const eligible = next.hands[seatId].filter(
-    (card) => !(next.drawnFrom === "discard" && next.drawnCardId === card.id)
-  );
-  if (eligible.length === 0) return next;
-  const worst = eligible.slice().sort((a, b) => cardValue(b) - cardValue(a))[0];
-  return discard(next, seatId, worst.id);
+  const worst = next.hands[seatId].slice().sort((a, b) => cardValue(b) - cardValue(a))[0];
+  return worst ? discard(next, seatId, worst.id) : next;
 }

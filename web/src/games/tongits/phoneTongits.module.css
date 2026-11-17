@@ -62,6 +62,21 @@
 }
 .emptyPile { color: var(--paper-dim); font-size: 0.72rem; }
 
+/* ---------- Draw response ---------- */
+.respond {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.7rem;
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  border: 2px solid var(--accent);
+}
+.respondText { margin: 0; font-size: 0.82rem; }
+.points { margin: 0; font-size: 0.72rem; color: var(--paper-dim); }
+.actionBtn { display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem; }
+
 /* ---------- table melds ---------- */
 .table {
   width: 100%;

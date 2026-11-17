@@ -192,3 +192,31 @@
   .winBurst { animation: none; }
   .winBurst::before { animation: none; content: none; }
 }
+
+.seatChips {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2em;
+  font-size: 0.68rem;
+  color: var(--paper-dim);
+  font-weight: 700;
+}
+.burnedTag {
+  margin-left: 0.5em;
+  padding: 0.05em 0.5em;
+  border-radius: 999px;
+  background: var(--panel-2);
+  color: var(--paper-dim);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.gain { color: var(--success); }
+.loss { color: var(--danger, #e8324f); }
+.payNote {
+  max-width: 34rem;
+  margin: 0.4rem auto 1rem;
+  font-size: 0.74rem;
+  color: var(--paper-dim);
+  text-align: center;
+}

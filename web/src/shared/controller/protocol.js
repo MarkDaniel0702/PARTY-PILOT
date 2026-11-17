@@ -7,7 +7,8 @@
 // added the Snake, Connect Four and Liar's Dice views and their actions. A
 // phone still running a cached older bundle is rejected with
 // "version-mismatch" and told to refresh, rather than silently misbehaving.
-export const PROTOCOL_VERSION = 4;
+// v5 reworked Tong-Its (take-discard-by-melding, Draw call/fold/challenge).
+export const PROTOCOL_VERSION = 5;
 
 export const MAX_PLAYERS = 8;
 
@@ -115,6 +116,9 @@ export const ACTION = {
   LAY_MELD: "layMeld",
   ADD_TO_MELD: "addToMeld",
   DISCARD: "discard",
+  // payload {} — call Draw instead of drawing; RESPOND_DRAW payload { challenge }.
+  CALL_DRAW: "callDraw",
+  RESPOND_DRAW: "respondDraw",
   // Snake Battle, phone -> host: payload { dir: "up" | "down" | "left" | "right" }.
   TURN: "turn",
   // Connect Four, phone -> host: payload { col }.
