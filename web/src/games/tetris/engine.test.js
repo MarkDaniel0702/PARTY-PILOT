@@ -449,6 +449,17 @@ describe("audit regressions", () => {
     expect(countFilled(stepGravity(g).board)).toBe(4); // so gravity locks it
   });
 
+  it("keeps about half a second of lock delay at high levels instead of two fast ticks", () => {
+    let g = { ...grounded(), level: 15 }; // 80ms per step
+    let steps = 0;
+    while (countFilled(g.board) === 0 && steps < 50) {
+      g = stepGravity(g);
+      steps++;
+    }
+    expect(steps).toBeGreaterThanOrEqual(Math.ceil(500 / dropIntervalMs(15)));
+    expect(steps * dropIntervalMs(15)).toBeGreaterThanOrEqual(480);
+  });
+
   it("does not spend resets while the piece is still falling", () => {
     const g = move({ ...createGame({ seed: 1 }), lockSteps: 0 }, 1);
     expect(g.lockResets || 0).toBe(0);

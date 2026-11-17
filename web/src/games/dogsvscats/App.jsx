@@ -168,7 +168,7 @@ export default function App() {
             ? {
                 view: VIEW.AIM,
                 title: `${team.emoji} ${actor?.name || team.name}`,
-                subtitle: `Wind ${match.wind > 0 ? "→" : match.wind < 0 ? "←" : "·"} ${Math.abs(match.wind)}`,
+                subtitle: `Wind ${match.wind > 0 ? "→" : match.wind < 0 ? "←" : "·"} ${Math.abs(match.wind)} · ${Math.max(0, MAX_MOVES - (match.moved || 0))} steps left`,
                 angle,
                 power,
                 weaponId,

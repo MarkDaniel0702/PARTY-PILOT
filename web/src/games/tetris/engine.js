@@ -14,6 +14,7 @@ export const HIDDEN = 2;
 export const TOTAL_ROWS = ROWS + HIDDEN;
 
 export const LOCK_DELAY_STEPS = 2;
+export const LOCK_DELAY_MS = 500;
 // Moves/rotations that may refresh the lock timer while the piece rests on
 // something. Without a cap, wiggling a grounded piece stalls it forever.
 export const MAX_LOCK_RESETS = 15;
@@ -249,7 +250,10 @@ export function stepGravity(state) {
   if (!collides(state.board, state.piece, 0, 1)) {
     return { ...state, piece: { ...state.piece, y: state.piece.y + 1 }, lockSteps: 0, lockResets: 0 };
   }
-  if (state.lockSteps + 1 < LOCK_DELAY_STEPS) {
+  // Lock delay is about half a second whatever the level: counting a fixed
+  // two gravity ticks would shrink it to ~160ms at high speed.
+  const steps = Math.max(LOCK_DELAY_STEPS, Math.ceil(LOCK_DELAY_MS / dropIntervalMs(state.level)));
+  if (state.lockSteps + 1 < steps) {
     return { ...state, lockSteps: state.lockSteps + 1 };
   }
   return lockPiece(state);

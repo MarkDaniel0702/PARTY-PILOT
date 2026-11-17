@@ -51,7 +51,7 @@
   color: var(--paper);
   font-size: 0.78rem;
   font-weight: 700;
-  min-height: 40px;
+  min-height: 44px;
   transition: border-color 0.15s, transform 0.1s;
 }
 .shipChip:active { transform: scale(0.96); }
@@ -161,7 +161,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
-  min-height: 42px;
+  min-height: 44px;
   border-radius: var(--radius-sm);
   background: var(--panel-2);
   border: 1px solid var(--border);

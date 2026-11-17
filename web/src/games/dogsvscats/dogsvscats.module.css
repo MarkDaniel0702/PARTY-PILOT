@@ -354,7 +354,7 @@
   background: var(--panel);
   border: 1px solid var(--border);
 }
-.aimCell input[type="range"] { width: 100%; accent-color: var(--team, var(--accent)); height: 30px; }
+.aimCell input[type="range"] { width: 100%; accent-color: var(--team, var(--accent)); height: 44px; }
 
 .dial { position: relative; display: grid; place-items: center; }
 .dialFace { fill: color-mix(in srgb, var(--paper) 5%, transparent); stroke: var(--border); stroke-width: 1; }

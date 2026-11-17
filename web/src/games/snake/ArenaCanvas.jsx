@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import { DIRS } from "./engine";
 import styles from "./snake.module.css";
 
@@ -197,8 +197,11 @@ export function ArenaCanvas({ game, colours, names, showNames = true, label = "S
     });
   }, []);
 
-  // A new game state becomes the target of the next glide.
-  useEffect(() => {
+  // A new game state becomes the target of the next glide. Layout effect, so
+  // the glide's anchor is moved before the browser can run another animation
+  // frame against the new state (a passive effect can land a frame late and
+  // draw the snake one cell back).
+  useLayoutEffect(() => {
     const m = motionRef.current;
     if (m.cur !== game) {
       m.prev = game && m.cur && game.tick === m.cur.tick + 1 ? m.cur : null;
