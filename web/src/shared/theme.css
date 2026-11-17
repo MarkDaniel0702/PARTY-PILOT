@@ -113,3 +113,35 @@ button { -webkit-tap-highlight-color: transparent; }
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.08); }
 }
+
+/* ---------- polish (shared by every game) ---------- */
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+/* Keyboard + switch-access users get a clear ring; mouse/touch users don't. */
+:focus-visible {
+  outline: 3px solid var(--accent-2);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Soft ambient glow behind every game — pure CSS, no JS, no per-frame cost. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(40vmax 40vmax at 8% 12%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%),
+    radial-gradient(36vmax 36vmax at 95% 90%, color-mix(in srgb, var(--accent-2) 11%, transparent), transparent 70%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

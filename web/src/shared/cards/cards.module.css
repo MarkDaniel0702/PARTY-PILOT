@@ -24,6 +24,15 @@
   transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s, outline-color 0.15s;
   outline: 3px solid transparent;
   outline-offset: 2px;
+  will-change: transform;
+}
+/* Soft top-left sheen so every card reads as a glossy printed card. */
+.frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22), transparent 45%);
 }
 
 /* Fluid so a hand still fits on a 320px phone. Floors keep the tap target
