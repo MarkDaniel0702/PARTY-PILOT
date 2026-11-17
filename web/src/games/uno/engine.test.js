@@ -13,7 +13,9 @@ import {
   skipTurn,
   currentSeat,
   topCard,
-  publicView
+  publicView,
+  cardPoints,
+  roundScore
 } from "./engine";
 
 // Deterministic "shuffle" so every test deals a known deck.
@@ -182,7 +184,7 @@ describe("wilds", () => {
   });
 
   it("makes the next seat draw four and lose their turn on a Wild Draw Four", () => {
-    const s = stateWith({ hands: { a: [card("wild", KIND.WILD4, null, "w"), card("red", KIND.NUMBER, 1, "k")], b: [], c: [] } });
+    const s = stateWith({ hands: { a: [card("wild", KIND.WILD4, null, "w"), spare("k")], b: [], c: [] } });
     const chosen = chooseColour(playCard(s, "a", "w"), "a", "blue");
     expect(chosen.hands.b).toHaveLength(4);
     expect(chosen.activeColour).toBe("blue");
@@ -197,7 +199,47 @@ describe("wilds", () => {
   });
 });
 
+describe("Wild Draw Four restriction", () => {
+  const w4 = card("wild", KIND.WILD4, null, "w4");
+
+  it("cannot be played while the hand holds a card of the active colour", () => {
+    const s = stateWith({ hands: { a: [w4, card("red", KIND.NUMBER, 1, "k")], b: [], c: [] } });
+    expect(getPlayable(s, "a")).toEqual(["k"]);
+    expect(playCard(s, "a", "w4")).toBe(s);
+  });
+
+  it("may be played when only number/symbol matches (not the colour) are held", () => {
+    const s = stateWith({ hands: { a: [w4, card("blue", KIND.NUMBER, 5, "five")], b: [], c: [] } });
+    expect(getPlayable(s, "a")).toEqual(expect.arrayContaining(["w4", "five"]));
+  });
+
+  it("a plain Wild is still always playable", () => {
+    const s = stateWith({ hands: { a: [card("wild", KIND.WILD, null, "w"), card("red", KIND.NUMBER, 1, "k")], b: [], c: [] } });
+    expect(getPlayable(s, "a")).toContain("w");
+  });
+
+  it("a drawn +4 does not hold the turn when the hand has the active colour", () => {
+    const s = stateWith({ drawPile: [w4], hands: { a: [card("red", KIND.NUMBER, 1, "k")], b: [], c: [] } });
+    const next = drawCard(s, "a");
+    expect(next.drawnCardId).toBeNull();
+    expect(currentSeat(next)).toBe("b");
+  });
+});
+
 describe("drawing", () => {
+  it("does not mistake an old hand card for a draw when nothing is left to draw", () => {
+    const s = stateWith({
+      drawPile: [],
+      discardPile: [card("red", KIND.NUMBER, 5, "top")],
+      hands: { a: [card("red", KIND.NUMBER, 1, "old")], b: [], c: [] }
+    });
+    const next = drawCard(s, "a");
+    expect(next.hands.a).toHaveLength(1);
+    expect(next.drawnCardId).toBeNull();
+    expect(next.lastEvent.cardId).toBeNull();
+    expect(currentSeat(next)).toBe("b"); // turn passes, no stall
+  });
+
   it("keeps the turn when the drawn card is playable", () => {
     const s = stateWith({
       drawPile: [card("red", KIND.NUMBER, 9, "d1")], // matches red
@@ -266,6 +308,24 @@ describe("winning", () => {
     expect(next.winner).toBe("a");
     expect(getPlayable(next, "b")).toEqual([]);
     expect(playCard(next, "b", "y")).toBe(next);
+  });
+});
+
+describe("scoring", () => {
+  it("values cards the official way", () => {
+    expect(cardPoints(card("red", KIND.NUMBER, 7))).toBe(7);
+    expect(cardPoints(card("red", KIND.NUMBER, 0))).toBe(0);
+    expect(cardPoints(card("red", KIND.SKIP))).toBe(20);
+    expect(cardPoints(card("red", KIND.DRAW2))).toBe(20);
+    expect(cardPoints(card("wild", KIND.WILD4))).toBe(50);
+  });
+
+  it("scores the winner the total of the other hands", () => {
+    const s = stateWith({
+      winner: "a",
+      hands: { a: [], b: [card("red", KIND.NUMBER, 7, "x"), card("wild", KIND.WILD)], c: [card("blue", KIND.SKIP)] }
+    });
+    expect(roundScore(s)).toBe(77);
   });
 });
 

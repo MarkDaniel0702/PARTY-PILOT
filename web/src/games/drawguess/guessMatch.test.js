@@ -150,3 +150,15 @@ describe("scoring", () => {
     expect(drawerPoints(9)).toBe(100);
   });
 });
+
+describe("judgeGuess — spacing", () => {
+  it("treats a multi-word answer typed without (or with extra) spaces as correct", () => {
+    expect(judgeGuess("hotdog", "hot dog")).toBe(RESULT.CORRECT);
+    expect(judgeGuess("ice  cream", "ice cream")).toBe(RESULT.CORRECT);
+    expect(judgeGuess("icecream", "ice cream")).toBe(RESULT.CORRECT);
+  });
+
+  it("still calls a one-letter slip on a multi-word answer close, not correct", () => {
+    expect(judgeGuess("hotdig", "hot dog")).toBe(RESULT.CLOSE);
+  });
+});

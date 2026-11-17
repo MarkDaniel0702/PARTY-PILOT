@@ -5,6 +5,9 @@
   gap: 0.8rem;
   width: 100%;
   max-width: 440px;
+  /* A steering screen: no page scroll or pinch-zoom while playing. */
+  touch-action: none;
+  overscroll-behavior: contain;
 }
 
 .head {
@@ -89,4 +92,8 @@
   margin: 18%;
   background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--snake) 80%, white), var(--snake));
   box-shadow: 0 0 16px -2px var(--snake);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .key, .pad { transition: none; }
 }

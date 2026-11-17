@@ -32,7 +32,7 @@ export function useTeams({ maxTeams = 6 } = {}) {
 
   const renameTeam = useCallback((index, name) => {
     setTeams((prev) =>
-      prev.map((t, i) => (i === index ? { ...t, name: name.trim() || `Team ${i + 1}` } : t))
+      prev.map((t, i) => (i === index ? { ...t, name: name.trim() ? name : `Team ${i + 1}` } : t))
     );
   }, []);
 

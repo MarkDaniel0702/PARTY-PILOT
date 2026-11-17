@@ -6,7 +6,7 @@ export const TTL_PROMPT_SETS = [
   { statements: ["Honey never spoils if stored properly.", "Bananas are botanically classified as berries.", "The Great Wall of China is visible from space with the naked eye."], lieIndex: 2 },
   { statements: ["Octopuses have three hearts.", "A group of flamingos is called a 'flamboyance'.", "Goldfish only have a memory span of three seconds."], lieIndex: 2 },
   { statements: ["The Eiffel Tower grows about 15 cm taller in summer heat.", "The Sahara Desert used to be a green, fertile region thousands of years ago.", "Mount Everest is the tallest mountain on Earth measured from base to peak."], lieIndex: 2 },
-  { statements: ["Sharks existed before trees.", "A day on Venus is longer than a year on Venus.", "The human body has about 10 times more bacterial cells than human cells."], lieIndex: 2 },
+  { statements: ["Sharks existed before trees.", "A day on Venus is longer than a year on Venus.", "Lightning never strikes the same place twice."], lieIndex: 2 },
   { statements: ["A shrimp's heart is located in its head.", "A crocodile cannot stick its tongue out.", "A group of owls is called a 'pack'."], lieIndex: 2 },
   { statements: ["Wombat poop is cube-shaped.", "A bolt of lightning is hotter than the surface of the sun.", "Bats are completely blind."], lieIndex: 2 },
   { statements: ["The unicorn is the national animal of Scotland.", "Napoleon Bonaparte was unusually short for his era, standing under 5 feet tall.", "The shortest war in recorded history lasted under 40 minutes."], lieIndex: 1 },

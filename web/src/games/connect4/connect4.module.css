@@ -118,6 +118,10 @@
    The 380px is the header, series bar and turn banner stacked above it. */
 .boardWrap { width: max(280px, min(100%, calc((100vh - 380px) * 7 / 6), 900px)); max-width: 100%; }
 
+/* On a phone the board is the whole point: fill the width so each column is a
+   comfortable (>= 44px) tap target instead of shrinking to fit the height. */
+@media (max-width: 600px) { .boardWrap { width: 100%; } }
+
 .board {
   position: relative;
   width: 100%;
@@ -202,11 +206,12 @@
   cursor: pointer;
   transition: background 0.15s;
 }
-.column:disabled { cursor: default; }
+.column:disabled { cursor: not-allowed; }
 .column:not(:disabled):hover,
 .column:not(:disabled):focus-visible { background: rgba(255, 255, 255, 0.1); outline: none; }
 /* A ghost disc at the top of the hovered column shows where it will go. */
-.column:not(:disabled):hover::before {
+.column:not(:disabled):hover::before,
+.column:not(:disabled):active::before {
   content: "";
   position: absolute;
   top: 3%;
@@ -219,7 +224,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .drop, .win { animation: none; }
+  .drop, .win, .banner, .turnPill { animation: none; }
+  .side, .column { transition: none; }
 }
 
 /* ---------- turn / result banner ---------- */
@@ -233,6 +239,7 @@
   border: 2px solid var(--chip, var(--border));
   font-weight: 800;
   font-size: 1rem;
+  animation: bannerIn 0.25s ease both;
 }
 .turnPill .chipDisc { width: 18px; height: 18px; }
 .turnDim { color: var(--paper-dim); font-weight: 700; font-size: 0.82rem; }

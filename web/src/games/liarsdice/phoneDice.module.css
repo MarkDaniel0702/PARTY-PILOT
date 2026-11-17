@@ -138,3 +138,8 @@
 .verdict { margin: 0; padding: 0.7rem 0.9rem; border-radius: var(--radius-md); font-weight: 800; font-size: 0.95rem; }
 .good { background: color-mix(in srgb, var(--success) 16%, var(--panel)); color: var(--paper); }
 .bluff { background: color-mix(in srgb, var(--danger) 14%, var(--panel)); color: var(--paper); }
+
+@media (prefers-reduced-motion: reduce) {
+  .faceBtn, .step, .primary, .liar { transition: none; }
+  .faceBtn:active, .step:active, .primary:active, .liar:active { transform: none; }
+}

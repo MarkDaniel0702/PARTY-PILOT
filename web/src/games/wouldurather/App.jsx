@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { GitFork } from "lucide-react";
 import { GameShell } from "../../shared/components/GameShell";
 import { Screen, ScreenTitle, ScreenSub, BigIcon, SetupBlock } from "../../shared/components/Screen";
@@ -40,6 +40,9 @@ export default function App() {
   const [voteIndex, setVoteIndex] = useState(0);
   const [votes, setVotes] = useState({ a: [], b: [] });
   const [questionsPlayed, setQuestionsPlayed] = useState(0);
+  // Swallows the accidental second tap of a double-tap, which would otherwise
+  // cast the NEXT voter's vote for them.
+  const lastVoteAt = useRef(0);
 
   function beginPrompt(pool, namesArg) {
     const { item } = usedIndices.pickUnused(pool);
@@ -64,6 +67,9 @@ export default function App() {
   }
 
   function castVote(choice) {
+    const now = Date.now();
+    if (now - lastVoteAt.current < 400) return;
+    lastVoteAt.current = now;
     const name = names[voteIndex];
     setVotes((prev) => ({ ...prev, [choice]: [...prev[choice], name] }));
     advanceVote(voteIndex + 1);
@@ -71,6 +77,8 @@ export default function App() {
 
   function handleStart() {
     const resolvedNames = roster.getNames();
+    usedIndices.reset();
+    setQuestionsPlayed(0);
     setNames(resolvedNames);
     beginPrompt(WYR_CATEGORIES[category], resolvedNames);
   }
@@ -108,9 +116,9 @@ export default function App() {
         <HowToPlay
           steps={[
             <>Pick a category and add your players, then tap <strong>Start</strong>.</>,
-            "Read the prompt out loud. Each player taps their own pick — A or B — in turn.",
-            "Once everyone's voted, the results appear automatically. Talk about the split!",
-            <>Tap <strong>Next Question</strong> to keep going, or <strong>Skip</strong> if a prompt isn't for your group.</>
+            "Read the prompt out loud. Each player taps their own pick — A or B — in turn, then passes the device on.",
+            "Once everyone's voted, the results appear automatically with who picked what. Talk about the split!",
+            <>Tap <strong>Next Question</strong> to keep going, <strong>Skip</strong> a prompt that isn't for your group, or <strong>End Session</strong> when you're done.</>
           ]}
         />
 
@@ -164,14 +172,20 @@ export default function App() {
               <VoteBar label={currentPrompt.a} pct={aPct} count={`${votes.a.length} vote${votes.a.length === 1 ? "" : "s"} (${aPct}%)`} />
               <VoteBar label={currentPrompt.b} pct={bPct} count={`${votes.b.length} vote${votes.b.length === 1 ? "" : "s"} (${bPct}%)`} />
             </VoteBarRow>
+            <p style={{ textAlign: "center", color: "var(--paper-dim)", fontSize: "0.88rem", lineHeight: 1.6, margin: "0 0 1.5rem" }}>
+              <strong>A:</strong> {votes.a.join(", ") || "nobody"} &nbsp;·&nbsp; <strong>B:</strong> {votes.b.join(", ") || "nobody"}
+              {votes.a.length === votes.b.length && votes.a.length > 0 && <><br />Dead even!</>}
+            </p>
             <Button onClick={handleNextOrSkip}>Next Question →</Button>
           </>
         )}
 
-        <ButtonRow>
-          <Button variant="secondary" onClick={handleNextOrSkip}>Skip</Button>
-          <Button variant="secondary" onClick={handleEndSession}>🏁 End Session</Button>
-        </ButtonRow>
+        <div style={{ marginTop: "0.8rem" }}>
+          <ButtonRow>
+            {phase === "vote" && <Button variant="secondary" onClick={handleNextOrSkip}>Skip</Button>}
+            <Button variant="secondary" onClick={handleEndSession}>🏁 End Session</Button>
+          </ButtonRow>
+        </div>
       </Screen>
 
       <Screen active={phase === "summary"}>

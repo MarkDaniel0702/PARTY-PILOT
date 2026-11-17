@@ -55,6 +55,14 @@ export default function App() {
 
   const ref = useRef();
   ref.current = { match };
+  // Every action is applied to the *latest* match, not the one from the last
+  // render. Two phone messages can land before React re-renders (a double-tap
+  // on Fire, both captains confirming together); reading a stale match would
+  // let the second action overwrite the first, or let one captain fire twice.
+  const commit = (next) => {
+    ref.current = { match: next };
+    setMatch(next);
+  };
 
   // ---------- phone actions -> engine ----------
   useEffect(() => {
@@ -68,24 +76,24 @@ export default function App() {
 
       if (msg.kind === ACTION.PLACE_SHIP) {
         const res = placeShip(m, playerIndex, payload.shipId, payload.row, payload.col, payload.orientation);
-        if (res.ok) setMatch(res.match);
+        if (res.ok) commit(res.match);
         return;
       }
       if (msg.kind === ACTION.REMOVE_SHIP) {
         const res = removeShip(m, playerIndex, payload.shipId);
-        if (res.ok) setMatch(res.match);
+        if (res.ok) commit(res.match);
         return;
       }
       if (msg.kind === ACTION.RANDOM_FLEET) {
         const res = randomizeFleet(m, playerIndex);
-        if (res.ok) setMatch(res.match);
+        if (res.ok) commit(res.match);
         return;
       }
       if (msg.kind === ACTION.CONFIRM_FLEET) {
         const res = confirmFleet(m, playerIndex);
         if (!res.ok) return;
         if (res.match.phase === "battle" && m.phase !== "battle") playSound("complete");
-        setMatch(res.match);
+        commit(res.match);
         return;
       }
       if (msg.kind === ACTION.FIRE) {
@@ -93,7 +101,7 @@ export default function App() {
         if (!res.ok) return;
         const shot = res.match.lastShot;
         playSound(shot.result === "hit" ? (shot.sunk ? "bonus" : "correct") : "incorrect");
-        setMatch(res.match);
+        commit(res.match);
       }
     });
   }, [onMessage]);
@@ -153,7 +161,9 @@ export default function App() {
                   col: match.lastShot.col,
                   result: match.lastShot.result,
                   sunk: match.lastShot.sunk,
-                  shipName: match.lastShot.shipId ? shipDef(match.lastShot.shipId)?.name : null,
+                  // A hit that hasn't sunk its ship must not say which ship it
+                  // was — that's information the rules withhold.
+                  shipName: match.lastShot.sunk && match.lastShot.shipId ? shipDef(match.lastShot.shipId)?.name : null,
                   mine: match.lastShot.by === idx
                 }
               : null
@@ -203,7 +213,7 @@ export default function App() {
   function handleStart() {
     const two = connected.slice(0, 2);
     if (two.length < 2) return;
-    setMatch(createMatch(two.map((p) => ({ playerId: p.playerId, name: p.name }))));
+    commit(createMatch(two.map((p) => ({ playerId: p.playerId, name: p.name }))));
     setImpact(null);
     setBanner(null);
     lastShotKeyRef.current = null;
@@ -212,7 +222,7 @@ export default function App() {
   function handleRematch() {
     if (!match) return;
     // The other captain fires first this time.
-    setMatch(
+    commit(
       createMatch(
         match.players.map((p) => ({ playerId: p.playerId, name: p.name })),
         opponentIndexOf(match.firstTurn ?? 0)
@@ -224,7 +234,7 @@ export default function App() {
   }
 
   function handleNewGame() {
-    setMatch(null);
+    commit(null);
     setImpact(null);
     setBanner(null);
   }
@@ -392,6 +402,7 @@ export default function App() {
                       </span>
                     </div>
                     <BoardGrid
+                      className={gridStyles.tvGrid}
                       ariaLabel={`${p.name}'s waters`}
                       cellRenderer={(r, c) => {
                         const info = fleetCellRenderer(view, r, c);
@@ -435,7 +446,7 @@ export default function App() {
                         {p.name}'s Fleet {i === match.winnerIndex ? "👑" : ""}
                       </span>
                     </div>
-                    <BoardGrid ariaLabel={`${p.name}'s revealed fleet`} cellRenderer={(r, c) => revealCellRenderer(view, r, c)} />
+                    <BoardGrid className={gridStyles.tvGrid} ariaLabel={`${p.name}'s revealed fleet`} cellRenderer={(r, c) => revealCellRenderer(view, r, c)} />
                   </div>
                 );
               })}

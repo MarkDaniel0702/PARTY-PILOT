@@ -295,3 +295,62 @@ describe("createMatch first turn", () => {
     expect(m.firstTurn).toBe(1);
   });
 });
+
+describe("audit regressions", () => {
+  it("rejects non-integer coordinates instead of letting a string slip past the bounds check", () => {
+    expect(isInBounds("0", "0")).toBe(false);
+    expect(isInBounds(2.5, 1)).toBe(false);
+    expect(isInBounds(NaN, 1)).toBe(false);
+    expect(isInBounds(0, 9)).toBe(true);
+  });
+
+  it("does not turn a hit into a miss when the shot arrives with string coordinates", () => {
+    const m = readyBothPlayers(twoPlayerMatch());
+    // Alice fires "0","0" - Bob's carrier is on row 0. Must be refused, not recorded as a miss.
+    const bad = fireAt(m, 0, "0", "0");
+    expect(bad.ok).toBe(false);
+    // ...and the cell is still fireable properly afterwards.
+    const good = fireAt(m, 0, 0, 0);
+    expect(good.ok).toBe(true);
+    expect(good.match.lastShot.result).toBe("hit");
+  });
+
+  it("rejects string coordinates and unknown orientations when placing", () => {
+    const m = twoPlayerMatch();
+    expect(placeShip(m, 0, "destroyer", "0", "0", ORIENTATION.H).ok).toBe(false);
+    expect(placeShip(m, 0, "destroyer", 0, 0, "diagonal").ok).toBe(false);
+  });
+
+  it("only accepts fleet confirmation during placement", () => {
+    const m = readyBothPlayers(twoPlayerMatch());
+    expect(m.phase).toBe("battle");
+    expect(confirmFleet(m, 0).ok).toBe(false);
+  });
+
+  it("applies actions strictly one after another: a repeated fire is refused, never a second turn", () => {
+    const m = readyBothPlayers(twoPlayerMatch());
+    const first = fireAt(m, 0, 5, 5);
+    expect(first.ok).toBe(true);
+    // Alice tries again on the updated match: it's Bob's turn.
+    expect(fireAt(first.match, 0, 6, 6)).toEqual({ ok: false, error: "not-your-turn" });
+  });
+
+  it("never leaks an unsunk ship's cells or id into the public view", () => {
+    let m = readyBothPlayers(twoPlayerMatch());
+    m = fireAt(m, 0, 0, 0).match; // hit the carrier, not sunk
+    const view = publicBoardView(m.players[1]);
+    expect(view.cells.filter((c) => c.shipId)).toHaveLength(0);
+    expect(JSON.stringify(view)).not.toContain("carrier");
+  });
+
+  it("fleet is 5/4/3/3/2 on a 10x10 board and randomized fleets never overlap", () => {
+    expect(SHIP_DEFS.map((s) => s.size)).toEqual([5, 4, 3, 3, 2]);
+    expect(BOARD_SIZE).toBe(10);
+    for (let i = 0; i < 50; i++) {
+      const res = randomizeFleet(twoPlayerMatch(), 0);
+      expect(res.ok).toBe(true);
+      const cells = res.match.players[0].fleet.flatMap((s) => s.cells.map(([r, c]) => `${r},${c}`));
+      expect(new Set(cells).size).toBe(17);
+    }
+  });
+});

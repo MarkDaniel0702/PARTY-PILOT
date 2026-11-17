@@ -483,3 +483,69 @@ describe("makeRng", () => {
     }
   });
 });
+
+describe("audit regressions", () => {
+  it("two heads swapping cells is a head-on: both die and nobody scores a kill", () => {
+    // A at 5,5 heading right, B at 6,5 heading left: they pass through each other.
+    const g = arena([
+      { id: "a", body: [[5, 5], [4, 5], [3, 5]], dir: "right" },
+      { id: "b", body: [[6, 5], [7, 5], [8, 5]], dir: "left" }
+    ]);
+    const after = step(g);
+    expect(snakeById(after, "a").alive).toBe(false);
+    expect(snakeById(after, "b").alive).toBe(false);
+    expect(snakeById(after, "a").kills).toBe(0);
+    expect(snakeById(after, "b").kills).toBe(0);
+    expect(after.events.filter((e) => e.type === "die").every((e) => e.cause === "head")).toBe(true);
+  });
+
+  it("still credits a kill when a head runs into a body that is not heading back at it", () => {
+    const g = arena([
+      { id: "a", body: [[5, 5], [4, 5], [3, 5]], dir: "right" },
+      { id: "b", body: [[6, 4], [6, 5], [6, 6]], dir: "up" }
+    ]);
+    const after = step(g);
+    expect(snakeById(after, "a").alive).toBe(false);
+    expect(snakeById(after, "b").kills).toBe(1);
+  });
+
+  it("crushes a snake whose head is caught in the ring the arena just closed", () => {
+    // Head sits on the outer ring, heading along it; the ring closes this tick.
+    const g = arena(
+      [
+        { id: "a", body: [[0, 5], [0, 6], [0, 7]], dir: "up" },
+        { id: "b", body: [[10, 5], [9, 5], [8, 5]], dir: "right" }
+      ],
+      { mode: "survival", shrinkStart: 1, shrinkEvery: 1 }
+    );
+    const after = step(g);
+    expect(after.inset).toBe(1);
+    expect(snakeById(after, "a").alive).toBe(false);
+    expect(snakeById(after, "b").alive).toBe(true);
+  });
+
+  it("drops food stranded in the closed ring so the quota refills in the open", () => {
+    let g = arena(
+      [
+        { id: "a", body: [[10, 5], [9, 5], [8, 5]], dir: "right" },
+        { id: "b", body: [[10, 8], [9, 8], [8, 8]], dir: "right" }
+      ],
+      { mode: "survival", shrinkStart: 1, shrinkEvery: 1 }
+    );
+    g = { ...g, food: [{ x: 0, y: 0, value: 1 }, { x: 19, y: 11, value: 1 }, { x: 5, y: 5, value: 1 }] };
+    const after = step(g);
+    expect(after.food.some((f) => isWall(after, f.x, f.y))).toBe(false);
+    expect(after.food.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("never spawns food on a living snake over a long run", () => {
+    let g = createGame(seats("a", "b", "c"), { seed: 9, mode: "timed", durationTicks: 5000 });
+    for (let i = 0; i < 400 && !g.over; i++) {
+      // wander: turn now and then so snakes survive a while and eat
+      if (i % 7 === 0) g = queueTurn(g, "a", i % 14 === 0 ? "up" : "down");
+      g = step(g);
+      const occupied = new Set(g.snakes.filter((s) => s.alive).flatMap((s) => s.body.map((c) => `${c.x},${c.y}`)));
+      g.food.forEach((f) => expect(occupied.has(`${f.x},${f.y}`)).toBe(false));
+    }
+  });
+});

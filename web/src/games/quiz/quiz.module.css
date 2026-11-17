@@ -83,9 +83,11 @@
   background: rgba(6, 10, 26, 0.88);
   backdrop-filter: blur(6px);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   padding: 1.5rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   animation: fadeIn 0.25s ease both;
 }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -98,6 +100,9 @@
   max-width: 560px;
   width: 100%;
   text-align: center;
+  /* auto margins centre a short card but let a tall one scroll from its top
+     instead of being clipped off-screen on small phones */
+  margin: auto;
   box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.7);
 }
 .qMeta {
@@ -125,14 +130,19 @@
   font-size: 0.85rem;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
-  transition: border-color 0.2s, transform 0.2s;
+  min-height: 44px;
+  transition: border-color 0.2s, transform 0.2s, background 0.2s;
 }
+.awardBtn:active:not(:disabled) { transform: scale(0.97); }
 .awardBtn:hover:not(:disabled) { border-color: var(--accent-2); transform: translateY(-2px); }
 .sw { width: 10px; height: 10px; border-radius: 3px; flex: none; }
 .awardBtnMissed { opacity: 0.45; text-decoration: line-through; pointer-events: none; transform: none; }
 .awardBtnCorrect { border-color: var(--accent-2); }
+.awardBtnCorrect:hover:not(:disabled) { background: color-mix(in srgb, var(--accent-2) 14%, var(--panel)); }
 .awardBtnIncorrect { border-color: var(--danger); }
+.awardBtnIncorrect:hover:not(:disabled) { background: color-mix(in srgb, var(--danger) 14%, var(--panel)); }
 .awardBtnPerk { border-color: var(--accent); }
 
 /* Turn / steal indicators */
@@ -147,7 +157,8 @@
 }
 @keyframes pulseTimer { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
 .stealHeading { margin: 0 0 0.4rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--danger); font-size: 0.9rem; }
-.qOutcome { font-size: 1.05rem; font-weight: 800; margin: 0 0 0.4rem; }
+.qOutcome { font-size: 1.05rem; font-weight: 800; margin: 0 0 0.4rem; animation: outcomePop 0.35s ease both; }
+@keyframes outcomePop { 0% { transform: scale(0.8); opacity: 0; } 60% { transform: scale(1.08); opacity: 1; } 100% { transform: scale(1); } }
 .qOutcomeCorrect { color: var(--accent-2); }
 .qOutcomeIncorrect, .qOutcomeTimeout { color: var(--danger); }
 .qOutcomeStolen { color: var(--accent); }
@@ -163,9 +174,16 @@
 
 .showAnswerBtn { margin-bottom: 1.2rem; }
 .backBoardBtn { max-width: 300px; margin: 0 auto; }
+.showAnswerBtn { max-width: 320px; margin-left: auto; margin-right: auto; }
+.tile { min-height: 48px; }
 
 @media (max-width: 640px) {
   .board { grid-template-columns: repeat(var(--cols, 3), minmax(92px, 1fr)); gap: 0.4rem; }
   .tile { padding: 1rem 0.3rem; box-shadow: 0 5px 0 0 #b5860a; }
   .catHeader { padding: 0.6rem 0.3rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay, .qOutcome, .stealZone, .tileBonus::after { animation: none; }
+  .tile, .awardBtn { transition: none; }
 }

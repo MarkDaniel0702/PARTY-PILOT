@@ -8,6 +8,8 @@ import {
   countMatching,
   isValidBid,
   minQuantity,
+  minQuantityFor,
+  raisableFace,
   placeBid,
   callLiar,
   nextRound,
@@ -104,6 +106,21 @@ describe("isValidBid / minQuantity", () => {
     expect(minQuantity(afterBid, 4)).toBe(4);
     expect(minQuantity(afterBid, 2)).toBe(4);
     expect(minQuantity(g, 2)).toBe(1);
+  });
+});
+
+describe("raisableFace", () => {
+  it("keeps the face when a raise on it still fits on the table", () => {
+    expect(raisableFace({ quantity: 2, face: 3 }, 6, 3)).toBe(3);
+    expect(raisableFace(null, 6, 5)).toBe(5);
+  });
+  it("moves up a face when the standing bid already claims every die", () => {
+    // 5 x 3 with 5 dice on the table: 6 x 3 is impossible, 5 x 4 is fine.
+    expect(raisableFace({ quantity: 5, face: 3 }, 5, 3)).toBe(4);
+    expect(minQuantityFor({ quantity: 5, face: 3 }, raisableFace({ quantity: 5, face: 3 }, 5, 3))).toBe(5);
+  });
+  it("falls back to the same face when nothing can be raised", () => {
+    expect(raisableFace({ quantity: 5, face: 6 }, 5, 6)).toBe(6);
   });
 });
 

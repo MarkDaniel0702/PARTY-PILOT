@@ -73,7 +73,12 @@ function loadYouTubeAPI() {
     };
     const tag = document.createElement("script");
     tag.src = "https://www.youtube.com/iframe_api";
-    tag.onerror = () => { ytApiPromise = null; };
+    tag.onerror = () => {
+      // Offline / blocked: resolve with nothing so the caller can show the
+      // "clip can't play" fallback instead of "Loading…" forever.
+      ytApiPromise = null;
+      resolve(null);
+    };
     document.head.appendChild(tag);
   });
   return ytApiPromise;
@@ -136,6 +141,8 @@ export default function App() {
 
   const buzzStateRef = useRef();
   buzzStateRef.current = {
+    phase,
+    hasSong: !!currentSong,
     revealed,
     teams: teams.teams,
     lockedTeamIds,
@@ -148,8 +155,10 @@ export default function App() {
   useEffect(() => {
     return onMessage((msg) => {
       if (msg.type !== "buzz") return;
-      const { revealed, teams: teamsArr, lockedTeamIds, buzzedTeamId, sessionPlayers, stopTimer, pauseClip } =
+      const { phase, hasSong, revealed, teams: teamsArr, lockedTeamIds, buzzedTeamId, sessionPlayers, stopTimer, pauseClip } =
         buzzStateRef.current;
+      // A late buzz arriving on the setup / results screen must not latch.
+      if (phase !== "play" || !hasSong) return;
       if (revealed || buzzedTeamId || buzzLockRef.current) return;
       const player = sessionPlayers.find((p) => p.playerId === msg.playerId);
       if (!player) return;
@@ -300,10 +309,28 @@ export default function App() {
     setClipVisible(true);
     setClipProgressVisible(!!song.clipDuration);
 
-    loadYouTubeAPI().then((YT) => {
+    // Safety net: a blocked/stalled API load must not leave "Loading…" up forever.
+    setTimeout(() => {
+      if (token === clipLoadTokenRef.current) setClipMode((m) => (m === "loading" ? "error" : m));
+    }, 15000);
+
+    loadYouTubeAPI()
+      // One macrotask so React has committed the clip panel (and its mount ref).
+      .then((YT) => new Promise((resolve) => setTimeout(() => resolve(YT), 0)))
+      .then((YT) => {
       if (token !== clipLoadTokenRef.current) return; // song moved on while the API was loading
+      if (!YT) {
+        setClipMode("error");
+        return;
+      }
+      // The mount node only exists once React has rendered the clip panel.
+      const mountParent = clipFrameMountRef.current;
+      if (!mountParent) {
+        setClipMode("error");
+        return;
+      }
       const mountEl = document.createElement("div");
-      clipFrameMountRef.current.appendChild(mountEl);
+      mountParent.appendChild(mountEl);
       const start = song.clipStart || 0;
       ytPlayerRef.current = new YT.Player(mountEl, {
         videoId: song.youtubeId,
@@ -366,6 +393,22 @@ export default function App() {
     ytPlayerRef.current.playVideo();
   }
 
+  // Leaving the game mid-clip must not leave the player (and its 250ms
+  // watchdog interval) running.
+  useEffect(
+    () => () => {
+      clipLoadTokenRef.current++;
+      stopClipWatchdog();
+      try {
+        ytPlayerRef.current?.destroy();
+      } catch (e) {
+        /* already gone */
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
   // ---------- Clue timer — restarts on a new song or a new clue level ----------
   useEffect(() => {
     if (phase !== "play" || !currentSong) return;
@@ -390,6 +433,7 @@ export default function App() {
     setCurrentSong(item);
     setClueLevel(1);
     setRevealed(false);
+    revealedRef.current = false;
     setupClipPlayer(item);
     setBuzzedTeamId(null);
     setBuzzedPlayerId(null);
@@ -418,6 +462,9 @@ export default function App() {
   }
 
   function revealAnswer() {
+    // Timer expiry and a manual tap can both land here; count the song once.
+    if (revealedRef.current) return;
+    revealedRef.current = true;
     gameTimer.stop();
     setSongsPlayed((p) => p + 1);
     setRevealed(true);
@@ -443,7 +490,8 @@ export default function App() {
     gameTimer.stop();
     destroyClipPlayer();
     const { ranked, tied, winner } = resolveStanding(teams.teams);
-    if (tied.length <= 1) {
+    // Everyone level on zero means nobody scored — no point in a tie-breaker.
+    if (tied.length <= 1 || ranked[0].score <= 0) {
       setResult({ ranked, winner: finalizeWinner(winner), shared: false, tiebreak: null });
       setPhase("summary");
     } else {
@@ -458,7 +506,7 @@ export default function App() {
     gameTimer.stop();
     destroyClipPlayer();
     const { ranked, tied, winner } = resolveStanding(teams.teams);
-    if (tied.length <= 1) {
+    if (tied.length <= 1 || ranked[0].score <= 0) {
       setResult({ ranked, winner: finalizeWinner(winner), shared: false, tiebreak: null });
       setPhase("themeComplete");
     } else {

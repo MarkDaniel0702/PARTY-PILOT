@@ -58,8 +58,11 @@ export function judgeGuess(guess, word, { isDrawer = false, alreadyCorrect = fal
   const w = normalise(word);
   if (!g) return RESULT.IGNORED;
   if (isDrawer || alreadyCorrect) return RESULT.IGNORED;
-  if (g === w) return RESULT.CORRECT;
-  if (w.length >= MIN_CLOSE_LENGTH && editDistance(g, w, 1) === 1) return RESULT.CLOSE;
+  // Spacing is not part of the answer: "hotdog" and "hot dog" are the same guess.
+  const gs = g.replace(/ /g, "");
+  const ws = w.replace(/ /g, "");
+  if (gs === ws) return RESULT.CORRECT;
+  if (ws.length >= MIN_CLOSE_LENGTH && editDistance(gs, ws, 1) === 1) return RESULT.CLOSE;
   return RESULT.WRONG;
 }
 

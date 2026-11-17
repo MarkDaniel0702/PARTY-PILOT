@@ -42,7 +42,9 @@
   font-size: 0.85rem;
   font-weight: 700;
 }
+.seatChip { transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s; }
 .seatChipActive {
+  transform: scale(1.06);
   border-color: var(--accent);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent);
 }
@@ -95,6 +97,9 @@
 
 .turnBanner {
   margin: 1.2rem 0 0;
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radius-md);
+  background: var(--panel-2);
   text-align: center;
   font-weight: 800;
   font-size: 1rem;
@@ -138,6 +143,7 @@
   margin: 0.8rem auto 0;
 }
 .colourBtn {
+  min-height: 56px;
   padding: 1.2rem 1rem;
   border-radius: var(--radius-md);
   color: #fff;
@@ -231,5 +237,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .seatHit, .seatSkipped, .dirFlip, .winBurst { animation: none; }
+  .seatChip, .colourBtn { transition: none; }
   .winBurst::before { animation: none; content: none; }
 }

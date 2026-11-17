@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Grid3x3 } from "lucide-react";
 import { GameShell } from "../../shared/components/GameShell";
 import { Screen, ScreenTitle, ScreenSub, BigIcon, SetupBlock } from "../../shared/components/Screen";
@@ -20,6 +20,7 @@ import { useUsedIndices } from "../../shared/hooks/useUsedIndices";
 import { resolveStanding } from "../../shared/utils/resolveStanding";
 import layoutStyles from "../../shared/components/layout.module.css";
 import { WORDGRID_CATEGORIES, WORDGRID_CATEGORY_ICONS } from "./data";
+import { computeStatuses, pointsForWin, isValidGuess } from "./logic";
 import styles from "./wordgrid.module.css";
 
 const MIN_PLAYERS = 2;
@@ -37,30 +38,6 @@ function finalizeWinner(winner) {
   return winner && winner.score > 0 ? winner : null;
 }
 
-function computeStatuses(guess, secret) {
-  const secretLetters = secret.split("");
-  const guessLetters = guess.split("");
-  const statuses = Array(secret.length).fill(null);
-
-  for (let i = 0; i < guessLetters.length; i++) {
-    if (guessLetters[i] === secretLetters[i]) {
-      statuses[i] = "correct";
-      secretLetters[i] = null;
-    }
-  }
-  for (let i = 0; i < guessLetters.length; i++) {
-    if (statuses[i]) continue;
-    const idx = secretLetters.indexOf(guessLetters[i]);
-    if (idx !== -1) {
-      statuses[i] = "present";
-      secretLetters[idx] = null;
-    } else {
-      statuses[i] = "absent";
-    }
-  }
-  return statuses;
-}
-
 function createEmptyBoard(rows, wordLength) {
   return Array.from({ length: rows }, () =>
     Array.from({ length: wordLength }, () => ({ letter: "", status: null, flipped: false }))
@@ -69,7 +46,7 @@ function createEmptyBoard(rows, wordLength) {
 
 function WordBoard({ board }) {
   return (
-    <div className={styles.board}>
+    <div className={styles.board} style={{ "--n": board[0]?.length || 5 }}>
       {board.map((row, r) => (
         <div className={styles.row} key={r}>
           {row.map((tile, c) => (
@@ -101,6 +78,19 @@ export default function App() {
   // flip animation finishes, not the instant a guess is submitted, so the
   // banner doesn't jump ahead of what's still animating on screen.
   const guessesUsedRef = useRef(0);
+  // Flip-animation timeouts, so leaving the game mid-flip leaks nothing.
+  const timeoutsRef = useRef(new Set());
+  useEffect(() => {
+    const timeouts = timeoutsRef.current;
+    return () => timeouts.forEach(clearTimeout);
+  }, []);
+  function later(fn, ms) {
+    const id = setTimeout(() => {
+      timeoutsRef.current.delete(id);
+      fn();
+    }, ms);
+    timeoutsRef.current.add(id);
+  }
 
   const [names, setNames] = useState([]);
   const [scores, setScores] = useState([]);
@@ -154,13 +144,13 @@ export default function App() {
   function animateRow(rowIndex, letters, statuses, done) {
     const len = letters.length;
     for (let i = 0; i < len; i++) {
-      setTimeout(() => {
+      later(() => {
         setBoard((prev) => {
           const next = prev.map((row) => row.slice());
           next[rowIndex][i] = { ...next[rowIndex][i], flipped: true };
           return next;
         });
-        setTimeout(() => {
+        later(() => {
           setBoard((prev) => {
             const next = prev.map((row) => row.slice());
             next[rowIndex][i] = { ...next[rowIndex][i], letter: letters[i], status: statuses[i] };
@@ -196,8 +186,8 @@ export default function App() {
 
   function handleGuess() {
     if (busy) return;
-    const guess = guessInput.trim().toUpperCase();
-    if (guess.length !== currentWord.length || !/^[A-Z]+$/.test(guess)) {
+    const guess = isValidGuess(guessInput, currentWord.length);
+    if (!guess) {
       setMessage(`Guess must be ${currentWord.length} letters, letters only.`);
       return;
     }
@@ -207,8 +197,8 @@ export default function App() {
 
   function handleTimerExpire() {
     if (busy) return;
-    const guess = guessInput.trim().toUpperCase();
-    if (guess.length === currentWord.length && /^[A-Z]+$/.test(guess)) {
+    const guess = isValidGuess(guessInput, currentWord.length);
+    if (guess) {
       submitGuess(guess);
       return;
     }
@@ -233,7 +223,7 @@ export default function App() {
 
   function handleWin(guessesUsedSnapshot) {
     gameTimer.stop();
-    const points = Math.max(maxGuesses - guessesUsedSnapshot + 1, 1);
+    const points = pointsForWin(maxGuesses, guessesUsedSnapshot);
     const newScores = scores.slice();
     newScores[turnIndex] += points;
     setScores(newScores);
@@ -269,7 +259,8 @@ export default function App() {
   function showSummary(scoresSnapshot) {
     const entrants = names.map((name, i) => ({ name, score: scoresSnapshot[i] }));
     const { ranked, tied, winner } = resolveStanding(entrants);
-    if (tied.length <= 1) {
+    // Everyone level on zero means nobody scored — no point in a tie-breaker.
+    if (tied.length <= 1 || ranked[0].score <= 0) {
       setResult({ ranked, winner: finalizeWinner(winner), shared: false, tiebreak: null });
       setPhase("summary");
     } else {
@@ -285,7 +276,6 @@ export default function App() {
   }
 
   function handlePlayAgain() {
-    usedIndices.reset();
     setScores(names.map(() => 0));
     setTurnIndex(0);
     setLastResult("");
@@ -379,8 +369,11 @@ export default function App() {
 
       <Screen active={phase === "guess"}>
         <TurnBanner>
-          Guess {guessesUsed + 1} of {maxGuesses}
+          {names[turnIndex]}: guess {guessesUsed + 1} of {maxGuesses}
         </TurnBanner>
+        <p className={styles.wordHint}>
+          A {currentWord.length}-letter word — type it below and tap Guess.
+        </p>
         {timerSetup.enabled && <GameTimer timer={gameTimer} />}
         <WordBoard board={board} />
         <div className={styles.inputArea}>
@@ -393,16 +386,28 @@ export default function App() {
             autoCapitalize="characters"
             disabled={busy}
             value={guessInput}
-            onChange={(e) => setGuessInput(e.target.value)}
-            onKeyUp={(e) => {
-              if (e.key === "Enter") handleGuess();
+            maxLength={currentWord.length || undefined}
+            inputMode="text"
+            autoCorrect="off"
+            spellCheck={false}
+            enterKeyHint="go"
+            aria-label={`Your guess, ${currentWord.length} letters`}
+            onChange={(e) => {
+              setGuessInput(e.target.value.replace(/[^a-zA-Z]/g, ""));
+              if (message) setMessage("");
+            }}
+            // keydown, not keyup: the Enter that activated "Tap to Start
+            // Guessing" releases on this freshly-focused input and would
+            // otherwise submit an empty guess.
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.nativeEvent.isComposing) handleGuess();
             }}
           />
           <Button disabled={busy} onClick={handleGuess}>
             Guess
           </Button>
         </div>
-        <p className={styles.guessMessage}>{message}</p>
+        <p className={styles.guessMessage} role="status" aria-live="polite">{message}</p>
         <div className={styles.giveUpWrap}>
           <Button variant="secondary" disabled={busy} onClick={giveUp}>
             🏳️ Give Up
@@ -414,6 +419,7 @@ export default function App() {
         <BigIcon>🏁</BigIcon>
         <ScreenTitle>Round Complete!</ScreenTitle>
         <ScreenSub>Here's how everyone scored.</ScreenSub>
+        {lastResult && <TurnBanner>{lastResult}</TurnBanner>}
         {result && <ResultsList result={result} unit="pts" unitSingular="pt" />}
         <ButtonRow>
           <Button onClick={handlePlayAgain}>Play Again</Button>

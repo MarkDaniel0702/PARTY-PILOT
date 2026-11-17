@@ -27,7 +27,9 @@ import {
   chooseColour,
   drawCard,
   passTurn,
-  skipTurn
+  skipTurn,
+  roundScore,
+  cardPoints
 } from "./engine";
 import cardStyles from "../../shared/cards/cards.module.css";
 import styles from "./uno.module.css";
@@ -263,9 +265,10 @@ export default function App() {
           steps={[
             <>Add players below, then tap <strong>Deal</strong>. Pair phones to keep every hand private, or skip it and pass the device.</>,
             "Play a card matching the discard pile's colour, number, or symbol — wilds go on anything.",
-            <><strong>Skip</strong> jumps the next player, <strong>Reverse</strong> flips direction, <strong>+2</strong> and <strong>+4</strong> make the next player draw and lose their turn.</>,
-            "No legal card? Draw one — you can play it right away if it works, otherwise your turn passes.",
-            "First player to empty their hand wins the round."
+            <><strong>Skip</strong> jumps the next player, <strong>Reverse</strong> flips direction (with 2 players it works as a Skip), <strong>+2</strong> and <strong>+4</strong> make the next player draw and lose their turn. No stacking.</>,
+            <><strong>Wild +4</strong> is only allowed when you hold no card of the current colour — the game checks this for you.</>,
+            "No legal card? Draw one — you can play it right away if it works, otherwise your turn passes. When the draw pile runs out the discards are reshuffled.",
+            "A player down to one card gets an UNO! flag. First to empty their hand wins the round and scores the points left in everyone else's hands (numbers = face value, Skip/Reverse/+2 = 20, wilds = 50)."
           ]}
         />
 
@@ -460,7 +463,9 @@ export default function App() {
         <ScreenTitle>
           <span className={styles.winBurst}>{winnerName} wins!</span>
         </ScreenTitle>
-        <ScreenSub>Hand emptied first. Cards left with everyone else:</ScreenSub>
+        <ScreenSub>
+          Hand emptied first{game ? ` — scores ${roundScore(game)} points` : ""}. Cards left with everyone else:
+        </ScreenSub>
         {game && (
           <ul className={styles.finalList}>
             {activeSeats
@@ -468,7 +473,9 @@ export default function App() {
               .map((s) => (
                 <li key={s.seatId} className={styles.finalRow}>
                   <span>{s.name}</span>
-                  <span className={styles.finalCount}>{handFor(game, s.seatId).length} cards</span>
+                  <span className={styles.finalCount}>
+                    {handFor(game, s.seatId).length} cards · {handFor(game, s.seatId).reduce((n, c) => n + cardPoints(c), 0)} pts
+                  </span>
                 </li>
               ))}
           </ul>

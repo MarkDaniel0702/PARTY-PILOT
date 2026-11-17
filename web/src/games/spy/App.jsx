@@ -9,12 +9,13 @@ import { Roster } from "../../shared/components/Roster";
 import { TimerSetup } from "../../shared/components/TimerSetup";
 import { GameTimer } from "../../shared/components/GameTimer";
 import { PassCard } from "../../shared/components/PassCard";
-import { RevealCard, ProgressDots } from "../../shared/components/RevealCard";
+import { RevealCard, TurnBanner, ProgressDots } from "../../shared/components/RevealCard";
 import { CompletionChime } from "../../shared/components/CompletionChime";
 import { useRoster } from "../../shared/hooks/useRoster";
 import { useTimerSetup } from "../../shared/hooks/useTimerSetup";
 import { useGameTimer } from "../../shared/hooks/useGameTimer";
-import { pickRandom, groupKeys } from "../../shared/utils/random";
+import { useUsedIndices } from "../../shared/hooks/useUsedIndices";
+import { groupKeys } from "../../shared/utils/random";
 import layoutStyles from "../../shared/components/layout.module.css";
 import { SPY_THEMES, SPY_THEME_ICONS, SPY_THEME_GROUPS } from "./data";
 import styles from "./spy.module.css";
@@ -49,6 +50,7 @@ export default function App() {
   const [urgent, setUrgent] = useState(false);
   const discussTimer = useGameTimer({ onExpire: () => setUrgent(true) });
   const prevSpyIndexRef = useRef(-1);
+  const usedPairs = useUsedIndices();
 
   const [names, setNames] = useState([]);
   const [words, setWords] = useState([]);
@@ -58,7 +60,8 @@ export default function App() {
   const [revealIndex, setRevealIndex] = useState(0);
 
   function dealWords() {
-    const pair = pickRandom(SPY_THEMES[theme]);
+    // No repeated word pair until the theme is exhausted (also across Play Again).
+    const { item: pair } = usedPairs.pickUnused(SPY_THEMES[theme]);
     const idx = pickSpyIndex(roster.count, prevSpyIndexRef.current);
     prevSpyIndexRef.current = idx;
 
@@ -78,6 +81,8 @@ export default function App() {
   }
 
   function handleStart() {
+    usedPairs.reset();
+    prevSpyIndexRef.current = -1;
     dealWords();
     setPhase("pass");
   }
@@ -115,6 +120,7 @@ export default function App() {
 
   function handleNewGame() {
     setTheme(null);
+    usedPairs.reset();
     prevSpyIndexRef.current = -1;
     setPhase("setup");
   }
@@ -138,9 +144,9 @@ export default function App() {
             steps={[
               <>Pick a theme and player count below, then tap <strong>Deal the Words</strong>.</>,
               "The device gets passed around — each player privately taps to reveal their word, then hides it before passing it on.",
-              "Almost everyone gets the same word. One random player — the Spy — gets a different, related word.",
-              "Once everyone's seen their word, the group discusses out loud and tries to spot who's bluffing.",
-              <>Anyone can tap <strong>Reveal the Spy</strong> when the group is ready to vote.</>
+              "Almost everyone gets the same word. One random player — the Spy — gets a different but related word, and doesn't know they're the Spy.",
+              "Once everyone's seen their word, take turns describing it without saying it. Listen for the clue that doesn't quite fit.",
+              <>When the group has voted on who the Spy is, tap <strong>Reveal the Spy</strong> to find out if you were right.</>
             ]}
           />
 
@@ -213,6 +219,7 @@ export default function App() {
             actually know it?
           </ScreenSub>
           {timerSetup.enabled && <GameTimer timer={discussTimer} />}
+          {urgent && <TurnBanner>⏰ Time's up — vote now!</TurnBanner>}
           <Button className={urgent ? styles.urgent : ""} onClick={handleRevealSpy}>
             Reveal the Spy
           </Button>

@@ -7,7 +7,7 @@ import { BOARD_SIZE, cellLabel, shipDef } from "./engine";
 import gridStyles from "./boardGrid.module.css";
 import styles from "./phoneBattleship.module.css";
 
-function targetCellInfo(target, row, col, canFire, onFire) {
+function targetCellInfo(target, row, col, canFire, onAim, aimed) {
   const cell = target.cells[row * BOARD_SIZE + col];
   let className = gridStyles.water;
   let content = "";
@@ -19,11 +19,16 @@ function targetCellInfo(target, row, col, canFire, onFire) {
     content = "•";
   }
   const clickable = canFire && !cell.shot;
+  const isAimed = clickable && aimed && aimed.row === row && aimed.col === col;
+  if (isAimed) {
+    className = `${className} ${gridStyles.aimed}`;
+    content = "◎";
+  }
   return {
     className,
     content,
-    ariaLabel: `${cellLabel(row, col)}${cell.shot ? `, ${cell.shot}` : ""}`,
-    onClick: clickable ? () => onFire(row, col) : undefined
+    ariaLabel: `${cellLabel(row, col)}${cell.shot ? `, ${cell.shot}` : ""}${isAimed ? ", aimed" : ""}`,
+    onClick: clickable ? () => onAim(row, col) : undefined
   };
 }
 
@@ -62,10 +67,30 @@ export function PhoneAttack({ view, send }) {
   const [tab, setTab] = useState(view.myTurn ? "attack" : "fleet");
   const [flash, setFlash] = useState(null);
   const seenShotRef = useRef(null);
+  // Tap a cell to line it up, then press Fire. A bare tap-to-fire on cells
+  // under 30px wide means a stray thumb costs you the shot.
+  const [aimed, setAimed] = useState(null);
+  const [sent, setSent] = useState(false);
 
   useEffect(() => {
     setTab(view.myTurn ? "attack" : "fleet");
+    setAimed(null);
+    setSent(false);
+    if (view.myTurn) {
+      try {
+        navigator.vibrate?.([30, 40, 30]);
+      } catch {
+        /* haptics are a nicety */
+      }
+    }
   }, [view.myTurn]);
+
+  // If the host never answers (it rejected the shot), let the captain retry.
+  useEffect(() => {
+    if (!sent) return undefined;
+    const t = setTimeout(() => setSent(false), 2000);
+    return () => clearTimeout(t);
+  }, [sent]);
 
   useEffect(() => {
     const shot = view.lastShot;
@@ -93,9 +118,15 @@ export function PhoneAttack({ view, send }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view.lastShot]);
 
-  function handleFire(row, col) {
-    if (!view.myTurn) return;
-    send(action(ACTION.FIRE, { row, col }));
+  function handleAim(row, col) {
+    if (!view.myTurn || sent) return;
+    setAimed({ row, col });
+  }
+
+  function handleFire() {
+    if (!view.myTurn || sent || !aimed) return;
+    setSent(true);
+    send(action(ACTION.FIRE, { row: aimed.row, col: aimed.col }));
   }
 
   return (
@@ -134,12 +165,16 @@ export function PhoneAttack({ view, send }) {
       {tab === "attack" ? (
         <>
           <p className={styles.sub}>
-            {view.myTurn ? `Tap a cell in ${view.opponentName ? `${view.opponentName}'s` : "their"} waters.` : "Watching — not your turn."}
+            {view.myTurn ? "Tap a cell to aim, then press Fire." : "Watching — not your turn."}
           </p>
           <BoardGrid
             ariaLabel={`${view.opponentName || "Opponent"}'s waters`}
-            cellRenderer={(r, c) => targetCellInfo(view.target, r, c, view.myTurn, handleFire)}
+            cellRenderer={(r, c) => targetCellInfo(view.target, r, c, view.myTurn && !sent, handleAim, aimed)}
           />
+          <button type="button" className={styles.fireBtn} disabled={!view.myTurn || !aimed || sent} onClick={handleFire}>
+            <Crosshair size={16} strokeWidth={2.5} style={{ verticalAlign: "-0.15em" }} />{" "}
+            {sent ? "Firing…" : aimed ? `FIRE at ${cellLabel(aimed.row, aimed.col)}` : "Pick a target"}
+          </button>
         </>
       ) : (
         <>

@@ -80,3 +80,8 @@
 @media (max-width: 480px) {
   .pictureFrame { aspect-ratio: 1 / 1; }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .pictureImage, .pictureFallbackEmoji { transition: none; }
+  .pictureSpinner { animation: none; border-top-color: var(--accent); }
+}

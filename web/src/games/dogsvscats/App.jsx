@@ -15,7 +15,7 @@ import { FieldThumb } from "./FieldThumb";
 import { AngleDial, PowerMeter } from "./AimControls";
 import { BATTLEFIELDS } from "./terrain";
 import { WEAPONS, weaponById } from "./weapons";
-import { createMatch, fire, endTurn, moveActive, activeCharacter, aliveOf, TEAMS, MAX_HP } from "./engine";
+import { createMatch, fire, endTurn, moveActive, activeCharacter, aliveOf, TEAMS, MAX_HP, MAX_MOVES } from "./engine";
 import styles from "./dogsvscats.module.css";
 
 const TURN_SECONDS = 45;
@@ -24,6 +24,12 @@ const FLOAT_MS = 1100;
 const BANNER_MS = 1500;
 const BOOM_MS = 760;
 const MAX_CRATERS = 40;
+const ANGLE_MIN = -20;
+const ANGLE_MAX = 200;
+const POWER_MIN = 10;
+const POWER_MAX = 100;
+// Rendering can stall (hidden tab, throttled rAF); the turn must not.
+const SHOT_SAFETY_MS = 700;
 
 const FIELD_ITEMS = BATTLEFIELDS.map((b) => ({
   key: b.id,
@@ -42,8 +48,15 @@ export default function App() {
   const [power, setPower] = useState(70);
   const [weaponId, setWeaponId] = useState(WEAPONS[0].id);
   const [shot, setShot] = useState(null);
-  const [shotProgress, setShotProgress] = useState(0);
   const [explosion, setExplosion] = useState(null);
+  // Flight and blast progress are written every frame by the animation loop
+  // and read by the canvas's own loop - deliberately NOT state, so a shot
+  // doesn't re-render this whole screen 60 times a second.
+  const progressRef = useRef({ shot: 0, boom: 0 });
+  // A shot is "in the air" from the moment it's fired until its turn passes.
+  // Messages can arrive faster than React re-renders (a double-tapped Fire
+  // button), and a stale render would let both of them through.
+  const firingRef = useRef(false);
   const [turnLeft, setTurnLeft] = useState(TURN_SECONDS);
   const [message, setMessage] = useState("");
 
@@ -67,6 +80,8 @@ export default function App() {
   const shownChars = hold?.characters ?? match?.characters ?? [];
   const shownActor = shownChars.find((c) => c.id === actor?.id) ?? actor;
   const busy = !!shot || (match && match.phase !== "aim");
+  const stepsLeft = match ? Math.max(0, MAX_MOVES - (match.moved || 0)) : 0;
+  const outOfSteps = stepsLeft === 0;
 
   // Handlers read fresh state through a ref so the listener registers once.
   const ref = useRef();
@@ -75,12 +90,16 @@ export default function App() {
   const doFire = useCallback((a, p, wid) => {
     const st = ref.current;
     const m = st.match;
-    if (!m || m.phase !== "aim") return;
+    if (!m || m.phase !== "aim" || firingRef.current) return;
 
     const before = new Map(m.characters.map((c) => [c.id, c.hp]));
     // Terrain is dug in place by fire(), so copy the mask first.
     const snapshot = { terrain: { ...m.terrain, mask: m.terrain.mask.slice() }, characters: m.characters };
     const { state, shot: s } = fire(m, { weaponId: wid, angle: a, power: p });
+    // Rejected (bad angle/power, no shooter): nothing happened, so there is
+    // nothing to animate.
+    if (!s) return;
+    firingRef.current = true;
 
     // Damage numbers come from diffing HP either side of the resolved shot,
     // so blast damage, direct hits and fall damage are all covered without
@@ -94,8 +113,8 @@ export default function App() {
     playSound("incorrect");
     setMatch(state);
     setHold(snapshot);
+    progressRef.current = { shot: 0, boom: 0 };
     setShot(s);
-    setShotProgress(0);
     if (hits.length) setFloats((f) => [...f, ...hits]);
   }, []);
 
@@ -112,14 +131,16 @@ export default function App() {
       if (seat === -1 || seat % 2 !== st.match.turnTeamIndex) return;
       const p = msg.payload || {};
       if (msg.kind === ACTION.AIM) {
-        if (typeof p.angle === "number") setAngle(p.angle);
-        if (typeof p.power === "number") setPower(p.power);
+        // Clamped to what the sliders allow: this is untrusted input.
+        if (Number.isFinite(p.angle)) setAngle(Math.max(ANGLE_MIN, Math.min(ANGLE_MAX, Math.round(p.angle))));
+        if (Number.isFinite(p.power)) setPower(Math.max(POWER_MIN, Math.min(POWER_MAX, Math.round(p.power))));
       } else if (msg.kind === ACTION.SELECT_WEAPON) {
-        setWeaponId(p.weaponId);
+        if (WEAPONS.some((w) => w.id === p.weaponId)) setWeaponId(p.weaponId);
       } else if (msg.kind === ACTION.MOVE) {
         setMatch((m) => (m ? moveActive(m, p.dir > 0 ? 1 : -1) : m));
       } else if (msg.kind === ACTION.FIRE) {
-        doFire(p.angle ?? st.angle, p.power ?? st.power, p.weaponId ?? st.weaponId);
+        const wid = WEAPONS.some((w) => w.id === p.weaponId) ? p.weaponId : st.weaponId;
+        doFire(Number.isFinite(p.angle) ? p.angle : st.angle, Number.isFinite(p.power) ? p.power : st.power, wid);
       }
     });
   }, [onMessage, doFire]);
@@ -186,6 +207,13 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, match?.turnTeamIndex, match?.activeByTeam, busy]);
 
+  // "Out of time!" is a notice, not a permanent fixture.
+  useEffect(() => {
+    if (!message) return undefined;
+    const t = setTimeout(() => setMessage(""), 2200);
+    return () => clearTimeout(t);
+  }, [message]);
+
   // ---------- turn-change banner ----------
   useEffect(() => {
     if (phase !== "play" || !match || match.winner) return undefined;
@@ -213,7 +241,8 @@ export default function App() {
     // A blast or shot left mid-animation by "End battle" must not reappear,
     // frozen, on the next battlefield.
     setShot(null);
-    setShotProgress(0);
+    firingRef.current = false;
+    progressRef.current = { shot: 0, boom: 0 };
     setExplosion(null);
     setMatchId((n) => n + 1);
     setTerrainVersion((v) => v + 1);
@@ -228,20 +257,22 @@ export default function App() {
   useEffect(() => {
     if (!shot) return undefined;
     const firingTeam = ref.current.team;
-    let raf;
-    const start = performance.now();
+    const w = shot.weapon;
     const dur = shot.reason === "melee" ? 220 : Math.min(FLIGHT_MS, 220 + shot.path.length * 7);
-    const tick = (now) => {
-      const t = Math.min(1, (now - start) / dur);
-      setShotProgress(t);
-      if (t < 1) {
-        raf = requestAnimationFrame(tick);
-        return;
-      }
-      const w = shot.weapon;
+    const prog = progressRef.current;
+    let raf = 0;
+    let safety = 0;
+    let detonated = false;
+    let finished = false;
+
+    const detonate = () => {
+      if (detonated) return;
+      detonated = true;
+      prog.shot = 1;
+      prog.boom = 0;
       setHold(null);
       setTerrainVersion((v) => v + 1);
-      setExplosion({ x: shot.impact.x, y: shot.impact.y, radius: w.radius, weaponId: w.id, t: 0 });
+      setExplosion({ x: shot.impact.x, y: shot.impact.y, radius: w.radius, weaponId: w.id });
       // The crater scorch and the spent-shot marker are what replace the aim
       // line: you correct off where the last one actually landed.
       if (shot.reason !== "out" && shot.reason !== "expired") {
@@ -254,26 +285,51 @@ export default function App() {
         born: performance.now()
       });
       playSound("timerEnd");
-      const boomStart = performance.now();
-      const boom = (n) => {
-        const bt = Math.min(1, (n - boomStart) / BOOM_MS);
-        setExplosion((e) => (e ? { ...e, t: bt } : e));
-        if (bt < 1) {
-          raf = requestAnimationFrame(boom);
-          return;
-        }
-        setExplosion(null);
-        setShot(null);
-        setMatch((m) => {
-          if (!m) return m;
-          if (m.winner) return m;
-          return endTurn(m);
-        });
-      };
-      raf = requestAnimationFrame(boom);
+    };
+
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      cancelAnimationFrame(raf);
+      clearTimeout(safety);
+      firingRef.current = false;
+      setExplosion(null);
+      setShot(null);
+      setMatch((m) => {
+        if (!m) return m;
+        if (m.winner) return m;
+        return endTurn(m);
+      });
+    };
+
+    const start = performance.now();
+    const boom = (boomStart) => (n) => {
+      prog.boom = Math.min(1, (n - boomStart) / BOOM_MS);
+      if (prog.boom < 1) {
+        raf = requestAnimationFrame(boom(boomStart));
+        return;
+      }
+      finish();
+    };
+    const tick = (now) => {
+      prog.shot = Math.min(1, (now - start) / dur);
+      if (prog.shot < 1) {
+        raf = requestAnimationFrame(tick);
+        return;
+      }
+      detonate();
+      raf = requestAnimationFrame(boom(performance.now()));
     };
     raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    // rAF stops in a background tab; without this the turn would never end.
+    safety = setTimeout(() => {
+      detonate();
+      finish();
+    }, dur + BOOM_MS + SHOT_SAFETY_MS);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(safety);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shot]);
 
@@ -292,22 +348,22 @@ export default function App() {
   useEffect(() => {
     if (phase !== "play") return undefined;
     const onKey = (e) => {
-      if (ref.current.busy) return;
+      if (ref.current.busy || e.ctrlKey || e.metaKey || e.altKey) return;
       const tag = e.target?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
       const step = e.shiftKey ? 5 : 1;
       switch (e.key) {
         case "ArrowLeft":
-          setAngle((a) => Math.min(200, a + step));
+          setAngle((a) => Math.min(ANGLE_MAX, a + step));
           break;
         case "ArrowRight":
-          setAngle((a) => Math.max(-20, a - step));
+          setAngle((a) => Math.max(ANGLE_MIN, a - step));
           break;
         case "ArrowUp":
-          setPower((p) => Math.min(100, p + step));
+          setPower((p) => Math.min(POWER_MAX, p + step));
           break;
         case "ArrowDown":
-          setPower((p) => Math.max(10, p - step));
+          setPower((p) => Math.max(POWER_MIN, p - step));
           break;
         case "a":
         case "A":
@@ -337,7 +393,8 @@ export default function App() {
   function handleNewGame() {
     setMatch(null);
     setShot(null);
-    setShotProgress(0);
+    firingRef.current = false;
+    progressRef.current = { shot: 0, boom: 0 };
     setExplosion(null);
     setHold(null);
     setPhase("setup");
@@ -410,7 +467,7 @@ export default function App() {
                 activeId={actor?.id}
                 aim={{ angle, power }}
                 shot={shot}
-                shotProgress={shotProgress}
+                progress={progressRef}
                 explosion={explosion}
                 weaponEmoji={weapon.emoji}
                 wind={match.wind}
@@ -497,7 +554,7 @@ export default function App() {
                 <button
                   type="button"
                   className={styles.moveBtn}
-                  disabled={busy}
+                  disabled={busy || outOfSteps}
                   onClick={() => setMatch((m) => moveActive(m, -1))}
                 >
                   ← Walk
@@ -505,12 +562,15 @@ export default function App() {
                 <button
                   type="button"
                   className={styles.moveBtn}
-                  disabled={busy}
+                  disabled={busy || outOfSteps}
                   onClick={() => setMatch((m) => moveActive(m, 1))}
                 >
                   Walk →
                 </button>
               </div>
+              <p className={styles.blurb}>
+                {outOfSteps ? "Out of steps this turn." : `${stepsLeft} steps left this turn.`} Keys: ←/→ angle, ↑/↓ power, A/D walk, Space fire.
+              </p>
 
               <div className={styles.aimGrid}>
                 <div className={styles.aimCell}>
@@ -518,8 +578,8 @@ export default function App() {
                   <input
                     aria-label="Angle"
                     type="range"
-                    min={-20}
-                    max={200}
+                    min={ANGLE_MIN}
+                    max={ANGLE_MAX}
                     value={angle}
                     disabled={busy}
                     onChange={(e) => setAngle(Number(e.target.value))}
@@ -530,8 +590,8 @@ export default function App() {
                   <input
                     aria-label="Power"
                     type="range"
-                    min={10}
-                    max={100}
+                    min={POWER_MIN}
+                    max={POWER_MAX}
                     value={power}
                     disabled={busy}
                     onChange={(e) => setPower(Number(e.target.value))}

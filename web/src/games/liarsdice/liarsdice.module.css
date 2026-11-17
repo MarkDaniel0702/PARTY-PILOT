@@ -160,3 +160,5 @@
   .seat { min-width: 0; flex: 1 1 8.5rem; padding: 0.6rem 0.7rem; font-size: 0.7rem; }
   .handDice { font-size: 0.7rem; }
 }
+
+@media (prefers-reduced-motion: reduce) { .seat { transition: none; } }

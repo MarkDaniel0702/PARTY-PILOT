@@ -154,6 +154,16 @@ describe("winning", () => {
   });
 });
 
+describe("last-move edge cases", () => {
+  it("scores a win, not a draw, when the 42nd disc completes four", () => {
+    const g = play([5,1,2,3,6,3,1,1,3,3,2,6,3,6,1,4,2,0,4,2,4,3,5,4,2,5,2,1,5,4,5,1,0,4,6,5,0,0,0,0,6,6]);
+    expect(g.moves).toBe(ROWS * COLS);
+    expect(g.winner).toBe(1);
+    expect(g.line.length).toBeGreaterThanOrEqual(4);
+    expect(legalColumns(g)).toEqual([]);
+  });
+});
+
 describe("pickFallbackColumn", () => {
   it("prefers the centre column on an empty board", () => {
     expect(pickFallbackColumn(createGame())).toBe(3);

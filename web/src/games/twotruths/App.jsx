@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Fingerprint } from "lucide-react";
 import { GameShell } from "../../shared/components/GameShell";
 import { Screen, ScreenTitle, ScreenSub, BigIcon, SetupBlock } from "../../shared/components/Screen";
@@ -18,6 +18,7 @@ import { useGameTimer } from "../../shared/hooks/useGameTimer";
 import { useUsedIndices } from "../../shared/hooks/useUsedIndices";
 import { resolveStanding } from "../../shared/utils/resolveStanding";
 import { TTL_PROMPT_SETS } from "./data";
+import { shufflePromptSet } from "./prompts";
 import styles from "./twotruths.module.css";
 
 const MIN_PLAYERS = 2;
@@ -43,6 +44,11 @@ export default function App() {
   const [view, setView] = useState("compose"); // 'compose' | 'statements' | 'voting' | 'results'
   const [statements, setStatements] = useState([]);
   const [lieIndex, setLieIndex] = useState(-1);
+  // Quick prompts aren't the storyteller's own statements, so the storyteller
+  // votes too and can't "fool" anyone for points.
+  const [isQuick, setIsQuick] = useState(false);
+  // Swallows the accidental second tap of a double-tap on the statement list.
+  const lastVoteAt = useRef(0);
 
   const [showWriteForm, setShowWriteForm] = useState(false);
   const [inputs, setInputs] = useState(["", "", ""]);
@@ -60,6 +66,7 @@ export default function App() {
   function startTurn() {
     setStatements([]);
     setLieIndex(-1);
+    setIsQuick(false);
     setShowWriteForm(false);
     setInputs(["", "", ""]);
     setSelectedLieIndex(-1);
@@ -68,6 +75,7 @@ export default function App() {
 
   function handleStart() {
     const resolvedNames = roster.getNames();
+    usedIndices.reset();
     setNames(resolvedNames);
     setScores(resolvedNames.map(() => 0));
     setTurnIndex(0);
@@ -100,13 +108,15 @@ export default function App() {
 
   function handleModeQuick() {
     const { item } = usedIndices.pickUnused(TTL_PROMPT_SETS);
-    setStatements(item.statements.slice());
-    setLieIndex(item.lieIndex);
+    const mixed = shufflePromptSet(item);
+    setStatements(mixed.statements);
+    setLieIndex(mixed.lieIndex);
+    setIsQuick(true);
     setView("statements");
   }
 
   function handleStartVoting() {
-    const order = names.map((_, i) => i).filter((i) => i !== turnIndex);
+    const order = names.map((_, i) => i).filter((i) => isQuick || i !== turnIndex);
     setVoterOrder(order);
     setVoterPos(0);
     setRoundGuesses([]);
@@ -115,6 +125,9 @@ export default function App() {
   }
 
   function castVote(guessIndex) {
+    const now = Date.now();
+    if (now - lastVoteAt.current < 400) return;
+    lastVoteAt.current = now;
     const voterIndex = voterOrder[voterPos];
     const nextGuesses = [...roundGuesses, { voterIndex, guessIndex }];
     const nextPos = voterPos + 1;
@@ -139,7 +152,7 @@ export default function App() {
     guessesSnapshot.forEach(({ voterIndex, guessIndex }) => {
       if (guessIndex === lieIndex) newScores[voterIndex] += 1;
     });
-    newScores[turnIndex] += fooledCount;
+    if (!isQuick) newScores[turnIndex] += fooledCount;
     setScores(newScores);
 
     setRoundSummary({ correctCount, fooledCount, totalVoters: guessesSnapshot.length });
@@ -154,7 +167,8 @@ export default function App() {
   function goToSummary() {
     const entrants = names.map((name, i) => ({ name, score: scores[i] }));
     const { ranked, tied, winner } = resolveStanding(entrants);
-    if (tied.length <= 1) {
+    // Nobody scored: a "tie" at 0 isn't worth a tie-breaker, just show results.
+    if (tied.length <= 1 || ranked[0].score === 0) {
       setResult({ ranked, winner: finalizeWinner(winner), shared: false, tiebreak: null });
       setPhase("summary");
     } else {
@@ -196,10 +210,11 @@ export default function App() {
         <HowToPlay
           steps={[
             <>Add your players, then tap <strong>Start</strong>.</>,
-            "Each turn, one player either writes 3 statements about themselves (2 true, 1 false) or grabs a ready-made prompt.",
-            "Everyone reads the 3 statements — only the storyteller knows which is the lie.",
-            "Every other player votes on which one they think is false.",
-            "The app reveals the answer and tallies who guessed right, then passes the turn to the next player."
+            "Each turn, one player either writes 3 statements about themselves (2 true, 1 false) or grabs a ready-made trivia prompt.",
+            "Everyone reads the 3 statements. With your own statements only you know the lie; with a quick prompt nobody does.",
+            "Every other player votes on which one they think is false — in turn, passing the device. (With a quick prompt, everyone votes, you included.)",
+            "Guessing the lie scores 1 point. The storyteller scores 1 point for every player they fool (own statements only).",
+            "The app reveals the answer, updates the scores, then passes the turn on. Tap End Session any time to see the final ranking."
           ]}
         />
 
@@ -294,6 +309,11 @@ export default function App() {
               ))}
             </StatementList>
             <Button onClick={handleStartVoting}>🗳️ Start Voting</Button>
+            <p className={styles.tally} style={{ marginTop: "0.8rem" }}>
+              {isQuick
+                ? "Everyone votes — pass the device around, including to the storyteller."
+                : `${names[turnIndex]}, hand the device to the next player — they vote first.`}
+            </p>
           </>
         )}
 
@@ -319,8 +339,8 @@ export default function App() {
             </StatementList>
             <p className={styles.tally}>
               {roundSummary.correctCount} of {roundSummary.totalVoters} player
-              {roundSummary.totalVoters === 1 ? "" : "s"} spotted the lie. {names[turnIndex]} fooled{" "}
-              {roundSummary.fooledCount}.
+              {roundSummary.totalVoters === 1 ? "" : "s"} spotted the lie.
+              {!isQuick && <> {names[turnIndex]} fooled {roundSummary.fooledCount}.</>}
             </p>
             <Scoreboard entries={names.map((name, i) => ({ name, score: scores[i] }))} />
             <Button onClick={handleNextTurn}>Next Player's Turn →</Button>

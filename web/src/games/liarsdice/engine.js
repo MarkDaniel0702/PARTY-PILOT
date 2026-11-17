@@ -92,6 +92,16 @@ export function minQuantityFor(current, face) {
   return face > current.face ? current.quantity : current.quantity + 1;
 }
 
+// A face the picker can sit on without offering an impossible bid: `face`
+// itself if a raise on it still fits on the table, else the next face up that
+// does (a bid of every die on the table can only be raised by a higher face).
+// Falls back to `face` when nothing at all can be raised.
+export function raisableFace(current, total, face) {
+  const fits = (f) => minQuantityFor(current, f) <= total;
+  if (fits(face)) return face;
+  return FACES.find((f) => f > face && fits(f)) ?? FACES.find(fits) ?? face;
+}
+
 export function isValidBid(state, quantity, face) {
   return bidAllowed(state.bid, totalDice(state), quantity, face);
 }

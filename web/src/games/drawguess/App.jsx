@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Brush, Flag, ArrowRight, Undo2, Trash2 } from "lucide-react";
+import { Brush, Flag, ArrowRight, Undo2, Trash2, Eye, EyeOff } from "lucide-react";
 import { GameShell } from "../../shared/components/GameShell";
 import { Screen, ScreenTitle, ScreenSub, BigIcon, SetupBlock } from "../../shared/components/Screen";
 import { HowToPlay } from "../../shared/components/HowToPlay";
@@ -94,6 +94,9 @@ export default function App() {
   const [lastResult, setLastResult] = useState("");
   const [colour, setColour] = useState(PALETTE[0]);
   const [width, setWidth] = useState(WIDTHS[1]);
+  // Local mode: the word sits on the screen everyone is watching, so the
+  // drawer can hide it again once they've memorised it.
+  const [wordHidden, setWordHidden] = useState(false);
 
   const [pendingTied, setPendingTied] = useState([]);
   const [pendingRanked, setPendingRanked] = useState([]);
@@ -151,13 +154,17 @@ export default function App() {
       const from = msg.playerId;
       const isDrawer = from === st.drawerId;
 
-      // Only the drawer may touch the canvas.
+      // Only the drawer may touch the canvas. Payloads come off the network,
+      // so colour/width are pinned to the palette and points must be numbers.
       if (isDrawer) {
         const p = msg.payload || {};
         if (msg.kind === ACTION.STROKE_START) {
-          setBoard((b) => ({ ...b, live: createStroke(p.id, p.colour, p.width, p.x, p.y) }));
+          const colour = PALETTE.includes(p.colour) ? p.colour : PALETTE[0];
+          const width = WIDTHS.includes(p.width) ? p.width : WIDTHS[1];
+          setBoard((b) => ({ ...b, live: createStroke(p.id, colour, width, Number(p.x) || 0, Number(p.y) || 0) }));
         } else if (msg.kind === ACTION.STROKE_POINTS) {
-          setBoard((b) => (b.live && b.live.id === p.id ? { ...b, live: appendPoints(b.live, p.pts) } : b));
+          const pts = Array.isArray(p.pts) ? p.pts.filter((n) => Number.isFinite(n)) : [];
+          setBoard((b) => (b.live && b.live.id === p.id ? { ...b, live: appendPoints(b.live, pts) } : b));
         } else if (msg.kind === ACTION.STROKE_END) {
           setBoard((b) => (b.live ? { strokes: [...b.strokes, b.live], live: null } : b));
         } else if (msg.kind === ACTION.UNDO) {
@@ -168,7 +175,7 @@ export default function App() {
         return;
       }
 
-      if (msg.kind === ACTION.GUESS) submitGuess(from, msg.payload?.text || "");
+      if (msg.kind === ACTION.GUESS) submitGuess(from, String(msg.payload?.text ?? "").slice(0, 80));
     });
   }, [onMessage]);
 
@@ -263,6 +270,7 @@ export default function App() {
 
   // Local mode only: the drawer has seen the word and is ready to draw.
   function handleLocalReveal() {
+    setWordHidden(false);
     setPhase("draw");
     if (timerSetup.enabled) gameTimer.start(timerSetup.seconds);
   }
@@ -281,6 +289,9 @@ export default function App() {
 
     if (verdict === RESULT.CORRECT) {
       playSound("correct");
+      // Mark them correct on the ref right away: two guesses can arrive before
+      // React re-renders, and both would otherwise be scored.
+      st.correctIds = [...st.correctIds, seatId];
       const pts = guessPoints(st.remainingFraction);
       setScores((prev) => ({ ...prev, [seatId]: (prev[seatId] || 0) + pts }));
       setCorrectIds((prev) => [...prev, seatId]);
@@ -341,7 +352,8 @@ export default function App() {
   function showSummary() {
     const entrants = activeSeats.map((s) => ({ name: s.name, score: scores[s.seatId] || 0 }));
     const { ranked, tied, winner } = resolveStanding(entrants);
-    if (tied.length <= 1) {
+    // Everyone level on zero means nobody scored — no point in a tie-breaker.
+    if (tied.length <= 1 || ranked[0].score <= 0) {
       setResult({ ranked, winner: finalizeWinner(winner), shared: false, tiebreak: null });
       setPhase("summary");
     } else {
@@ -371,17 +383,48 @@ export default function App() {
   }
 
   // ---------- local drawing on the shared screen ----------
+  // pointermove fires at 60-120Hz; re-rendering this whole screen (and
+  // repainting the canvas) per event is wasteful, so points are queued and
+  // applied once per animation frame.
   const localSeqRef = useRef(0);
+  const pendingPtsRef = useRef([]);
+  const rafRef = useRef(0);
+  function flushPoints() {
+    rafRef.current = 0;
+    const pts = pendingPtsRef.current;
+    if (!pts.length) return;
+    pendingPtsRef.current = [];
+    setBoard((b) => {
+      if (!b.live) return b;
+      let live = b.live;
+      for (const [x, y] of pts) live = appendPoint(live, x, y);
+      return live === b.live ? b : { ...b, live };
+    });
+  }
   function localStart(nx, ny, c, w) {
     const id = `l${localSeqRef.current++}`;
+    pendingPtsRef.current = [];
     setBoard((b) => ({ ...b, live: createStroke(id, c, w, nx, ny) }));
   }
   function localPoint(nx, ny) {
-    setBoard((b) => (b.live ? { ...b, live: appendPoint(b.live, nx, ny) } : b));
+    pendingPtsRef.current.push([nx, ny]);
+    if (!rafRef.current) rafRef.current = requestAnimationFrame(flushPoints);
   }
   function localEnd() {
-    setBoard((b) => (b.live ? { strokes: [...b.strokes, b.live], live: null } : b));
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = 0;
+    }
+    const pts = pendingPtsRef.current;
+    pendingPtsRef.current = [];
+    setBoard((b) => {
+      if (!b.live) return b;
+      let live = b.live;
+      for (const [x, y] of pts) live = appendPoint(live, x, y);
+      return { strokes: [...b.strokes, live], live: null };
+    });
   }
+  useEffect(() => () => cancelAnimationFrame(rafRef.current), []);
 
   const canStart =
     seats.length >= MIN_PLAYERS &&
@@ -523,7 +566,17 @@ export default function App() {
 
         {/* Local mode shows the word to whoever is holding the device — they
             already revealed it deliberately via the pass card. */}
-        {playMode === "local" && <p className={styles.localWord}>Your word: <strong>{currentWord}</strong></p>}
+        {playMode === "local" && (
+          <div className={styles.localWord}>
+            <span>
+              Drawer&apos;s word: <strong>{wordHidden ? "••••••" : currentWord}</strong>
+            </span>
+            <button type="button" className={styles.toolBtn} onClick={() => setWordHidden((h) => !h)}>
+              {wordHidden ? <Eye size={15} strokeWidth={2.5} /> : <EyeOff size={15} strokeWidth={2.5} />}
+              {wordHidden ? "Show word" : "Hide word"}
+            </button>
+          </div>
+        )}
 
         <StrokeCanvas
           strokes={board.strokes}
@@ -629,7 +682,9 @@ export default function App() {
             </li>
           ))}
         </ul>
-        <Button onClick={handleNextTurn}>Next turn →</Button>
+        <Button onClick={handleNextTurn}>
+          {turnIndex + 1 >= activeSeats.length && roundIndex + 1 >= rounds ? "See final scores →" : "Next turn →"}
+        </Button>
       </Screen>
 
       <Screen active={phase === "summary"}>

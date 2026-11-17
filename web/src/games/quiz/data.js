@@ -331,7 +331,7 @@ export const QUIZ_THEMES = {
           200: [
             { q: "Which Pixar film follows an old man who ties balloons to his house to fly to South America?", a: "Up" },
             { q: "Which Pixar film follows a rat named Remy who dreams of becoming a chef in Paris?", a: "Ratatouille" },
-            { q: "In Disney's 'Aladdin', what is the name of the wish-granting genie originally voiced by Robin Williams?", a: "Genie" }
+            { q: "In Disney's 'Aladdin', which blue, wish-granting character, originally voiced by Robin Williams, bursts out of a magic lamp?", a: "Genie" }
           ],
           300: [
             { q: "What is the name of the kingdom ruled by Simba's family in Disney's 'The Lion King'?", a: "The Pride Lands" },
@@ -425,7 +425,7 @@ export const QUIZ_THEMES = {
           ],
           200: [
             { q: "Which 2012 film brought together Iron Man, Captain America, Thor, Hulk, Black Widow, and Hawkeye for the first time?", a: "The Avengers" },
-            { q: "Which 2018 MCU film introduced Black Panther as the lead character in his own solo film?", a: "Black Panther" },
+            { q: "Which 2018 MCU film, set in the hidden African nation of Wakanda, starred the late Chadwick Boseman as its lead?", a: "Black Panther" },
             { q: "Which villain, played by Tom Hiddleston, is Thor's adoptive brother and the primary antagonist of 'The Avengers' (2012)?", a: "Loki" }
           ],
           300: [
@@ -514,12 +514,12 @@ export const QUIZ_THEMES = {
         name: "Popular Anime",
         questions: {
           100: [
-            { q: "Which anime follows a young ninja named Naruto Uzumaki who dreams of becoming Hokage?", a: "Naruto" },
+            { q: "Which anime follows an orange-clad young ninja from the Hidden Leaf Village who dreams of becoming Hokage?", a: "Naruto" },
             { q: "Which anime follows a boy named Tanjiro Kamado who becomes a demon slayer to save his sister?", a: "Demon Slayer (Kimetsu no Yaiba)" },
             { q: "Which anime and manga franchise features Pikachu and a trainer named Ash Ketchum?", a: "Pokémon" }
           ],
           200: [
-            { q: "Which anime and manga series follows Monkey D. Luffy as he searches for the ultimate treasure known as the 'One Piece'?", a: "One Piece" },
+            { q: "Which anime and manga series follows Monkey D. Luffy and his Straw Hat Pirates as they search for the legendary treasure left behind by Gol D. Roger?", a: "One Piece" },
             { q: "Which anime series follows Izuku Midoriya as he trains to become a hero despite being born without a superpower called a 'Quirk'?", a: "My Hero Academia" },
             { q: "Which classic anime follows Usagi Tsukino, a schoolgirl who transforms into a magical guardian to fight evil?", a: "Sailor Moon" }
           ],
@@ -961,7 +961,7 @@ export const QUIZ_THEMES = {
           400: [
             { q: "Which grunge band, fronted by Kurt Cobain, released the influential 1991 album 'Nevermind', featuring 'Smells Like Teen Spirit'?", a: "Nirvana" },
             { q: "Which American singer released the operatic rock album 'Bat Out of Hell' in 1977, one of the best-selling albums in music history?", a: "Meat Loaf" },
-            { q: "Which American rock band, led by guitarist Eddie Van Halen, released its self-titled debut album in 1978, featuring 'Runnin' with the Devil'?", a: "Van Halen" }
+            { q: "Which American rock band, formed in Pasadena by brothers Eddie and Alex, released its self-titled debut album in 1978, featuring 'Runnin' with the Devil'?", a: "Van Halen" }
           ],
           500: [
             { q: "Which 1969 music festival in upstate New York became a defining moment for rock and counterculture, featuring Jimi Hendrix and The Who?", a: "Woodstock" },
@@ -1095,7 +1095,7 @@ export const QUIZ_THEMES = {
         questions: {
           100: [
             { q: "Which American singer, known as the 'Queen of Pop', is famous for hits like 'Like a Virgin' and 'Vogue'?", a: "Madonna" },
-            { q: "Which American rapper, born Marshall Mathers III, is famous for albums like 'The Marshall Mathers LP' and 'The Eminem Show'?", a: "Eminem" },
+            { q: "Which Detroit rapper, born Marshall Mathers III, is famous for albums like 'The Slim Shady LP' and 'Recovery'?", a: "Eminem" },
             { q: "Which American singer, known as 'The Boss', is famous for songs like 'Born in the U.S.A.' and 'Dancing in the Dark'?", a: "Bruce Springsteen" }
           ],
           200: [
@@ -1190,7 +1190,7 @@ export const QUIZ_THEMES = {
         questions: {
           100: [
             { q: "Which Nintendo franchise features colorful creatures that trainers catch, train, and battle, starting with 'Red and Blue' in 1996?", a: "Pokémon" },
-            { q: "Which Nintendo franchise, starring a mustachioed plumber, began with the 1985 game 'Super Mario Bros.' and remains one of the best-selling video game series of all time?", a: "Super Mario" },
+            { q: "Which Nintendo franchise, which stars a mustachioed plumber who stomps Goombas and rescues Princess Peach, began in 1985 and remains one of the best-selling video game series of all time?", a: "Super Mario" },
             { q: "Which Nintendo kart-racing franchise, featuring Mario and friends racing with power-up items like shells and bananas, began in 1992?", a: "Mario Kart" }
           ],
           200: [
@@ -1229,7 +1229,7 @@ export const QUIZ_THEMES = {
             { q: "Which country hosted the 2016 Summer Olympics, the first Olympics held in South America?", a: "Brazil (Rio de Janeiro)" }
           ],
           200: [
-            { q: "How many rings are on the Olympic flag, representing the five inhabited continents?", a: "Five" },
+            { q: "How many interlocking rings appear on the Olympic flag?", a: "Five" },
             { q: "What are the traditional Olympic medal colors awarded for first, second, and third place?", a: "Gold, silver, and bronze" },
             { q: "In which city were the first modern Olympic Games held in 1896?", a: "Athens, Greece" }
           ],
@@ -1681,7 +1681,7 @@ export const QUIZ_THEMES = {
           400: [
             { q: "Which South Korean company is the world's largest manufacturer of smartphones and semiconductors, alongside making TVs and appliances?", a: "Samsung" },
             { q: "Which Taiwanese company is the world's largest contract manufacturer of semiconductor chips, producing chips for companies like Apple and Nvidia?", a: "TSMC (Taiwan Semiconductor Manufacturing Company)" },
-            { q: "Which Japanese company, founded in 1889 originally as a playing card maker, now produces the Nintendo Switch and other gaming consoles?", a: "Nintendo" }
+            { q: "Which Japanese company, founded in 1889 originally as a playing card maker, now produces the Switch console and franchises like The Legend of Zelda?", a: "Nintendo" }
           ],
           500: [
             { q: "Which company did Steve Jobs, Steve Wozniak, and Ronald Wayne co-found in a garage in 1976?", a: "Apple" },
@@ -1719,7 +1719,7 @@ export const QUIZ_THEMES = {
             { q: "What Japanese cooking technique involves deep-frying battered seafood or vegetables until light and crispy?", a: "Tempura" }
           ],
           500: [
-            { q: "What is the name of the fermented soybean paste used as a base for miso soup in Japanese cuisine?", a: "Miso" },
+            { q: "What is the name of the fermented soybean paste used as the base for a classic Japanese soup often served at breakfast?", a: "Miso" },
             { q: "What is the name of the fermented, pungent Icelandic dish made from cured shark meat, considered a national delicacy?", a: "Hákarl" },
             { q: "What is the name of the traditional cheese-filled bread from the country of Georgia, shaped like a boat with an egg in the center?", a: "Khachapuri" }
           ]
@@ -2079,14 +2079,14 @@ export const QUIZ_THEMES = {
           { q: "What are the names of the two sisters who move to the countryside and befriend the forest spirit Totoro?", a: "Satsuki and Mei Kusakabe" }
         ],
         200: [
-          { q: "What is the name of the wandering wizard whose real name is revealed to be Howl Jenkins Pendragon, who lives inside a magical walking castle?", a: "Howl" },
+          { q: "What is the name of the vain, wandering wizard who lives inside a magical walking castle powered by a fire demon named Calcifer?", a: "Howl" },
           { q: "What is the name of the young woman raised by wolves who fights to protect the forest from humans in Princess Mononoke?", a: "San" },
           { q: "What is the name of the young prince who is cursed with a deadly infection after killing a demon boar at the start of Princess Mononoke?", a: "Ashitaka" }
         ],
         300: [
           { q: "What are the names of the two young protagonists who search for the legendary floating island of Laputa in Castle in the Sky?", a: "Pazu and Sheeta" },
           { q: "In Porco Rosso, what is the human name of the title character, a World War I flying ace cursed to have the face of a pig?", a: "Marco Pagot" },
-          { q: "What is the name of the princess and protagonist who tries to make peace between her people and a spreading toxic jungle in Nausicaä of the Valley of the Wind?", a: "Nausicaä" }
+          { q: "What is the name of the princess and protagonist who tries to make peace between her people and a spreading toxic jungle in the 1984 Hayao Miyazaki film?", a: "Nausicaä" }
         ],
         400: [
           { q: "What is the name of the aspiring young writer in Whisper of the Heart who is inspired to write a fantasy novel after meeting an antique cat figurine?", a: "Shizuku Tsukishima" },
@@ -2094,7 +2094,7 @@ export const QUIZ_THEMES = {
           { q: "What is the surname of Sophie, the young hat maker who is transformed into an old woman by a witch's curse in Howl's Moving Castle?", a: "Hatter (Sophie Hatter)" }
         ],
         500: [
-          { q: "What is the name of the tiny 'Borrower' girl, a member of the Clock family, who lives secretly beneath the floorboards in The Secret World of Arrietty?", a: "Arrietty" },
+          { q: "What is the name of the tiny 'Borrower' girl, a member of the Clock family, who lives secretly beneath the floorboards in the 2010 Ghibli film based on Mary Norton's 'The Borrowers'?", a: "Arrietty" },
           { q: "What name does the orphanage matron give to the title character of Earwig and the Witch, replacing the nickname 'Earwig,' before she is adopted by a witch?", a: "Erica Wigg" },
           { q: "What is the name of the grieving boy who follows a talking gray heron into a mysterious tower in The Boy and the Heron?", a: "Mahito Maki" }
         ]
@@ -2394,7 +2394,7 @@ export const QUIZ_THEMES = {
           { q: "What title does Dwight insist on being called, correcting anyone who shortens it to 'Assistant Regional Manager'?", a: "Assistant TO the Regional Manager" }
         ],
         300: [
-          { q: "What is the name of the company Dunder Mifflin merges with partway through the series, becoming 'Dunder Mifflin Sabre'?", a: "Sabre" },
+          { q: "What is the name of the Florida-based printer company that buys Dunder Mifflin partway through the series?", a: "Sabre" },
           { q: "After quitting Dunder Mifflin, what is the name of the rival paper company Michael starts with Pam and Ryan?", a: "Michael Scott Paper Company" },
           { q: "What is the name of Andy Bernard's college a cappella group, which he frequently brings up?", a: "Here Comes Treble" }
         ],
@@ -2589,7 +2589,7 @@ export const QUIZ_THEMES = {
           { q: "During 'The Nightman Cometh' rehearsals, Frank keeps singing a lyric about paying a toll that sounds inappropriate, insisting to Charlie he's actually singing what word?", a: "Soul" }
         ],
         500: [
-          { q: "Which character delivers this ad pitch: 'Hello, Charlie Kelly here, local business owner and cat enthusiast... Finally, there is an elegant, comfortable mitten for cats'?", a: "Charlie" },
+          { q: "Which character delivers this ad pitch: 'Hello, local business owner and cat enthusiast here... Finally, there is an elegant, comfortable mitten for cats'?", a: "Charlie" },
           { q: "In 'The Gang Gets Extreme,' Dennis objects to the Gang's new anthem, insisting they aren't singing about being ordinary birds but rather about being what 'infinitely cooler' concept?", a: "Bird-men" },
           { q: "What is the title of the song Charlie sings while descending from the ceiling on a giant sun prop to propose to the Waitress in 'The Nightman Cometh'?", a: "Charlie's Ballad (also known as 'Marry Me')" }
         ]
@@ -2764,7 +2764,7 @@ export const QUIZ_THEMES = {
           { q: "Which 2011 film, set primarily during World War II, introduced Steve Rogers as Captain America?", a: "Captain America: The First Avenger" }
         ],
         300: [
-          { q: "Which 2014 film introduced the Guardians of the Galaxy team and was Marvel Studios' first major film set primarily off Earth?", a: "Guardians of the Galaxy" },
+          { q: "Which 2014 film, starring Chris Pratt as Star-Lord, was Marvel Studios' first major film set primarily off Earth?", a: "Guardians of the Galaxy" },
           { q: "In 'Avengers: Endgame,' what term does the film use for the time-travel plan the surviving Avengers undertake to retrieve the Infinity Stones from the past?", a: "The Time Heist" },
           { q: "Which Infinity Stone is hidden inside the Tesseract throughout the early Captain America and Avengers films?", a: "The Space Stone" }
         ],
@@ -2925,7 +2925,7 @@ export const QUIZ_THEMES = {
         ],
         400: [
           { q: "What is the name of the planet where the Republic's clone trooper army is secretly created in 'Attack of the Clones'?", a: "Kamino" },
-          { q: "What is the name of the prison-mining planet where Han, Chewbacca, and Lando pull off a dangerous spice heist in 'Solo: A Star Wars Story,' also referenced in the original film's 'Kessel Run' line?", a: "Kessel" },
+          { q: "What is the name of the prison-mining planet where Han, Chewbacca, and Lando pull off a dangerous spice heist in 'Solo: A Star Wars Story,' also the setting of the famous run the Millennium Falcon made in under twelve parsecs?", a: "Kessel" },
           { q: "Which capital planet of the Galactic Republic, and later the Empire, is depicted as an entirely city-covered world?", a: "Coruscant" }
         ],
         500: [
@@ -3036,7 +3036,7 @@ export const QUIZ_THEMES = {
         100: [
           { q: "Who is the villainous sea witch who tricks Ariel into a deal in 'The Little Mermaid'?", a: "Ursula" },
           { q: "Who is Simba's scheming uncle and the main villain of 'The Lion King'?", a: "Scar" },
-          { q: "What is the title of the evil queen and witch who poisons Snow White with a cursed apple?", a: "The Evil Queen" }
+          { q: "Which villain, who consults a Magic Mirror and disguises herself as an old hag, poisons Snow White with a cursed apple?", a: "The Evil Queen" }
         ],
         200: [
           { q: "Who is the power-hungry royal vizier in 'Aladdin' who seeks the genie's lamp?", a: "Jafar" },
@@ -3074,7 +3074,7 @@ export const QUIZ_THEMES = {
           { q: "Which Elton John and Tim Rice song from 'The Lion King' won the Academy Award for Best Original Song?", a: "\"Can You Feel the Love Tonight\"" }
         ],
         300: [
-          { q: "Which song plays as Belle and the Beast share their dance in the ballroom scene of 'Beauty and the Beast'?", a: "\"Beauty and the Beast\"" },
+          { q: "Which Oscar-winning title song, sung by Mrs. Potts, plays as Belle and the Beast waltz in the ballroom?", a: "Beauty and the Beast" },
           { q: "Which 'Pocahontas' song, about respecting the natural world, won the Academy Award for Best Original Song?", a: "\"Colors of the Wind\"" },
           { q: "Which carefree, problem-free philosophy song do Timon and Pumbaa teach young Simba in 'The Lion King'?", a: "\"Hakuna Matata\"" }
         ],
@@ -3210,7 +3210,7 @@ export const QUIZ_THEMES = {
         ],
         500: [
           { q: "Approximately how much was the combined production budget for all three 'Lord of the Rings' films, which were shot simultaneously back-to-back?", a: "About $281 million (roughly $93-94 million per film)" },
-          { q: "What is the name of the crowd-simulation software developed by Weta Digital for the trilogy's massive battle scenes, later used industry-wide?", a: "Massive" },
+          { q: "What is the name of the crowd-simulation software developed by Weta Digital for the trilogy's enormous army battle scenes, later used industry-wide?", a: "Massive" },
           { q: "Which studio produced and financed 'The Lord of the Rings' trilogy?", a: "New Line Cinema" }
         ]
       }
@@ -3479,7 +3479,7 @@ export const QUIZ_THEMES = {
           { q: "What messaging and photo-sharing app, launched in 2011, popularized disappearing photo messages and later introduced 'Stories'?", a: "Snapchat" }
         ],
         300: [
-          { q: "What social news and discussion platform, launched in 2005 and often called 'the front page of the internet,' organizes content into topic-based communities called subreddits?", a: "Reddit" },
+          { q: "What social news and discussion platform, launched in 2005 and often called 'the front page of the internet,' organizes content into topic-based communities written as 'r/' followed by a name?", a: "Reddit" },
           { q: "What social networking site, founded by Jonathan Abrams and launched in 2003, became hugely popular in the Philippines, at one point drawing nearly 40% of its global traffic from the country?", a: "Friendster" },
           { q: "What professional networking platform, founded in December 2002 and launched in May 2003, is widely used for job searching, recruiting, and business networking?", a: "LinkedIn" }
         ],
@@ -3535,7 +3535,7 @@ export const QUIZ_THEMES = {
         ],
         200: [
           { q: "What internet slang term, short for 'fear of missing out,' describes the anxious feeling that others are having rewarding experiences without you?", a: "FOMO" },
-          { q: "What slang term for an obsessive, overly devoted super-fan of a celebrity originated from a 2000 Eminem song about an obsessive fan named Stan?", a: "Stan" },
+          { q: "What slang term for an obsessive, overly devoted super-fan of a celebrity originated from a 2000 Eminem song about an obsessive fan?", a: "Stan" },
           { q: "What slang term describes feeling bitter, irritated, or resentful, especially after losing or being embarrassed?", a: "Salty" }
         ],
         300: [

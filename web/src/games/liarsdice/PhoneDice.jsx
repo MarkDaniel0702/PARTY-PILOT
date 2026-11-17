@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Minus, Plus, Megaphone } from "lucide-react";
 import { Die } from "./Die";
 import { ACTION, action } from "../../shared/controller/protocol";
-import { bidAllowed, minQuantityFor, FACES } from "./engine";
+import { bidAllowed, minQuantityFor, raisableFace, FACES } from "./engine";
 import styles from "./phoneDice.module.css";
 
 // The private Liar's Dice screen: your own dice, the standing bid and, on your
@@ -42,22 +42,28 @@ function BidText({ bid }) {
   );
 }
 
+// Where the picker starts: the sensible next step on a standing bid (raise the
+// quantity of the same face), or your best face on an opening bid — always a
+// bid that can actually be placed.
+function startingPick(bid, totalDice, dice, wilds) {
+  const f = raisableFace(bid, totalDice, bid ? bid.face : commonestFace(dice, wilds));
+  const q = bid ? minQuantityFor(bid, f) : Math.min(totalDice, Math.max(1, Math.round(totalDice / 3)));
+  return { f, q };
+}
+
 export function PhoneDice({ view, send, showRound = true }) {
   const { bid, totalDice } = view;
   const bidKey = bid ? `${bid.quantity}-${bid.face}` : "none";
-  const defaultFace = bid ? bid.face : commonestFace(view.dice, view.wilds);
 
-  const [face, setFace] = useState(defaultFace);
-  const [quantity, setQuantity] = useState(() =>
-    bid ? minQuantityFor(bid, defaultFace) : Math.max(1, Math.round(totalDice / 3))
-  );
+  const [face, setFace] = useState(() => startingPick(bid, totalDice, view.dice, view.wilds).f);
+  const [quantity, setQuantity] = useState(() => startingPick(bid, totalDice, view.dice, view.wilds).q);
 
   // A new bid, a new round or a fresh turn starts the picker from the sensible
   // next step: raise the quantity on the same face (or open on your best face).
   useEffect(() => {
-    const f = bid ? bid.face : commonestFace(view.dice, view.wilds);
+    const { f, q } = startingPick(bid, totalDice, view.dice, view.wilds);
     setFace(f);
-    setQuantity(bid ? minQuantityFor(bid, f) : Math.max(1, Math.round(totalDice / 3)));
+    setQuantity(q);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bidKey, view.round, view.myTurn]);
 

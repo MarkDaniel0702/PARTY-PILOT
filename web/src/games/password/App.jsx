@@ -10,7 +10,7 @@ import { Stepper } from "../../shared/components/Stepper";
 import { TimerSetup } from "../../shared/components/TimerSetup";
 import { GameTimer } from "../../shared/components/GameTimer";
 import { PassCard } from "../../shared/components/PassCard";
-import { RevealCard, TurnBanner } from "../../shared/components/RevealCard";
+import { RevealCard, TurnBanner, ProgressDots } from "../../shared/components/RevealCard";
 import { ResultsList } from "../../shared/components/ResultsList";
 import { TieBreakerScreen } from "../../shared/components/TieBreakerScreen";
 import { useRoster } from "../../shared/hooks/useRoster";
@@ -121,7 +121,8 @@ export default function App() {
   function showSummary(scoresSnapshot) {
     const entrants = names.map((name, i) => ({ name, score: scoresSnapshot[i] }));
     const { ranked, tied, winner } = resolveStanding(entrants);
-    if (tied.length <= 1) {
+    // Nobody scored: a "tie" at 0 isn't worth a tie-breaker, just show results.
+    if (tied.length <= 1 || ranked[0].score === 0) {
       setResult({ ranked, winner: finalizeWinner(winner), shared: false, tiebreak: null });
       setPhase("summary");
     } else {
@@ -137,7 +138,7 @@ export default function App() {
   }
 
   function handlePlayAgain() {
-    usedIndices.reset();
+    // Don't reset usedIndices: words already played stay out until the pool is exhausted.
     setScores(names.map(() => 0));
     setTurnIndex(0);
     setLastResult("");
@@ -158,10 +159,10 @@ export default function App() {
         <HowToPlay
           steps={[
             <>Pick a category, add your players, then tap <strong>Start</strong>.</>,
-            "Each turn, one player privately sees a secret word and gives one-word clues out loud — no rhyming, no spelling.",
-            <>The rest of the group shouts guesses. Tap <strong>They Got It!</strong> the moment someone's right.</>,
-            "Fewer clues used means more points — the app scores it for you.",
-            "The clue-giver role rotates automatically every round."
+            "Each turn, one player (the clue-giver) privately sees a secret word and gives one-word clues out loud — no rhyming, no spelling, no parts of the word. Hold the screen away from the guessers!",
+            <>The rest of the group shouts guesses. Tap <strong>They Got It!</strong> the moment someone's right. Still stuck? Tap <strong>Give Next Clue</strong> for another clue.</>,
+            "Fewer clues used means more points for the clue-giver — the screen shows what the round is worth. If the clue timer runs out, the next clue starts by itself; after the last clue the round ends.",
+            "Everyone gets exactly one turn as clue-giver, in order. Most points wins."
           ]}
         />
 
@@ -209,12 +210,13 @@ export default function App() {
       </Screen>
 
       <Screen active={phase === "pass"}>
+        <ProgressDots current={turnIndex} total={names.length} />
         <TurnBanner>{lastResult}</TurnBanner>
         <PassCard
           icon="🔐"
           title="Pass the device to"
           name={names[turnIndex]}
-          hint="You'll give one-word clues — nobody else should see the word!"
+          hint="You'll give one-word clues. Tilt the screen away from the guessers!"
           buttonLabel="Tap to Reveal My Word"
           onReveal={handleReveal}
         />
@@ -223,12 +225,13 @@ export default function App() {
       <Screen active={phase === "clue"}>
         <ScreenSub>Give one-word clues out loud — the group is guessing!</ScreenSub>
         <TurnBanner>
-          Clue {cluesUsed} of {maxClues}
+          Clue {cluesUsed} of {maxClues} · worth {Math.max(maxClues - cluesUsed + 1, 1)} pt
+          {maxClues - cluesUsed + 1 === 1 ? "" : "s"} if guessed now
         </TurnBanner>
         {timerSetup.enabled && <GameTimer timer={gameTimer} />}
         <RevealCard label="YOUR SECRET WORD" text={currentWord} />
         <Button disabled={cluesUsed >= maxClues} onClick={giveNextClue}>
-          🗣️ Give Next Clue
+          {cluesUsed >= maxClues ? "Last clue — no more clues" : "🗣️ Give Next Clue"}
         </Button>
         <div style={{ marginTop: "0.8rem" }}>
           <ButtonRow>

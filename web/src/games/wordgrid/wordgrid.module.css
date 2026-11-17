@@ -16,9 +16,13 @@
 /* Word board */
 .board { display: flex; flex-direction: column; align-items: center; gap: clamp(4px, 1vw, 7px); margin: 0 auto 1.6rem; }
 .row { display: flex; gap: clamp(4px, 1vw, 7px); }
+/* --n is the word length: tiles shrink so even a 9-letter word fits a 360px
+   phone (page padding + row gaps are subtracted from the viewport) instead of
+   overflowing sideways. */
 .tile {
-  width: clamp(38px, 10vw, 58px);
-  height: clamp(38px, 10vw, 58px);
+  --gap: clamp(4px, 1vw, 7px);
+  width: clamp(26px, calc((100vw - 3rem - (var(--n, 5) - 1) * var(--gap)) / var(--n, 5)), 58px);
+  height: clamp(26px, calc((100vw - 3rem - (var(--n, 5) - 1) * var(--gap)) / var(--n, 5)), 58px);
   border: 2px solid var(--tile-border);
   border-radius: 8px;
   background: var(--tile-bg);
@@ -26,7 +30,7 @@
   align-items: center;
   justify-content: center;
   font-family: var(--font-display);
-  font-size: clamp(1.1rem, 4vw, 1.6rem);
+  font-size: clamp(0.95rem, 4vw, 1.6rem);
   color: var(--paper);
   text-transform: uppercase;
   transition: transform 0.55s, background 0.2s, border-color 0.2s;
@@ -46,6 +50,7 @@
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 0.9rem 1rem;
+  min-height: 48px;
   color: var(--paper);
   font-family: var(--font-body);
   font-weight: 700;
@@ -53,7 +58,9 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
-.gameInput:focus { outline: none; border-color: var(--accent); }
+.gameInput { transition: border-color 0.2s, box-shadow 0.2s; }
+.gameInput:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+.gameInput:disabled { opacity: 0.55; }
 .inputArea > button {
   display: inline-flex;
   align-items: center;
@@ -65,7 +72,9 @@
   flex: none;
 }
 
+.wordHint { text-align: center; color: var(--paper-dim); font-size: 0.85rem; margin: 0 0 0.8rem; }
 .guessMessage {
+  animation: msgIn 0.25s ease both;
   text-align: center;
   min-height: 1.6rem;
   font-weight: 800;
@@ -80,4 +89,12 @@
 @media (max-width: 480px) {
   .inputArea { flex-direction: column; max-width: 280px; }
   .inputArea > button { width: 100%; }
+}
+
+@keyframes msgIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .tile { transition: background 0.01s, border-color 0.01s; }
+  .tile.flip { transform: none; }
+  .guessMessage { animation: none; }
 }

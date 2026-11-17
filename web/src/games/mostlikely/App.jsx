@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Users } from "lucide-react";
 import { GameShell } from "../../shared/components/GameShell";
 import { Screen, ScreenTitle, ScreenSub, BigIcon, SetupBlock } from "../../shared/components/Screen";
@@ -16,6 +16,7 @@ import { useTimerSetup } from "../../shared/hooks/useTimerSetup";
 import { useGameTimer } from "../../shared/hooks/useGameTimer";
 import { useUsedIndices } from "../../shared/hooks/useUsedIndices";
 import { MLT_CATEGORIES, MLT_CATEGORY_ICONS } from "./data";
+import { rankVotes } from "./tally";
 
 const MIN_PLAYERS = 3;
 const MAX_PLAYERS = 10;
@@ -48,6 +49,9 @@ export default function App() {
   const [voteIndex, setVoteIndex] = useState(0);
   const [votes, setVotes] = useState([]);
   const [questionsPlayed, setQuestionsPlayed] = useState(0);
+  // Swallows the accidental second tap of a double-tap, which would otherwise
+  // cast the NEXT voter's vote for them (the picker grid stays mounted).
+  const lastVoteAt = useRef(0);
 
   function beginPrompt(pool, namesArg) {
     const { item } = usedIndices.pickUnused(pool);
@@ -72,12 +76,17 @@ export default function App() {
   }
 
   function castVote(nomineeIndex) {
+    const now = Date.now();
+    if (now - lastVoteAt.current < 400) return;
+    lastVoteAt.current = now;
     setVotes((prev) => prev.map((v, i) => (i === nomineeIndex ? v + 1 : v)));
     advanceVote(voteIndex + 1);
   }
 
   function handleStart() {
     const resolvedNames = roster.getNames();
+    usedIndices.reset();
+    setQuestionsPlayed(0);
     setNames(resolvedNames);
     beginPrompt(MLT_CATEGORIES[category], resolvedNames);
   }
@@ -102,10 +111,7 @@ export default function App() {
     setPhase("setup");
   }
 
-  const ranked = names
-    .map((name, i) => ({ name, score: votes[i] || 0 }))
-    .sort((a, b) => b.score - a.score);
-  const winner = ranked[0] && ranked[0].score > 0 ? ranked[0] : null;
+  const { ranked, winner, tiedNames } = rankVotes(names, votes);
 
   return (
     <GameShell title="MOST LIKELY TO" titleIcon={Users}>
@@ -117,8 +123,9 @@ export default function App() {
           steps={[
             <>Pick a category and add your players (at least 3), then tap <strong>Start</strong>.</>,
             'A question appears, like "Most likely to become famous?" Each player taps who they\'d vote for — in turn.',
-            "Once everyone's voted, the results reveal automatically, ranked by votes.",
-            <>Tap <strong>Next Question</strong> to keep going, or <strong>Skip</strong> anytime.</>
+            "You can vote for anyone — even yourself. Pass the device after each tap so nobody sees your pick.",
+            "Once everyone's voted, the results reveal automatically, ranked by votes. A tie is a tie — nobody wins alone.",
+            <>Tap <strong>Next Question</strong> to keep going, <strong>Skip</strong> a question you don't like, or <strong>End Session</strong> when you're done.</>
           ]}
         />
 
@@ -169,14 +176,19 @@ export default function App() {
           <>
             <PromptHeading text={currentPrompt} />
             <ResultsList result={{ ranked, winner, shared: false, tiebreak: null }} unit="votes" unitSingular="vote" chime={false} />
+            {tiedNames.length > 1 && (
+              <TurnBanner>🤝 It's a tie: {tiedNames.join(" & ")}</TurnBanner>
+            )}
             <Button onClick={handleNextOrSkip}>Next Question →</Button>
           </>
         )}
 
-        <ButtonRow>
-          <Button variant="secondary" onClick={handleNextOrSkip}>Skip</Button>
-          <Button variant="secondary" onClick={handleEndSession}>🏁 End Session</Button>
-        </ButtonRow>
+        <div style={{ marginTop: "0.8rem" }}>
+          <ButtonRow>
+            {phase === "vote" && <Button variant="secondary" onClick={handleNextOrSkip}>Skip</Button>}
+            <Button variant="secondary" onClick={handleEndSession}>🏁 End Session</Button>
+          </ButtonRow>
+        </div>
       </Screen>
 
       <Screen active={phase === "summary"}>

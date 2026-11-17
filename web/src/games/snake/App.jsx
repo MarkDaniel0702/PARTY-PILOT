@@ -123,6 +123,7 @@ export default function App() {
     const onKey = (e) => {
       const tag = e.target?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
       const lower = e.key.length === 1 ? e.key.toLowerCase() : e.key;
       const seatsNow = seatsRef.current;
       const kb1 = seatsNow.find((s) => s.seatId === "kb1");
@@ -167,6 +168,10 @@ export default function App() {
   useEffect(() => {
     if (phase !== "play") return undefined;
     let timer;
+    // Fixed-timestep scheduling: each tick is aimed at `due`, not "a tick
+    // after the last one finished", so render and timer jitter doesn't slow
+    // the game (and the timed-mode clock, which counts ticks, stays honest).
+    let due = performance.now();
     const loop = () => {
       const g = gameRef.current;
       if (!g || g.over) return;
@@ -181,9 +186,15 @@ export default function App() {
         setPhase("over");
         return;
       }
-      timer = setTimeout(loop, tickMs(next, baseMsRef.current));
+      const ms = tickMs(next, baseMsRef.current);
+      due += ms;
+      const now = performance.now();
+      // A long stall (tab hidden) must not trigger a burst of catch-up ticks.
+      if (due < now - ms) due = now;
+      timer = setTimeout(loop, Math.max(0, due - now));
     };
-    timer = setTimeout(loop, tickMs(gameRef.current, baseMsRef.current));
+    due += tickMs(gameRef.current, baseMsRef.current);
+    timer = setTimeout(loop, Math.max(0, due - performance.now()));
     return () => clearTimeout(timer);
   }, [phase]);
 
@@ -396,7 +407,7 @@ export default function App() {
 
             <div className={styles.layout}>
               <div className={styles.field}>
-                <ArenaCanvas game={game} colours={colourOf} names={nameOf} label="The arena" />
+                <ArenaCanvas game={game} colours={colourOf} names={nameOf} label="The arena" tickMs={tickMs(game, baseMs)} />
                 {phase === "countdown" && (
                   <div className={styles.countdown} aria-live="assertive">
                     <span key={count} className={styles.countNum}>

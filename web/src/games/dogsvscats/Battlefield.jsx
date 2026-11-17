@@ -44,7 +44,7 @@ export function Battlefield({
   activeId,
   aim,
   shot,
-  shotProgress,
+  progress = null,
   explosion,
   weaponEmoji = null,
   wind = 0,
@@ -90,7 +90,7 @@ export function Battlefield({
     activeId,
     aim,
     shot,
-    shotProgress,
+    progress,
     explosion,
     weaponEmoji,
     wind,
@@ -184,6 +184,10 @@ export function Battlefield({
       if (!canvas || !wrap || !p.terrain) return;
       const { terrain: t, battlefield: field, scenery: sc } = p;
       const time = p.reduced ? 0 : now;
+      // Flight and blast progress (0..1) live in a ref the host's animation
+      // loop writes to, so they never cost a React re-render per frame.
+      const prog = p.progress ? p.progress.current : { shot: 0, boom: 0 };
+      const boomT = prog.boom;
 
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const cw = wrap.clientWidth;
@@ -205,14 +209,14 @@ export function Battlefield({
       let shakeX = 0;
       let shakeY = 0;
       if (p.explosion && !p.reduced) {
-        const k = (1 - p.explosion.t) ** 2 * sx(p.explosion.radius) * 0.28;
+        const k = (1 - boomT) ** 2 * sx(p.explosion.radius) * 0.28;
         shakeX = Math.sin(now / 18) * k;
         shakeY = Math.cos(now / 13) * k;
       }
       ctx.save();
       ctx.translate(shakeX, shakeY);
       if (p.explosion && !p.reduced) {
-        const z = 1 + 0.035 * (1 - p.explosion.t) ** 3;
+        const z = 1 + 0.035 * (1 - boomT) ** 3;
         const zx = sx(p.explosion.x);
         const zy = sx(p.explosion.y);
         ctx.translate(zx, zy);
@@ -590,7 +594,7 @@ export function Battlefield({
       if (p.shot && p.shot.path.length > 1) {
         const lob = p.shot.weapon.id === "lobber";
         const trail = lob ? "200,236,255" : "255,236,190";
-        const upto = Math.max(1, Math.floor(p.shot.path.length * p.shotProgress));
+        const upto = Math.max(1, Math.min(p.shot.path.length, Math.floor(p.shot.path.length * prog.shot)));
         const tailStart = Math.max(0, upto - 90);
         const tailLen = Math.max(1, upto - tailStart);
         ctx.lineCap = "round";
@@ -672,7 +676,8 @@ export function Battlefield({
 
       // ---------- explosion ----------
       if (p.explosion) {
-        const { x, y, radius, t: et, weaponId } = p.explosion;
+        const { x, y, radius, weaponId } = p.explosion;
+        const et = boomT;
         const pal = PALETTES[weaponId] || PALETTES.bazooka;
         const ex = sx(x);
         const ey = sx(y);
@@ -843,7 +848,7 @@ export function Battlefield({
 
       // Full-frame flash at the instant of detonation.
       if (p.explosion && !p.reduced) {
-        const fa = Math.max(0, 1 - p.explosion.t * 5) * 0.3;
+        const fa = Math.max(0, 1 - boomT * 5) * 0.3;
         if (fa > 0.01) {
           ctx.fillStyle = "rgba(255,246,222," + fa + ")";
           ctx.fillRect(0, 0, cw, ch);
@@ -881,6 +886,18 @@ export function Battlefield({
   useEffect(() => {
     if (reduced) drawFrame(performance.now());
   });
+
+  // Reduced motion has no standing loop, but a flight or blast still has to
+  // be shown progressing: run one only for as long as one is happening.
+  const animating = !!(shot || explosion);
+  useEffect(() => {
+    if (!reduced || !animating) return undefined;
+    let raf = requestAnimationFrame(function tick(now) {
+      drawFrame(now);
+      raf = requestAnimationFrame(tick);
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [reduced, animating, drawFrame]);
 
   useEffect(() => {
     const wrap = wrapRef.current;

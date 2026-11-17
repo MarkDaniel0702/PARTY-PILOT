@@ -43,8 +43,11 @@ function key(row, col) {
   return `${row},${col}`;
 }
 
+// Coordinates arrive off the network, so "3" or 2.5 or NaN must not pass:
+// a string cell would slip the bounds check but never match a ship's numeric
+// cells, turning a real hit into a miss that can't be re-fired.
 export function isInBounds(row, col) {
-  return row >= 0 && row < BOARD_SIZE && col >= 0 && col < BOARD_SIZE;
+  return Number.isInteger(row) && Number.isInteger(col) && row >= 0 && row < BOARD_SIZE && col >= 0 && col < BOARD_SIZE;
 }
 
 // Cells a ship of `size` occupies, anchored at (row, col) and extending
@@ -105,6 +108,7 @@ export function placeShip(match, playerIndex, shipId, row, col, orientation) {
   const def = shipDef(shipId);
   if (!def) return { ok: false, error: "unknown-ship" };
 
+  if (orientation !== ORIENTATION.H && orientation !== ORIENTATION.V) return { ok: false, error: "bad-orientation" };
   const cells = computeShipCells(row, col, def.size, orientation);
   if (!cells.every(([r, c]) => isInBounds(r, c))) return { ok: false, error: "out-of-bounds" };
 
@@ -165,6 +169,7 @@ export function randomizeFleet(match, playerIndex, rng = Math.random) {
 export function confirmFleet(match, playerIndex) {
   const player = match.players[playerIndex];
   if (!player) return { ok: false, error: "no-player" };
+  if (match.phase !== "placement") return { ok: false, error: "not-placement" };
   if (!isFleetComplete(player)) return { ok: false, error: "incomplete" };
 
   const nextPlayers = match.players.map((p, i) => (i === playerIndex ? { ...p, ready: true } : p));

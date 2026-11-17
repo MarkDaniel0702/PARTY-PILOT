@@ -73,7 +73,7 @@ export const SPY_THEMES = {
     { main: "Siargao", spy: "Bohol" },
     { main: "Mall of Asia", spy: "SM North EDSA" },
     { main: "Divisoria", spy: "Quiapo" },
-    { main: "Baguio", spy: "Tagaytay" }
+    { main: "Hundred Islands", spy: "Puerto Princesa Underground River" }
   ],
 
   // ---- Specific subthemes derived from Quiz Night's broader categories ----
@@ -429,7 +429,7 @@ export const SPY_THEMES = {
     { main: "Beijing", spy: "Bangkok" },
     { main: "Cairo", spy: "Nairobi" }
   ],
-  "Planets of the Solar System": [
+  "The Solar System": [
     { main: "Mercury", spy: "Venus" },
     { main: "Earth", spy: "Mars" },
     { main: "Jupiter", spy: "Saturn" },
@@ -538,7 +538,7 @@ export const SPY_THEME_ICONS = {
   "Filipino Food": "🍚",
   "Philippine Historical Figures": "🎖️",
   "World Capitals": "🌐",
-  "Planets of the Solar System": "🪐",
+  "The Solar System": "🪐",
   "World Currencies": "💵",
   "Ancient Civilizations": "🏛️",
   "Tech Companies": "🖥️",
@@ -561,5 +561,5 @@ export const SPY_THEME_GROUPS = {
   "Sports": ["Basketball Players", "NBA Teams", "Football Players", "Football Teams", "Olympic Sports", "Sports Equipment"],
   "Academic": ["College Courses", "Computer Science Terms", "Engineering Terms", "Business Terms", "Medical Terms", "Education Terms", "Architecture Terms"],
   "Philippines": ["Famous Places in the Philippines", "Philippine Provinces", "Philippine Cities", "Filipino Celebrities", "Filipino Food", "Philippine Historical Figures"],
-  "General Knowledge": ["World Capitals", "Planets of the Solar System", "World Currencies", "Ancient Civilizations", "Tech Companies", "International Dishes", "Famous Scientists", "E-Commerce Platforms"]
+  "General Knowledge": ["World Capitals", "The Solar System", "World Currencies", "Ancient Civilizations", "Tech Companies", "International Dishes", "Famous Scientists", "E-Commerce Platforms"]
 };

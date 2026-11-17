@@ -27,6 +27,7 @@ import styles from "./tetris.module.css";
 const DAS_MS = 170; // delay before a held direction starts repeating
 const ARR_MS = 45; // repeat interval once it does
 const SNAPSHOT_MS = 80; // ~12 board updates a second to the TV
+const SOFT_ARR_MS = 45; // held soft-drop speed
 
 // A short tick on a hard drop. Feature-detected because iOS Safari has no
 // vibration API at all, and a thrown error mid-drop would be a real bug.
@@ -40,57 +41,67 @@ function thud() {
 
 export function PhoneTetris({ seed, mode, colour, garbageEvent, onState, onGarbage, onOver }) {
   const [game, setGame] = useState(() => createGame({ seed, mode }));
+  // The ref is the source of truth; React state only mirrors it for drawing.
+  // The engine's piece bag is a stateful RNG, so running it inside a setState
+  // updater (which StrictMode and React's rebasing may call twice) would deal
+  // this player a different piece sequence from everybody else.
   const gameRef = useRef(game);
-  gameRef.current = game;
 
   const repeatRef = useRef(null);
   const sentGarbageRef = useRef(0);
   const overSentRef = useRef(false);
 
+  // Parents pass inline callbacks; keep the latest in a ref so streaming
+  // timers aren't torn down and rebuilt on every parent render.
+  const cbRef = useRef({});
+  cbRef.current = { onState, onGarbage, onOver };
+
   const apply = useCallback((fn) => {
-    setGame((g) => (g.over ? g : fn(g)));
+    const g = gameRef.current;
+    if (g.over) return;
+    const next = fn(g);
+    if (next === g) return;
+    gameRef.current = next;
+    setGame(next);
   }, []);
 
   // Gravity, re-armed whenever the level changes so the speed curve applies.
   useEffect(() => {
     if (game.over) return undefined;
-    const id = setInterval(() => setGame((g) => (g.over ? g : stepGravity(g))), dropIntervalMs(game.level));
+    const id = setInterval(() => apply(stepGravity), dropIntervalMs(game.level));
     return () => clearInterval(id);
-  }, [game.level, game.over]);
+  }, [game.level, game.over, apply]);
 
   // Stream snapshots to the host for the TV.
   useEffect(() => {
-    const id = setInterval(() => {
-      const g = gameRef.current;
-      onState?.(snapshot(g));
-    }, SNAPSHOT_MS);
+    const id = setInterval(() => cbRef.current.onState?.(snapshot(gameRef.current)), SNAPSHOT_MS);
     return () => clearInterval(id);
-  }, [onState]);
+  }, []);
 
   // Report garbage as it's generated, and the top-out exactly once.
   useEffect(() => {
     if (game.garbageSent > sentGarbageRef.current) {
       const rows = game.garbageSent - sentGarbageRef.current;
       sentGarbageRef.current = game.garbageSent;
-      onGarbage?.(rows);
+      cbRef.current.onGarbage?.(rows);
     }
-  }, [game.garbageSent, onGarbage]);
+  }, [game.garbageSent]);
 
   useEffect(() => {
     if (game.over && !overSentRef.current) {
       overSentRef.current = true;
-      onState?.(snapshot(game));
-      onOver?.({ score: game.score, lines: game.lines });
+      cbRef.current.onState?.(snapshot(game));
+      cbRef.current.onOver?.({ score: game.score, lines: game.lines });
     }
-  }, [game.over, game.score, game.lines, onState, onOver]);
+  }, [game]);
 
   // Garbage sent by an opponent. Queued rather than applied immediately —
   // it only lands once the current piece locks, which is what gives you a
   // chance to cancel it with a clear of your own.
   useEffect(() => {
     if (!garbageEvent || !garbageEvent.rows) return;
-    setGame((g) => (g.over ? g : queueGarbage(g, garbageEvent.rows)));
-  }, [garbageEvent]);
+    apply((g) => queueGarbage(g, garbageEvent.rows));
+  }, [garbageEvent, apply]);
 
   const stopRepeat = useCallback(() => {
     if (repeatRef.current) {
@@ -100,29 +111,51 @@ export function PhoneTetris({ seed, mode, colour, garbageEvent, onState, onGarba
     }
   }, []);
 
+  // Held-button auto-repeat. `fn` fires once immediately, then every `arr` ms
+  // after `das` ms.
   const startRepeat = useCallback(
-    (dir) => {
+    (fn, das = DAS_MS, arr = ARR_MS) => {
       stopRepeat();
-      apply((g) => move(g, dir));
+      apply(fn);
       const delay = setTimeout(() => {
-        const timer = setInterval(() => apply((g) => move(g, dir)), ARR_MS);
+        const timer = setInterval(() => apply(fn), arr);
         repeatRef.current = { delay, timer };
-      }, DAS_MS);
+      }, das);
       repeatRef.current = { delay, timer: null };
     },
     [apply, stopRepeat]
   );
 
   useEffect(() => stopRepeat, [stopRepeat]);
+  useEffect(() => {
+    if (game.over) stopRepeat();
+  }, [game.over, stopRepeat]);
+
+  // A finger that slides off the pad, a call coming in or the tab losing
+  // focus must never leave a direction latched on.
+  useEffect(() => {
+    window.addEventListener("pointerup", stopRepeat);
+    window.addEventListener("pointercancel", stopRepeat);
+    window.addEventListener("blur", stopRepeat);
+    return () => {
+      window.removeEventListener("pointerup", stopRepeat);
+      window.removeEventListener("pointercancel", stopRepeat);
+      window.removeEventListener("blur", stopRepeat);
+    };
+  }, [stopRepeat]);
 
   // Physical keyboards work too, for anyone pairing a laptop.
   useEffect(() => {
     const down = (e) => {
       const k = e.key;
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
       if (["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", " ", "Shift"].includes(k)) e.preventDefault();
+      // OS key-repeat is welcome for moving and soft drop, but a held space
+      // bar must not hard-drop every piece in the queue.
       if (k === "ArrowLeft") apply((g) => move(g, -1));
       else if (k === "ArrowRight") apply((g) => move(g, 1));
       else if (k === "ArrowDown") apply(softDrop);
+      else if (e.repeat) return;
       else if (k === "ArrowUp" || k === "x") apply((g) => rotate(g, 1));
       else if (k === "z") apply((g) => rotate(g, -1));
       else if (k === " ") apply(hardDrop);
@@ -135,15 +168,18 @@ export function PhoneTetris({ seed, mode, colour, garbageEvent, onState, onGarba
   const snap = snapshot(game);
   const queue = nextQueue(game, 3);
 
-  const hold = (dir) => ({
+  const hold = (fn, das, arr) => ({
     onPointerDown: (e) => {
       e.preventDefault();
-      startRepeat(dir);
+      startRepeat(fn, das, arr);
     },
     onPointerUp: stopRepeat,
     onPointerCancel: stopRepeat,
-    onPointerLeave: stopRepeat
+    onPointerLeave: stopRepeat,
+    onContextMenu: (e) => e.preventDefault()
   });
+  const left = (g) => move(g, -1);
+  const right = (g) => move(g, 1);
 
   return (
     <div className={styles.phoneWrap} style={colour ? { "--seat": colour } : undefined}>
@@ -176,8 +212,9 @@ export function PhoneTetris({ seed, mode, colour, garbageEvent, onState, onGarba
       {game.over ? (
         <p className={styles.phoneOver}>Topped out — watch the big screen!</p>
       ) : (
+        <>
         <div className={styles.pad}>
-          <button type="button" className={styles.padBtn} aria-label="Move left" {...hold(-1)}>
+          <button type="button" className={styles.padBtn} aria-label="Move left" {...hold(left)}>
             ←
           </button>
           <button
@@ -191,7 +228,7 @@ export function PhoneTetris({ seed, mode, colour, garbageEvent, onState, onGarba
           >
             ⟳
           </button>
-          <button type="button" className={styles.padBtn} aria-label="Move right" {...hold(1)}>
+          <button type="button" className={styles.padBtn} aria-label="Move right" {...hold(right)}>
             →
           </button>
           <button
@@ -209,10 +246,7 @@ export function PhoneTetris({ seed, mode, colour, garbageEvent, onState, onGarba
             type="button"
             className={styles.padBtn}
             aria-label="Soft drop"
-            onPointerDown={(e) => {
-              e.preventDefault();
-              apply(softDrop);
-            }}
+            {...hold(softDrop, 0, SOFT_ARR_MS)}
           >
             ↓
             <span className={styles.padSub}>Soft</span>
@@ -231,6 +265,8 @@ export function PhoneTetris({ seed, mode, colour, garbageEvent, onState, onGarba
             <span className={styles.padSub}>Hard</span>
           </button>
         </div>
+        <p className={styles.phoneHint}>Hold ← → to slide · ⟳ rotates · DROP slams the piece down</p>
+        </>
       )}
     </div>
   );

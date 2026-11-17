@@ -18,6 +18,12 @@ const DANGER_ROWS = 5;
 export function BoardView({ cells, piece, label, dimmed = false, className = "" }) {
   const canvasRef = useRef(null);
   const wrapRef = useRef(null);
+  const bgRef = useRef(null); // cached well + grid, rebuilt only on resize
+  // Snapshots arrive ~12x a second with a fresh `piece` object each time;
+  // key the redraw on its values so an idle board isn't repainted for nothing.
+  const pieceRef = useRef(piece);
+  pieceRef.current = piece;
+  const pieceKey = piece ? piece.t + piece.x + "," + piece.y + "," + piece.r : "";
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -35,6 +41,7 @@ export function BoardView({ cells, piece, label, dimmed = false, className = "" 
       canvas.style.height = ch + "px";
     }
 
+    const piece = pieceRef.current;
     const ctx = canvas.getContext("2d");
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, cw, ch);
@@ -42,26 +49,36 @@ export function BoardView({ cells, piece, label, dimmed = false, className = "" 
     // Solid dark well in both themes, not a translucent black: the piece
     // colours are bright and need a dark backdrop to read, and over a light
     // page a translucent fill washes out to grey.
-    const well = ctx.createLinearGradient(0, 0, 0, ch);
-    well.addColorStop(0, "#0d121d");
-    well.addColorStop(1, "#171e2d");
-    ctx.fillStyle = well;
-    ctx.fillRect(0, 0, cw, ch);
-
-    ctx.strokeStyle = "rgba(255,255,255,0.045)";
-    ctx.lineWidth = 1;
-    for (let x = 1; x < COLS; x++) {
-      ctx.beginPath();
-      ctx.moveTo(x * cell, 0);
-      ctx.lineTo(x * cell, ch);
-      ctx.stroke();
+    const bgKey = canvas.width + "x" + canvas.height;
+    if (!bgRef.current || bgRef.current.key !== bgKey) {
+      const bg = document.createElement("canvas");
+      bg.width = canvas.width;
+      bg.height = canvas.height;
+      const b = bg.getContext("2d");
+      b.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const well = b.createLinearGradient(0, 0, 0, ch);
+      well.addColorStop(0, "#0d121d");
+      well.addColorStop(1, "#171e2d");
+      b.fillStyle = well;
+      b.fillRect(0, 0, cw, ch);
+      b.strokeStyle = "rgba(255,255,255,0.045)";
+      b.lineWidth = 1;
+      b.beginPath();
+      for (let x = 1; x < COLS; x++) {
+        b.moveTo(x * cell, 0);
+        b.lineTo(x * cell, ch);
+      }
+      for (let y = 1; y < ROWS; y++) {
+        b.moveTo(0, y * cell);
+        b.lineTo(cw, y * cell);
+      }
+      b.stroke();
+      bgRef.current = { key: bgKey, canvas: bg };
     }
-    for (let y = 1; y < ROWS; y++) {
-      ctx.beginPath();
-      ctx.moveTo(0, y * cell);
-      ctx.lineTo(cw, y * cell);
-      ctx.stroke();
-    }
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.drawImage(bgRef.current.canvas, 0, 0);
+    ctx.restore();
 
     const grid = cells ? parseSnapshot(cells) : null;
 
@@ -132,7 +149,7 @@ export function BoardView({ cells, piece, label, dimmed = false, className = "" 
       ctx.fillStyle = "rgba(6,9,16,0.62)";
       ctx.fillRect(0, 0, cw, ch);
     }
-  }, [cells, piece, dimmed]);
+  }, [cells, pieceKey, dimmed]);
 
   useEffect(() => {
     draw();

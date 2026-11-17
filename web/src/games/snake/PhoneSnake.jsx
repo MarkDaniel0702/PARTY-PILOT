@@ -36,7 +36,14 @@ export function PhoneSnake({ view, send }) {
   const sendRef = useRef(send);
   sendRef.current = send;
 
+  const live = view.status === "playing" && view.alive;
+  const liveRef = useRef(live);
+  liveRef.current = live;
+
+  // Turns only mean something while the snake is alive and the match is on;
+  // sending them otherwise just spams the host (it ignores them).
   const turn = (dir) => {
+    if (!liveRef.current) return;
     tick();
     sendRef.current(action(ACTION.TURN, { dir }));
   };
@@ -44,9 +51,11 @@ export function PhoneSnake({ view, send }) {
   // Keyboard, for anyone using a laptop as a controller.
   useEffect(() => {
     const onKey = (e) => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
       const dir = KEYS[e.key] || KEYS[e.key?.toLowerCase?.()];
       if (!dir) return;
       e.preventDefault();
+      if (e.repeat || !liveRef.current) return;
       sendRef.current(action(ACTION.TURN, { dir }));
     };
     window.addEventListener("keydown", onKey);
@@ -88,10 +97,8 @@ export function PhoneSnake({ view, send }) {
     banner = view.respawnIn ? `💥 Crashed — back in ${view.respawnIn}s` : "💥 You crashed — watch the screen";
     tone = styles.bad;
   } else {
-    banner = "Steer! Swipe or tap";
+    banner = "Steer! Tap an arrow, or swipe on the pad";
   }
-
-  const live = view.status === "playing" && view.alive;
 
   return (
     <div className={styles.wrap} style={{ "--snake": view.colour || "var(--accent)" }}>

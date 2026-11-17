@@ -228,10 +228,13 @@ export function step(state) {
     events.push({ type: "shrink", inset });
   }
   const arena = { ...state, inset };
+  // Food stranded in the newly closed ring can never be eaten, yet it would
+  // still count towards the food quota — drop it so the quota refills inside.
+  const openFood = inset === state.inset ? state.food : state.food.filter((f) => !isWall(arena, f.x, f.y));
 
   // Respawns (timed mode): a snake that has waited long enough comes back at
   // its own start spot, if that spot is clear.
-  let startFood = state.food;
+  let startFood = openFood;
   let snakes = state.snakes.map((s) => {
     if (s.alive || s.respawnAt === null || tick < s.respawnAt) return s;
     const spot = spawnPoints(state.startCount, state.cols, state.rows)[s.slot];
@@ -282,13 +285,27 @@ export function step(state) {
   plan.forEach((p, id) => {
     const k = keyOf(p.head.x, p.head.y);
     const outOfBounds = p.head.x < 0 || p.head.y < 0 || p.head.x >= state.cols || p.head.y >= state.rows;
-    if (outOfBounds || isWall(arena, p.head.x, p.head.y)) {
+    const me = snakes.find((x) => x.id === id);
+    // The closing arena crushes a snake whose head is caught in the new wall,
+    // not just one that steers into it.
+    if (outOfBounds || isWall(arena, p.head.x, p.head.y) || isWall(arena, me.body[0].x, me.body[0].y)) {
       dying.set(id, { cause: "wall", by: null });
     } else if (heads.get(k).length > 1) {
       dying.set(id, { cause: "head", by: null });
     } else if (owner.has(k)) {
       const by = owner.get(k);
-      dying.set(id, { cause: by === id ? "self" : "body", by: by === id ? null : by });
+      const other = by === id ? null : plan.get(by);
+      const otherHead = other && snakes.find((x) => x.id === by).body[0];
+      const swapped =
+        other &&
+        otherHead.x === p.head.x && otherHead.y === p.head.y &&
+        other.head.x === me.body[0].x && other.head.y === me.body[0].y;
+      if (swapped) {
+        // Two heads passing through each other is a head-on, not a kill.
+        dying.set(id, { cause: "head", by: null });
+      } else {
+        dying.set(id, { cause: by === id ? "self" : "body", by: by === id ? null : by });
+      }
     }
   });
 

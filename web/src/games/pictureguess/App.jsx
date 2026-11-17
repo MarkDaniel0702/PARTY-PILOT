@@ -98,6 +98,8 @@ export default function App() {
 
   const buzzStateRef = useRef();
   buzzStateRef.current = {
+    phase,
+    hasPic: !!currentPic,
     revealed,
     teams: teams.teams,
     lockedTeamIds,
@@ -109,8 +111,10 @@ export default function App() {
   useEffect(() => {
     return onMessage((msg) => {
       if (msg.type !== "buzz") return;
-      const { revealed, teams: teamsArr, lockedTeamIds, buzzedTeamId, sessionPlayers, stopTimer } =
+      const { phase, hasPic, revealed, teams: teamsArr, lockedTeamIds, buzzedTeamId, sessionPlayers, stopTimer } =
         buzzStateRef.current;
+      // A late buzz arriving on the setup / results screen must not latch.
+      if (phase !== "play" || !hasPic) return;
       if (revealed || buzzedTeamId || buzzLockRef.current) return;
       const player = sessionPlayers.find((p) => p.playerId === msg.playerId);
       if (!player) return;
@@ -195,14 +199,19 @@ export default function App() {
     const cache = thumbCacheRef.current;
     if (cache.has(title)) return Promise.resolve(cache.get(title));
     const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`;
-    return fetch(url)
+    // A hung request must not strand the round on "Loading picture…" — give up
+    // after a few seconds and fall back to the emoji.
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), 7000);
+    return fetch(url, { signal: ctl.signal })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         const src = (data && data.thumbnail && data.thumbnail.source) || null;
         cache.set(title, src);
         return src;
       })
-      .catch(() => null);
+      .catch(() => null)
+      .finally(() => clearTimeout(timer));
   }
 
   // Fetch a fresh picture whenever the current one changes.
@@ -219,20 +228,28 @@ export default function App() {
       }
       setPictureSrc(src);
       setLoadedToken(token);
+      // The URL resolved but the image itself may never arrive; don't wait forever.
+      setTimeout(() => {
+        if (token === pictureLoadTokenRef.current) setPictureState((st) => (st === "loading" ? "fallback" : st));
+      }, 10000);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPic]);
 
   // Per-step reveal timer — restarts whenever a new picture is dealt or the
-  // player/timer sharpens a step, and stops once fully sharpened.
+  // player/timer sharpens a step, and stops once fully sharpened. It holds off
+  // while the photo is still downloading: otherwise a slow connection burns the
+  // blur steps before anyone has seen anything. It also stays stopped while a
+  // team is buzzed in or the answer is up.
   useEffect(() => {
     if (phase !== "play" || !currentPic) return;
     gameTimer.stop();
+    if (pictureState === "loading" || revealed || buzzedTeamId) return;
     if (timerSetup.enabled && revealLevel < BLUR_STEPS.length - 1) {
       gameTimer.start(timerSetup.seconds);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [revealLevel, currentPic, phase]);
+  }, [revealLevel, currentPic, phase, pictureState]);
 
   function dealPicture(poolArg, queueArg, pos) {
     setCurrentPic(poolArg[queueArg[pos]]);
@@ -261,6 +278,7 @@ export default function App() {
   }
 
   function revealAnswer() {
+    if (revealed) return; // a late timer tick / double tap must not count the picture twice
     gameTimer.stop();
     setPicsPlayed((p) => p + 1);
     setRevealLevel(BLUR_STEPS.length - 1);
@@ -283,7 +301,8 @@ export default function App() {
   function goToSummary() {
     gameTimer.stop();
     const { ranked, tied, winner } = resolveStanding(teams.teams);
-    if (tied.length <= 1) {
+    // Everyone level on zero means nobody scored — no point in a tie-breaker.
+    if (tied.length <= 1 || ranked[0].score <= 0) {
       setResult({ ranked, winner: finalizeWinner(winner), shared: false, tiebreak: null });
       setPhase("summary");
     } else {

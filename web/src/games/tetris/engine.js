@@ -14,6 +14,9 @@ export const HIDDEN = 2;
 export const TOTAL_ROWS = ROWS + HIDDEN;
 
 export const LOCK_DELAY_STEPS = 2;
+// Moves/rotations that may refresh the lock timer while the piece rests on
+// something. Without a cap, wiggling a grounded piece stalls it forever.
+export const MAX_LOCK_RESETS = 15;
 // Standard competitive garbage: singles send nothing, a Tetris sends four.
 export const GARBAGE_FOR_LINES = { 0: 0, 1: 0, 2: 1, 3: 2, 4: 4 };
 const LINE_SCORES = { 1: 100, 2: 300, 3: 500, 4: 800 };
@@ -74,6 +77,7 @@ export function createGame({ seed = 1, mode = "battle" } = {}) {
     hold: null,
     canHold: true,
     lockSteps: 0,
+    lockResets: 0,
     score: 0,
     lines: 0,
     level: 1,
@@ -104,13 +108,19 @@ export function collides(board, piece, dx = 0, dy = 0, rotation = piece.rotation
 
 export function move(state, dx) {
   if (state.over || collides(state.board, state.piece, dx, 0)) return state;
-  return {
-    ...state,
-    piece: { ...state.piece, x: state.piece.x + dx },
-    // Touching the floor then sliding resets the lock timer, which is what
-    // lets players tuck a piece under an overhang at the last moment.
-    lockSteps: 0
-  };
+  const piece = { ...state.piece, x: state.piece.x + dx };
+  // Touching the floor then sliding resets the lock timer, which is what
+  // lets players tuck a piece under an overhang at the last moment.
+  return { ...state, piece, ...refreshLock(state, piece) };
+}
+
+// Lock-timer refresh after a successful move/rotate. Only grounded pieces
+// spend a reset, and only MAX_LOCK_RESETS of them are honoured.
+function refreshLock(state, piece) {
+  if (!collides(state.board, piece, 0, 1)) return { lockSteps: 0 };
+  const used = state.lockResets || 0;
+  if (used >= MAX_LOCK_RESETS) return { lockResets: used };
+  return { lockSteps: 0, lockResets: used + 1 };
 }
 
 export function rotate(state, dir = 1) {
@@ -119,11 +129,8 @@ export function rotate(state, dir = 1) {
   const to = ((from + dir) % 4 + 4) % 4;
   for (const [kx, ky] of kicksFor(state.piece.type, from, to)) {
     if (!collides(state.board, state.piece, kx, ky, to)) {
-      return {
-        ...state,
-        piece: { ...state.piece, rotation: to, x: state.piece.x + kx, y: state.piece.y + ky },
-        lockSteps: 0
-      };
+      const piece = { ...state.piece, rotation: to, x: state.piece.x + kx, y: state.piece.y + ky };
+      return { ...state, piece, ...refreshLock(state, piece) };
     }
   }
   return state; // every kick blocked — rotation genuinely doesn't fit
@@ -188,6 +195,11 @@ function nextPieceFrom(state, board) {
 
 export function lockPiece(state) {
   if (state.over) return state;
+  // Lock-out: a piece that comes to rest entirely above the visible well ends
+  // the game, rather than relying on the next spawn happening to collide.
+  const lockedOut = cellsOf(state.piece.type, state.piece.rotation).every(
+    ([, cy]) => state.piece.y + cy < HIDDEN
+  );
   const placed = placePiece(state.board, state.piece);
   const { board, cleared } = clearLines(placed);
 
@@ -212,6 +224,7 @@ export function lockPiece(state) {
     lines,
     level,
     lockSteps: 0,
+    lockResets: 0,
     canHold: true,
     lastClear: cleared,
     // Bumped once per clearing lock. The host samples boards ~12x a second
@@ -226,7 +239,7 @@ export function lockPiece(state) {
   if (pending > 0) next = addGarbage(next, pending);
 
   const spawned = nextPieceFrom(next, next.board);
-  return { ...next, piece: spawned.piece, bag: spawned.bag, over: next.over || spawned.over };
+  return { ...next, piece: spawned.piece, bag: spawned.bag, over: next.over || spawned.over || lockedOut };
 }
 
 // One gravity step. Returns the state unchanged in shape but with the piece
@@ -234,7 +247,7 @@ export function lockPiece(state) {
 export function stepGravity(state) {
   if (state.over) return state;
   if (!collides(state.board, state.piece, 0, 1)) {
-    return { ...state, piece: { ...state.piece, y: state.piece.y + 1 }, lockSteps: 0 };
+    return { ...state, piece: { ...state.piece, y: state.piece.y + 1 }, lockSteps: 0, lockResets: 0 };
   }
   if (state.lockSteps + 1 < LOCK_DELAY_STEPS) {
     return { ...state, lockSteps: state.lockSteps + 1 };
@@ -244,8 +257,16 @@ export function stepGravity(state) {
 
 export function softDrop(state) {
   if (state.over) return state;
-  if (collides(state.board, state.piece, 0, 1)) return lockPiece(state);
-  return { ...state, score: state.score + 1, piece: { ...state.piece, y: state.piece.y + 1 }, lockSteps: 0 };
+  // A resting piece stays put: locking on a soft-drop tap made a stray double
+  // tap throw a piece away. Gravity (or hard drop) does the locking.
+  if (collides(state.board, state.piece, 0, 1)) return state;
+  return {
+    ...state,
+    score: state.score + 1,
+    piece: { ...state.piece, y: state.piece.y + 1 },
+    lockSteps: 0,
+    lockResets: 0
+  };
 }
 
 export function hardDrop(state) {
@@ -266,7 +287,7 @@ export function holdPiece(state) {
   if (state.hold) {
     const piece = spawnPiece(state.hold);
     if (collides(state.board, piece)) return { ...state, over: true };
-    return { ...state, hold: current, piece, canHold: false };
+    return { ...state, hold: current, piece, canHold: false, lockSteps: 0, lockResets: 0 };
   }
   const spawned = nextPieceFrom(state, state.board);
   return {
@@ -275,6 +296,8 @@ export function holdPiece(state) {
     piece: spawned.piece,
     bag: spawned.bag,
     canHold: false,
+    lockSteps: 0,
+    lockResets: 0,
     over: state.over || spawned.over
   };
 }

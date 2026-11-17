@@ -23,7 +23,8 @@ import {
   nextQueue,
   dropIntervalMs,
   snapshot,
-  parseSnapshot
+  parseSnapshot,
+  MAX_LOCK_RESETS
 } from "./engine";
 
 // Fills the bottom `n` rows except for a two-wide gap, so a dropped O piece
@@ -428,5 +429,53 @@ describe("shared piece sequence", () => {
       hit = hardDrop(queueGarbage({ ...hit, board: emptyBoard() }, 2));
     }
     expect(hitPieces).toEqual(cleanPieces);
+  });
+});
+
+describe("audit regressions", () => {
+  const grounded = () => ({
+    ...createGame({ seed: 1 }),
+    piece: { type: "T", rotation: 0, x: 3, y: TOTAL_ROWS - 2 }
+  });
+
+  it("caps how many times wiggling a grounded piece can refresh the lock timer", () => {
+    let g = grounded();
+    for (let i = 0; i < MAX_LOCK_RESETS * 2; i++) {
+      g = { ...g, lockSteps: 1 };
+      g = move(g, i % 2 ? -1 : 1);
+    }
+    expect(g.lockResets).toBe(MAX_LOCK_RESETS);
+    expect(g.lockSteps).toBe(1); // no longer refreshed
+    expect(countFilled(stepGravity(g).board)).toBe(4); // so gravity locks it
+  });
+
+  it("does not spend resets while the piece is still falling", () => {
+    const g = move({ ...createGame({ seed: 1 }), lockSteps: 0 }, 1);
+    expect(g.lockResets || 0).toBe(0);
+  });
+
+  it("soft drop on a resting piece does not lock it", () => {
+    const g = grounded();
+    expect(softDrop(g)).toBe(g);
+  });
+
+  it("hold clears the lock timer for the incoming piece", () => {
+    const g = { ...grounded(), lockSteps: 1, lockResets: 9 };
+    const h = holdPiece(g);
+    expect(h.lockSteps).toBe(0);
+    expect(h.lockResets).toBe(0);
+  });
+
+  it("locking a piece entirely above the visible well is a lock-out", () => {
+    const board = emptyBoard().map((r) => r.slice());
+    // Stack reaching the first visible row, directly under the spawn box.
+    for (let x = 0; x < COLS; x++) board[HIDDEN][x] = x === 0 ? null : "G";
+    const g = { ...createGame({ seed: 1 }), board, piece: { type: "O", rotation: 0, x: 4, y: 0 } };
+    expect(lockPiece(g).over).toBe(true);
+  });
+
+  it("a piece resting partly in the visible well is not a lock-out", () => {
+    const g = { ...createGame({ seed: 1 }), piece: { type: "O", rotation: 0, x: 4, y: TOTAL_ROWS - 2 } };
+    expect(lockPiece(g).over).toBe(false);
   });
 });

@@ -33,9 +33,14 @@ export default function App() {
   const [category, setCategory] = useState("");
   const [summaryTitle, setSummaryTitle] = useState("Round Complete!");
   const [summaryText, setSummaryText] = useState("Great round.");
+  const [notice, setNotice] = useState("");
 
-  function pickCategory() {
-    return usedIndices.pickUnused(CATEGORIES_LIST).item;
+  // `avoid` keeps a pool-exhaustion reset (or "New Category") from serving the
+  // category that is already on screen.
+  function pickCategory(avoid) {
+    let next = usedIndices.pickUnused(CATEGORIES_LIST).item;
+    if (next === avoid) next = usedIndices.pickUnused(CATEGORIES_LIST).item;
+    return next;
   }
 
   function startTimerForTurn() {
@@ -49,7 +54,8 @@ export default function App() {
     const active = resolvedNames.map((_, i) => i);
     setActiveIndices(active);
     setTurnPos(0);
-    setCategory(pickCategory());
+    setNotice("");
+    setCategory(pickCategory(category));
     setPhase("play");
     startTimerForTurn();
   }
@@ -60,6 +66,7 @@ export default function App() {
   }
 
   function handleNailedIt() {
+    setNotice("");
     gameTimer.stop();
     advanceTurn();
   }
@@ -67,6 +74,7 @@ export default function App() {
   function handleStuck() {
     gameTimer.stop();
     if (eliminationMode) {
+      setNotice(`${names[activeIndices[turnPos]]} is out!`);
       const newActive = activeIndices.slice();
       newActive.splice(turnPos, 1);
       if (newActive.length === 1) {
@@ -79,13 +87,14 @@ export default function App() {
       setTurnPos(newPos);
       startTimerForTurn();
     } else {
+      setNotice(`${names[activeIndices[turnPos]]} passed.`);
       advanceTurn();
     }
   }
 
+  // The current player keeps their turn — a fresh category isn't a reset.
   function handleNewCategory() {
-    setCategory(pickCategory());
-    setTurnPos(0);
+    setCategory(pickCategory(category));
     startTimerForTurn();
   }
 
@@ -109,16 +118,19 @@ export default function App() {
     const active = names.map((_, i) => i);
     setActiveIndices(active);
     setTurnPos(0);
-    setCategory(pickCategory());
+    setNotice("");
+    setCategory(pickCategory(category));
     setPhase("play");
     startTimerForTurn();
   }
 
   function handleNewGame() {
+    gameTimer.stop();
     usedIndices.reset();
     setPhase("setup");
   }
 
+  const stillIn = activeIndices.map((i) => names[i]);
   const currentName = names[activeIndices[turnPos]];
 
   return (
@@ -174,6 +186,12 @@ export default function App() {
       <Screen active={phase === "play"}>
         <CategoryBanner>🧠 Category: {category}</CategoryBanner>
         <TurnBanner>{currentName ? `🎙️ ${currentName}'s turn!` : null}</TurnBanner>
+        <div aria-live="polite">{notice && <TurnBanner>{notice}</TurnBanner>}</div>
+        {eliminationMode && stillIn.length > 1 && (
+          <p style={{ textAlign: "center", color: "var(--paper-dim)", fontSize: "0.85rem", margin: "0 0 1rem" }}>
+            Still in ({stillIn.length}): {stillIn.join(", ")}
+          </p>
+        )}
         {timerSetup.enabled && <GameTimer timer={gameTimer} />}
 
         <RevealCard footnote="Say something that fits the category out loud!" />

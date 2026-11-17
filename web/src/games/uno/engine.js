@@ -110,6 +110,15 @@ export function canPlay(card, state) {
   return false;
 }
 
+// canPlay plus the official Wild Draw Four restriction: it may only be played
+// while the hand holds no card of the colour currently in play. (The official
+// game settles bluffs with a challenge; with hands hidden we simply enforce it.)
+function legalFor(card, hand, state) {
+  if (!canPlay(card, state)) return false;
+  if (card.kind === KIND.WILD4) return !hand.some((c) => c.id !== card.id && c.colour === state.activeColour);
+  return true;
+}
+
 // Card ids this seat may legally play right now. Empty unless it's their
 // turn, no wild is awaiting a colour, and the game is still running.
 export function getPlayable(state, seatId) {
@@ -118,9 +127,22 @@ export function getPlayable(state, seatId) {
   const hand = state.hands[seatId] || [];
   if (state.drawnCardId) {
     const drawn = hand.find((c) => c.id === state.drawnCardId);
-    return canPlay(drawn, state) ? [drawn.id] : [];
+    return drawn && legalFor(drawn, hand, state) ? [drawn.id] : [];
   }
-  return hand.filter((c) => canPlay(c, state)).map((c) => c.id);
+  return hand.filter((c) => legalFor(c, hand, state)).map((c) => c.id);
+}
+
+// Official scoring values: numbers face value, Skip/Reverse/+2 = 20, wilds = 50.
+export function cardPoints(card) {
+  if (card.kind === KIND.NUMBER) return card.value;
+  return card.kind === KIND.WILD || card.kind === KIND.WILD4 ? 50 : 20;
+}
+
+// The winner scores the total of everyone else's remaining cards.
+export function roundScore(state, winnerId = state.winner) {
+  return state.seatOrder
+    .filter((id) => id !== winnerId)
+    .reduce((sum, id) => sum + state.hands[id].reduce((n, c) => n + cardPoints(c), 0), 0);
 }
 
 export function handFor(state, seatId) {
@@ -256,11 +278,13 @@ export function drawCard(state, seatId) {
 
   const drawn = drawMany(state, seatId, 1);
   const hand = drawn.hands[seatId];
-  const card = hand[hand.length - 1];
+  // Nothing left anywhere to draw: the hand is unchanged, so the "last card"
+  // is an old one and must not be mistaken for a fresh draw.
+  const card = hand.length > state.hands[seatId].length ? hand[hand.length - 1] : null;
   const next = { ...state, ...drawn };
 
   const event = withEvent(state, { kind: "draw", seatId, cardId: card ? card.id : null });
-  if (card && canPlay(card, next)) return { ...next, drawnCardId: card.id, lastEvent: event };
+  if (card && legalFor(card, hand, next)) return { ...next, drawnCardId: card.id, lastEvent: event };
   return { ...next, drawnCardId: null, turnIndex: step(next, 1), lastEvent: event };
 }
 

@@ -21,6 +21,7 @@ import {
   HandCoins,
   Dices,
   Clover,
+  Eye,
 } from "lucide-react";
 import { GameShell } from "../../shared/components/GameShell";
 import { Screen, ScreenTitle, ScreenSub, BigIcon, SetupBlock } from "../../shared/components/Screen";
@@ -132,6 +133,19 @@ function BonusGlyph({ type, size = 40 }) {
   return Glyph ? <Glyph size={size} strokeWidth={1.75} aria-hidden="true" /> : null;
 }
 
+// crypto.randomUUID only exists on secure origins (https/localhost); a party
+// hosted over plain http on a LAN address would otherwise crash on mount.
+function newTeamId() {
+  return globalThis.crypto?.randomUUID?.() ?? `t${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
+}
+
+// First "Team N" not already taken, so removing Team 1 and adding another
+// never produces a second "Team 2".
+function nextTeamName(teams) {
+  const taken = new Set(teams.map((t) => t.name));
+  for (let n = 1; ; n++) if (!taken.has(`Team ${n}`)) return `Team ${n}`;
+}
+
 function QuizScoreboard({ teams, onAdjust }) {
   return (
     <div className={rosterStyles.scoreboard}>
@@ -178,8 +192,8 @@ export default function App() {
       return [
         ...prev,
         {
-          id: crypto.randomUUID(),
-          name: name || `Team ${prev.length + 1}`,
+          id: newTeamId(),
+          name: name || nextTeamName(prev),
           score: 0,
           color: TEAM_COLORS[prev.length % TEAM_COLORS.length],
           perks: { double: false, freePass: false }
@@ -191,16 +205,18 @@ export default function App() {
     setTeams((prev) => (prev.length <= 1 ? prev : prev.filter((_, idx) => idx !== i)));
   }
   function renameTeam(i, name) {
-    setTeams((prev) => prev.map((t, idx) => (idx === i ? { ...t, name: name.trim() || `Team ${idx + 1}` } : t)));
+    setTeams((prev) => prev.map((t, idx) => (idx === i ? { ...t, name } : t)));
   }
   function adjustScore(i, delta) {
     setTeams((prev) => prev.map((t, idx) => (idx === i ? { ...t, score: t.score + delta } : t)));
   }
+  // Teams are matched by id, never by object identity: every score change
+  // makes a new team object, so a reference held across a render goes stale.
   function updateTeamScore(team, delta) {
-    setTeams((prev) => prev.map((t) => (t === team ? { ...t, score: t.score + delta } : t)));
+    setTeams((prev) => prev.map((t) => (t.id === team.id ? { ...t, score: t.score + delta } : t)));
   }
   function setTeamPerk(team, key, value) {
-    setTeams((prev) => prev.map((t) => (t === team ? { ...t, perks: { ...t.perks, [key]: value } } : t)));
+    setTeams((prev) => prev.map((t) => (t.id === team.id ? { ...t, perks: { ...t.perks, [key]: value } } : t)));
   }
 
   useEffect(() => {
@@ -234,6 +250,8 @@ export default function App() {
   const [outcome, setOutcome] = useState(null);
   const [outcomeTeam, setOutcomeTeam] = useState(null);
   const [missedTeams, setMissedTeams] = useState(() => new Set());
+  // The judge needs to see the answer *before* ruling on it, not only after.
+  const [answerShown, setAnswerShown] = useState(false);
 
   const [bonusEvent, setBonusEvent] = useState(null);
   const [bonusPickingTeam, setBonusPickingTeam] = useState(null);
@@ -284,7 +302,7 @@ export default function App() {
       const timedOut = timedOutIndex != null ? timedOutIndex : activeTeamIndex;
       if (idx === timedOut) return;
       const team = teams[idx];
-      if (missedTeams.has(team)) return;
+      if (missedTeams.has(team.id)) return;
       buzzLockRef.current = true;
       // Winning the buzz race isn't the same as answering correctly — the
       // phone only learns "You're up!" here. The real buzzResult (right /
@@ -321,7 +339,7 @@ export default function App() {
         sessionPlayers.forEach((p) => {
           if (!p.connected) return;
           const idx = indexOfTeamId(teams, p.teamId);
-          const eligible = idx !== -1 && idx !== timedOut && !missedTeams.has(teams[idx]);
+          const eligible = idx !== -1 && idx !== timedOut && !missedTeams.has(teams[idx].id);
           sendTo(
             p.playerId,
             view(
@@ -384,6 +402,8 @@ export default function App() {
   }
 
   function handleStart() {
+    // Names are kept raw while typing (so spaces can be typed); tidy them once here.
+    setTeams((prev) => prev.map((t, i) => ({ ...t, name: t.name.trim() || `Team ${i + 1}` })));
     setAnswered(new Set());
     setTurnIndex(0);
     generateBonusTiles();
@@ -416,6 +436,7 @@ export default function App() {
     setCurrentQuestion(question);
     setActiveTeamIndex(turnIndex);
     setQuestionPhase("answering");
+    setAnswerShown(false);
     setTimedOutIndex(null);
     setOutcome(null);
     setOutcomeTeam(null);
@@ -447,8 +468,8 @@ export default function App() {
   }
 
   function handleMiss(team) {
-    if (missedTeams.has(team)) return;
-    const nextMissed = new Set(missedTeams).add(team);
+    if (missedTeams.has(team.id)) return;
+    const nextMissed = new Set(missedTeams).add(team.id);
     setMissedTeams(nextMissed);
     const timedOut = timedOutIndex != null ? timedOutIndex : activeTeamIndex;
     const eligible = teams.filter((_, i) => i !== timedOut);
@@ -472,7 +493,7 @@ export default function App() {
       const pts = outcomeType !== "freepass" && team.perks.double ? currentPoints * 2 : currentPoints;
       setTeams((prev) =>
         prev.map((t) => {
-          if (t !== team) return t;
+          if (t.id !== team.id) return t;
           const next = { ...t, score: t.score + pts };
           if (outcomeType !== "freepass" && t.perks.double) next.perks = { ...t.perks, double: false };
           if (outcomeType === "freepass") next.perks = { ...next.perks, freePass: false };
@@ -484,7 +505,7 @@ export default function App() {
       const pts = team.perks.double ? currentPoints * 2 : currentPoints;
       setTeams((prev) =>
         prev.map((t) =>
-          t === team ? { ...t, score: t.score + pts, perks: t.perks.double ? { ...t.perks, double: false } : t.perks } : t
+          t.id === team.id ? { ...t, score: t.score + pts, perks: t.perks.double ? { ...t.perks, double: false } : t.perks } : t
         )
       );
       const timedOut = timedOutIndex != null ? timedOutIndex : activeTeamIndex;
@@ -567,8 +588,8 @@ export default function App() {
     const stealAmt = Math.min(150, Math.max(0, targetTeam.score));
     setTeams((prev) =>
       prev.map((t) => {
-        if (t === targetTeam) return { ...t, score: t.score - stealAmt };
-        if (t === pickingTeam) return { ...t, score: t.score + stealAmt };
+        if (t.id === targetTeam.id) return { ...t, score: t.score - stealAmt };
+        if (t.id === pickingTeam.id) return { ...t, score: t.score + stealAmt };
         return t;
       })
     );
@@ -615,8 +636,9 @@ export default function App() {
       return;
     }
     const { ranked, tied, winner } = resolveStanding(teams);
-    if (tied.length <= 1) {
-      setResult({ ranked, winner, shared: false, tiebreak: null });
+    // Everyone level on zero or less means nobody won anything — no tie-breaker.
+    if (tied.length <= 1 || ranked[0].score <= 0) {
+      setResult({ ranked, winner: winner && winner.score > 0 ? winner : null, shared: false, tiebreak: null });
       setPhase("results");
     } else {
       setPendingRanked(ranked);
@@ -670,7 +692,7 @@ export default function App() {
             steps={[
               <>Pick a theme and add your teams below, then tap <strong>Start Quiz</strong>.</>,
               "Whoever's turn it is calls out a category and point value shown in the turn banner, and taps that tile.",
-              <>Read the question out loud, then mark it <strong><Ico icon={Check} /> Correct</strong> or <strong><Ico icon={X} /> Incorrect</strong>. A correct answer keeps the turn — an incorrect one passes it to the next team.</>,
+              <>Read the question out loud (tap <strong>Show answer</strong> if the judge needs it), then mark it <strong><Ico icon={Check} /> Correct</strong> or <strong><Ico icon={X} /> Incorrect</strong>. A correct answer keeps the turn — an incorrect one passes it to the next team.</>,
               <>If the timer runs out before anyone answers, a <strong>10-second steal</strong> opens for everyone else — first to answer right steals the points and the turn.</>,
               <>Watch for <strong><Ico icon={Star} /> BONUS</strong> tiles — they trigger a surprise event instead of a question.</>,
               "When the board is empty, the final results appear on their own."
@@ -809,7 +831,7 @@ export default function App() {
 
       {overlayOpen && (
         <div className={styles.overlay}>
-          <div className={styles.questionCard}>
+          <div className={styles.questionCard} role="dialog" aria-modal="true" aria-label="Question">
             {!isBonus && (
               <>
                 <span className={styles.qMeta}>{currentCategory?.name} · {currentPoints} pts</span>
@@ -828,7 +850,14 @@ export default function App() {
                   </div>
                 )}
                 <p className={styles.qText}>{currentQuestion?.q}</p>
-                {questionPhase === "resolved" && <AnswerBlock label="Answer" text={currentQuestion?.a} />}
+                {(questionPhase === "resolved" || answerShown) && <AnswerBlock label="Answer" text={currentQuestion?.a} />}
+                {questionPhase !== "resolved" && !answerShown && (
+                  <div className={styles.showAnswerBtn}>
+                    <Button variant="secondary" onClick={() => setAnswerShown(true)}>
+                      <Ico icon={Eye} /> Show answer (for the judge)
+                    </Button>
+                  </div>
+                )}
 
                 {questionPhase === "answering" && activeTeam && (
                   <div className={styles.awardRow}>
@@ -889,7 +918,7 @@ export default function App() {
                   <div className={styles.awardRow}>
                     {eligibleSteal.map((team, i) => {
                       const pts = team.perks.double ? currentPoints * 2 : currentPoints;
-                      const isMissed = missedTeams.has(team);
+                      const isMissed = missedTeams.has(team.id);
                       return (
                         <Fragment key={i}>
                           <button
@@ -915,7 +944,7 @@ export default function App() {
 
                 {questionPhase === "resolved" && (
                   <>
-                    <p className={`${styles.qOutcome} ${OUTCOME_CLASSES[outcome] || ""}`.trim()}>
+                    <p className={`${styles.qOutcome} ${OUTCOME_CLASSES[outcome] || ""}`.trim()} role="status">
                       {outcome && OUTCOME_META[outcome] && <Ico icon={OUTCOME_META[outcome].icon} size={17} />}{" "}
                       {outcome === "stolen"
                         ? `Stolen by ${outcomeTeam ? outcomeTeam.name : ""}!`
@@ -947,7 +976,7 @@ export default function App() {
                     {bonusMessage && <p className={styles.bonusResult}>{bonusMessage}</p>}
                     {bonusInteractiveType === "steal" &&
                       teams
-                        .filter((t) => t !== bonusPickingTeam)
+                        .filter((t) => t.id !== bonusPickingTeam?.id)
                         .map((t, i) => (
                           <button key={i} type="button" className={styles.awardBtn} onClick={() => handleBonusSteal(t)}>
                             <span className={styles.sw} style={{ background: t.color }} />

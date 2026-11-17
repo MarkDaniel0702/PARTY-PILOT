@@ -9,7 +9,7 @@ import { Roster } from "../../shared/components/Roster";
 import { TimerSetup } from "../../shared/components/TimerSetup";
 import { GameTimer } from "../../shared/components/GameTimer";
 import { PassCard } from "../../shared/components/PassCard";
-import { RevealCard, TurnBanner } from "../../shared/components/RevealCard";
+import { RevealCard, TurnBanner, ProgressDots } from "../../shared/components/RevealCard";
 import { CompletionChime } from "../../shared/components/CompletionChime";
 import { useRoster } from "../../shared/hooks/useRoster";
 import { useTimerSetup } from "../../shared/hooks/useTimerSetup";
@@ -105,8 +105,8 @@ export default function App() {
             <>Pick a category and add your players, then tap <strong>Start</strong>.</>,
             <>Each player gets a secret character — held up for the <strong>group</strong> to see, not the player themselves.</>,
             "The player asks yes-or-no questions out loud to guess who they are, while the group answers.",
-            <>Tap <strong>Got It!</strong> when they guess right, or let the timer run out.</>,
-            "The turn passes automatically to the next player."
+            <>Tap <strong>Got It!</strong> when they guess right, or <strong>Reveal &amp; Skip</strong> to give up. If the timer hits zero the turn ends by itself.</>,
+            "Everyone gets one turn, in order — the turn passes automatically."
           ]}
         />
 
@@ -144,14 +144,15 @@ export default function App() {
       </Screen>
 
       <Screen active={phase === "pass"}>
+        <ProgressDots current={turnIndex} total={names.length} />
         <TurnBanner>{lastResult}</TurnBanner>
         <PassCard
           icon="🙈"
-          title="It's"
+          title="Up next"
           name={currentName}
           hint={
             <>
-              's turn! Everyone <strong>else</strong> should be watching — {currentName}, look away.
+              {currentName}, look away! Everyone <strong>else</strong> gather round and watch the screen.
             </>
           }
           buttonLabel="They've Looked Away — Show Everyone"

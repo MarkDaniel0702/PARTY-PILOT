@@ -333,7 +333,15 @@
   max-width: 360px;
   align-items: stretch;
   --seat: var(--accent);
+  /* The phone is a controller: no scroll, pinch or double-tap zoom while
+     playing, and no text-selection or callout on long presses. */
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  overscroll-behavior: contain;
 }
+.phoneHint { margin: 0; text-align: center; font-size: 0.7rem; color: var(--paper-dim); }
 .phoneStats {
   display: flex;
   align-items: center;

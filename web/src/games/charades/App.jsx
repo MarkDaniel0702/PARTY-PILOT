@@ -9,7 +9,7 @@ import { Roster } from "../../shared/components/Roster";
 import { TimerSetup } from "../../shared/components/TimerSetup";
 import { GameTimer } from "../../shared/components/GameTimer";
 import { PassCard } from "../../shared/components/PassCard";
-import { RevealCard, TurnBanner } from "../../shared/components/RevealCard";
+import { RevealCard, TurnBanner, ProgressDots } from "../../shared/components/RevealCard";
 import { ResultsList } from "../../shared/components/ResultsList";
 import { TieBreakerScreen } from "../../shared/components/TieBreakerScreen";
 import { useRoster } from "../../shared/hooks/useRoster";
@@ -102,7 +102,8 @@ export default function App() {
   function showSummary(scoresSnapshot) {
     const entrants = names.map((name, i) => ({ name, score: scoresSnapshot[i] }));
     const { ranked, tied, winner } = resolveStanding(entrants);
-    if (tied.length <= 1) {
+    // Nobody scored: a "tie" at 0 isn't worth a tie-breaker, just show results.
+    if (tied.length <= 1 || ranked[0].score === 0) {
       setResult({ ranked, winner: finalizeWinner(winner), shared: false, tiebreak: null });
       setPhase("summary");
     } else {
@@ -118,7 +119,7 @@ export default function App() {
   }
 
   function handlePlayAgain() {
-    usedIndices.reset();
+    // Don't reset usedIndices: words already played stay out until the pool is exhausted.
     setScores(names.map(() => 0));
     setTurnIndex(0);
     setLastResult("");
@@ -141,8 +142,8 @@ export default function App() {
             <>Pick a category and add your players, then tap <strong>Start</strong>.</>,
             "Each turn, one player privately sees a secret word or phrase and acts it out — no talking!",
             <>The group shouts out guesses. Anyone taps <strong>Correct!</strong> the moment it's guessed.</>,
-            <>If time runs out first, tap <strong>Skip</strong> and the next player goes.</>,
-            "Correct rounds score a point for the actor — totally optional, just for fun."
+            <>Can't act it out? Tap <strong>Skip</strong>. If the timer hits zero the turn ends by itself and the next player goes.</>,
+            "Everyone gets exactly one turn. A correct guess scores a point for the actor — most points wins."
           ]}
         />
 
@@ -180,6 +181,7 @@ export default function App() {
       </Screen>
 
       <Screen active={phase === "pass"}>
+        <ProgressDots current={turnIndex} total={names.length} />
         <TurnBanner>{lastResult}</TurnBanner>
         <PassCard
           icon="🎭"
@@ -193,7 +195,7 @@ export default function App() {
 
       <Screen active={phase === "act"}>
         <ScreenSub>
-          <strong>{names[turnIndex]}</strong>, act this out — no talking or spelling!
+          <strong>{names[turnIndex]}</strong>, act this out — no talking or spelling! Everyone else shout your guesses.
         </ScreenSub>
         {timerSetup.enabled && <GameTimer timer={gameTimer} />}
         <RevealCard label="ACT THIS OUT" text={currentWord} />

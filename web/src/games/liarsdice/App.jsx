@@ -246,7 +246,7 @@ export default function App() {
           steps={[
             <>Add players below, then tap <strong>Deal</strong>. Pair phones to keep every roll private, or skip it and pass the device.</>,
             "Everyone rolls their own dice in secret. Take turns bidding on how many dice of one face are on the WHOLE table — yours and everyone else's.",
-            <>Each bid must beat the last: <strong>more dice</strong>, or the <strong>same number of a higher face</strong>. Think "at least four 3s".</>,
+            <>Each bid must beat the last: <strong>more dice</strong>, or the <strong>same number of a higher face</strong> (ones rank lowest). Think "at least four 3s". You can never bid more dice than are on the table.</>,
             <>Think the last bid is a lie? Call <strong>Liar!</strong> Every die is revealed — if the bid was true, the challenger loses a die; if not, the bidder does.</>,
             <>Ones are <strong>wild</strong> and count as any face (unless the bid is on ones themselves) — you can switch this off.</>,
             "Whoever loses a die opens the next round. Lose all your dice and you're out; the last player left wins."

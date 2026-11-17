@@ -19,6 +19,9 @@ export const TEAMS = [
 export const MAX_HP = 100;
 export const FALL_DAMAGE_PER_PX = 0.35;
 export const SAFE_FALL = 40;
+// Walking is a nudge into position, not a way to cross the map: each turn gets
+// a fixed number of steps (MOVE_STEP px each).
+export const MAX_MOVES = 60;
 
 export function createMatch({
   battlefieldId = "hills",
@@ -51,7 +54,10 @@ export function createMatch({
     battlefield: def,
     characters,
     turnTeamIndex: 0,
+    // Index, within each team's full roster, of the member who acts on that
+    // team's next turn. Dead members are skipped when it is read.
     activeByTeam: { dogs: 0, cats: 0 },
+    moved: 0, // walking steps spent this turn
     wind: rollWind(rng),
     phase: "aim", // aim | flying | resolve | over
     lastShot: null,
@@ -69,12 +75,20 @@ export function aliveOf(state, teamId) {
   return teamOf(state, teamId).filter((c) => c.alive);
 }
 
+// First living member of a team at or after roster slot `from` (wrapping).
+function rosterPick(state, teamId, from) {
+  const roster = teamOf(state, teamId);
+  for (let i = 0; i < roster.length; i++) {
+    const c = roster[(((from + i) % roster.length) + roster.length) % roster.length];
+    if (c.alive) return { c, slot: roster.indexOf(c) };
+  }
+  return null;
+}
+
 export function activeCharacter(state) {
   const team = TEAMS[state.turnTeamIndex];
-  const alive = aliveOf(state, team.id);
-  if (alive.length === 0) return null;
-  const idx = state.activeByTeam[team.id] % alive.length;
-  return alive[idx];
+  const pick = rosterPick(state, team.id, state.activeByTeam[team.id] || 0);
+  return pick ? pick.c : null;
 }
 
 function damageAt(characters, cx, cy, weapon) {
@@ -117,6 +131,12 @@ function checkWinner(state) {
  */
 export function fire(state, { weaponId, angle, power }) {
   if (state.phase !== "aim") return { state, shot: null };
+  // Angle and power can come straight off a phone: NaN, a string or Infinity
+  // would otherwise produce a shell with a NaN path that never lands.
+  angle = Number(angle);
+  power = Number(power);
+  if (!Number.isFinite(angle) || !Number.isFinite(power)) return { state, shot: null };
+  power = Math.max(0, Math.min(100, power));
   const shooter = activeCharacter(state);
   if (!shooter) return { state, shot: null };
 
@@ -191,16 +211,27 @@ export function endTurn(state) {
   if (state.phase === "over") return state;
   const nextTeamIndex = (state.turnTeamIndex + 1) % TEAMS.length;
   const nextTeam = TEAMS[nextTeamIndex];
-  const alive = aliveOf(state, nextTeam.id);
-  if (alive.length === 0) return withWinner(state);
+  if (aliveOf(state, nextTeam.id).length === 0) return withWinner(state);
+
+  // The pointer is kept equal to whoever is acting (even if they have just
+  // died), so the team that played moves on to the living member *after* them,
+  // and the team coming up has its pointer pinned to its first living member.
+  // Counting through the living only (the old behaviour) skipped or repeated
+  // people whenever someone died in between.
+  const prev = TEAMS[state.turnTeamIndex];
+  const prevSlot = state.activeByTeam[prev.id] || 0;
+  const advanced = rosterPick(state, prev.id, prevSlot + 1);
+  const upNext = rosterPick(state, nextTeam.id, state.activeByTeam[nextTeam.id] || 0);
 
   return {
     ...state,
     turnTeamIndex: nextTeamIndex,
     activeByTeam: {
       ...state.activeByTeam,
-      [nextTeam.id]: (state.activeByTeam[nextTeam.id] + 1) % Math.max(1, alive.length)
+      [prev.id]: advanced ? advanced.slot : prevSlot,
+      [nextTeam.id]: upNext.slot
     },
+    moved: 0,
     wind: rollWind(state.rng),
     phase: "aim",
     lastShot: null
@@ -215,6 +246,7 @@ export function moveActive(state, direction) {
   if (state.phase !== "aim") return state;
   const actor = activeCharacter(state);
   if (!actor) return state;
+  if ((state.moved || 0) >= MAX_MOVES) return state;
 
   const targetX = actor.x + direction * MOVE_STEP;
   if (targetX < 2 || targetX > state.terrain.width - 2) return state;
@@ -228,10 +260,15 @@ export function moveActive(state, direction) {
   if (isSolid(state.terrain, targetX, startY)) return state;
   const landing = settle(state.terrain, targetX, startY);
   if (landing.lost) return state;
+  // Walking off a ledge is fine, jumping off a cliff is not: a drop that would
+  // hurt is refused, so you can't dodge fall damage by strolling down instead
+  // of being blasted down.
+  if (landing.fell - MAX_CLIMB > SAFE_FALL) return state;
   const bestY = landing.y;
 
   return {
     ...state,
+    moved: (state.moved || 0) + 1,
     characters: state.characters.map((c) => (c.id === actor.id ? { ...c, x: targetX, y: bestY } : c))
   };
 }

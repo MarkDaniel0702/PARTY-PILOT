@@ -14,7 +14,7 @@ import {
   findSpawns
 } from "./terrain";
 import { simulateShot, launchVelocity, blastDamage, distance, rollWind, GRAVITY } from "./physics";
-import { createMatch, fire, endTurn, moveActive, activeCharacter, aliveOf, TEAMS, MAX_HP } from "./engine";
+import { createMatch, fire, endTurn, moveActive, activeCharacter, aliveOf, TEAMS, MAX_HP, MAX_MOVES, SAFE_FALL } from "./engine";
 import { WEAPONS, weaponById } from "./weapons";
 
 // A flat slab of ground across the bottom third — predictable for physics.
@@ -457,5 +457,94 @@ describe("a character buried in the ground", () => {
     const { state } = fire(setupState, { weaponId: "whack", angle: 0, power: 0 });
     const victim = state.characters.find((c) => c.id !== shooter.id);
     expect(isSolid(t, victim.x, victim.y)).toBe(false);
+  });
+});
+
+describe("audit regressions", () => {
+  const kill = (m, id) => ({ ...m, characters: m.characters.map((c) => (c.id === id ? { ...c, hp: 0, alive: false } : c)) });
+  const actorId = (m) => activeCharacter(m).id;
+
+  it("both teams start with their first member, then rotate in roster order", () => {
+    let m = createMatch({ perTeam: 3, seed: 8 });
+    const seen = [];
+    for (let i = 0; i < 6; i++) {
+      seen.push(actorId(m));
+      m = endTurn(m);
+    }
+    expect(seen).toEqual(["dogs-0", "cats-0", "dogs-1", "cats-1", "dogs-2", "cats-2"]);
+  });
+
+  it("skips a dead teammate without skipping or repeating a living one", () => {
+    let m = createMatch({ perTeam: 3, seed: 8 });
+    m = endTurn(m); // cats up
+    m = kill(m, "dogs-1");
+    m = endTurn(m); // dogs up: dogs-1 is dead, so dogs-2
+    expect(actorId(m)).toBe("dogs-2");
+    m = endTurn(endTurn(m));
+    expect(actorId(m)).toBe("dogs-0");
+  });
+
+  it("when the shooter dies on their own turn, the next teammate in line is up next (nobody is skipped)", () => {
+    let m = createMatch({ perTeam: 3, seed: 8 });
+    expect(actorId(m)).toBe("dogs-0");
+    m = kill(m, "dogs-0"); // the shooter blew themselves up
+    m = endTurn(endTurn(m)); // cats, then dogs again
+    expect(actorId(m)).toBe("dogs-1");
+  });
+
+  it("refuses a shot with a non-numeric angle or power instead of flying NaN forever", () => {
+    const m = createMatch({ seed: 8 });
+    for (const bad of [{ angle: NaN, power: 50 }, { angle: 45, power: "abc" }, { angle: Infinity, power: 50 }]) {
+      const r = fire(m, { weaponId: "bazooka", ...bad });
+      expect(r.shot).toBeNull();
+      expect(r.state).toBe(m);
+    }
+  });
+
+  it("every shot finishes: the path is finite and bounded", () => {
+    const m = createMatch({ seed: 8 });
+    for (const [angle, power] of [[90, 100], [0, 100], [180, 100], [89, 10]]) {
+      const { shot } = fire(m, { weaponId: "lobber", angle, power });
+      expect(shot.path.length).toBeLessThan(1500);
+      expect(shot.path.every(([x, y]) => Number.isFinite(x) && Number.isFinite(y))).toBe(true);
+    }
+  });
+
+  it("limits walking to a fixed number of steps per turn, refilled next turn", () => {
+    let m = createMatch({ battlefieldId: "hills", perTeam: 1, seed: 8 });
+    let steps = 0;
+    for (let i = 0; i < MAX_MOVES + 20; i++) {
+      const next = moveActive(m, i % 2 ? -1 : 1); // shuffle back and forth so walls/edges can't be the limit
+      if (next !== m) steps++;
+      m = next;
+    }
+    expect(steps).toBeLessThanOrEqual(MAX_MOVES);
+    expect(m.moved).toBeLessThanOrEqual(MAX_MOVES);
+    const refused = moveActive(m, 1);
+    if (m.moved >= MAX_MOVES) expect(refused).toBe(m);
+    expect(endTurn(m).moved).toBe(0);
+  });
+
+  it("will not stroll off a cliff taller than a safe fall", () => {
+    const m = createMatch({ perTeam: 1, seed: 8 });
+    const t = createTerrain(TERRAIN_W, TERRAIN_H);
+    for (let x = 0; x < t.width; x++) {
+      const top = x < 300 ? 150 : 150 + SAFE_FALL + 60;
+      for (let y = top; y < t.height; y++) t.mask[y * t.width + x] = 1;
+    }
+    const ledge = {
+      ...m,
+      terrain: t,
+      characters: m.characters.map((c) => (c.teamId === "dogs" ? { ...c, x: 298, y: 149 } : c))
+    };
+    expect(moveActive(ledge, 1)).toBe(ledge);
+    // A gentle drop is still fine.
+    const t2 = createTerrain(TERRAIN_W, TERRAIN_H);
+    for (let x = 0; x < t2.width; x++) {
+      const top = x < 300 ? 150 : 150 + 20;
+      for (let y = top; y < t2.height; y++) t2.mask[y * t2.width + x] = 1;
+    }
+    const step = { ...ledge, terrain: t2 };
+    expect(moveActive(step, 1)).not.toBe(step);
   });
 });
